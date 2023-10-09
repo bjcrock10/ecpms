@@ -28,13 +28,13 @@ export const useSimpleMenuStore = defineStore("simpleMenu", {
       },
       { 
         icon: "Activity",
-        pageName: "side-menu-reports",
-        title: "Report",
+        pageName: "side-menu-to",
+        title: "Travel Order",
       },
       { 
         icon: "Activity",
-        pageName: "side-menu-to",
-        title: "Travel Order",
+        pageName: "side-menu-reports",
+        title: "Report",
       },
       {
         icon: "Github",

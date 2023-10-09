@@ -26,6 +26,16 @@ export const useTopMenuStore = defineStore("topMenu", {
         pageName: "side-menu-clients",
         title: "Client",
       },
+      { 
+        icon: "Activity",
+        pageName: "side-menu-to",
+        title: "Travel Order",
+      },
+      { 
+        icon: "Activity",
+        pageName: "side-menu-reports",
+        title: "Report",
+      },
       {
         icon: "Github",
         pageName: "side-menu-page-2",

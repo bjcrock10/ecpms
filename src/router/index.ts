@@ -17,7 +17,7 @@ import TOProfile from "../pages/travelorder/Profile.vue";
 const routes = [
   {
     path: "/home",
-    component: SimpleMenu,
+    component: TopMenu,
     children: [
       {
         path: "/dashboard",
