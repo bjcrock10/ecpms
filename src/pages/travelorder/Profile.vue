@@ -236,26 +236,26 @@ onMounted(async ()=>{
       <!-- BEGIN: HTML Table Data -->
     <div class="grid grid-cols-12 gap-5 mt-5 intro-y">
         <div class="col-span-12 intro-y lg:col-span-4">
-            <form class="validate-form" @submit.prevent="onSubmit">
+            <form class="validate-form" @submit="onSubmit">
                 <div class="grid grid-cols-12 gap-5 mt-5 intro-y">
                     <div class="col-span-12 sm:col-span-12">
                         <FormLabel htmlFor="modal-form-3"> TO Number </FormLabel>
-                        <FormInput type="text" v-model="formTO.toNo" class="col-span-12 sm:col-span-6" required />
+                        <FormInput type="text" v-model="formTO.toNo" class="col-span-12 sm:col-span-6" required :disabled="(office==='RO' && formTO.status==='For Approval')?false:true"/>
                     </div>
                     <div class="col-span-4 sm:col-span-12">
                         <FormLabel htmlFor="modal-form-3"> TO Date </FormLabel>
-                        <FormInput type="date" v-model="formTO.toDate" class="col-span-12 sm:col-span-6" required />
+                        <FormInput type="date" v-model="formTO.toDate" class="col-span-12 sm:col-span-6" required :disabled="(formTO.status!=='For Approval')?true:false"/>
                     </div>
                     <div class="col-span-12 sm:col-span-12">
                         <FormLabel htmlFor="modal-form-3">Purpose</FormLabel>
                         <!-- <ClassicEditor v-model="formTO.purpose" /> -->
-                        <FormInput type="text" v-model="formTO.purpose" class="col-span-12 sm:col-span-6" required />
+                        <FormInput type="text" v-model="formTO.purpose" class="col-span-12 sm:col-span-6" required :disabled="(formTO.status!=='For Approval')?true:false"/>
                     </div>
                     <div class="col-span-12 sm:col-span-12">
                         <FormLabel htmlFor="modal-form-3"> PO Scanned URL</FormLabel>
                         <div class="grid grid-cols-12 gap-5 mt-5 intro-y">
                           <div class="col-span-11 sm:col-span-11">
-                            <FormInput type="url" v-model="formTO.poAttachment" class="col-span-12 sm:col-span-6" required />
+                            <FormInput type="url" v-model="formTO.poAttachment" class="col-span-12 sm:col-span-6" required :disabled="(formTO.status!=='For Approval')?true:false"/>
                           </div>
                           <div class="col-span-1 sm:col-span-1">
                             <Button type="button" class="-ml-5 bg-primary" 
@@ -267,11 +267,11 @@ onMounted(async ()=>{
                         </div>
                           
                     </div>
-                    <div class="col-span-12 sm:col-span-12" v-if="office==='RO'">
+                    <div class="col-span-12 sm:col-span-12" >
                         <FormLabel htmlFor="modal-form-3"> RO Scanned URL </FormLabel>
                         <div class="grid grid-cols-12 gap-5 mt-5 intro-y">
                           <div class="col-span-11 sm:col-span-11">
-                            <FormInput type="url" v-model="formTO.roAttachment" class="col-span-12 sm:col-span-6" :required="(formTO.status==='Approved')?true:false" />
+                            <FormInput type="url" v-model="formTO.roAttachment" class="col-span-12 sm:col-span-6" :disabled="(office==='RO')?false:true" :required="(formTO.status!=='For Approval')?true:false" />
                           </div>
                           <div class="col-span-1 sm:col-span-1">
                             <Button type="button" class="-ml-5 bg-primary" 
@@ -390,7 +390,7 @@ onMounted(async ()=>{
                     :options="{
                     placeholder: 'Select item below. If others please specify.',
                     }"
-                    class="w-full" required
+                    class="w-full" required :disabled="(formTO.status!=='For Approval')?true:false"
                 >
                     <option v-for="item in employeeList" :value="item['id']" :key="item['id']">{{item['lname']+', '+item['fname']}}</option>
                     <option :value="formTODetail.userId">{{formTODetail.fullName}}</option>
@@ -406,6 +406,7 @@ onMounted(async ()=>{
                         @focus="showSearchBrgy"
                         @blur="hideSearchBrgy"
                         v-model="addressSelect.addressName"
+                        :disabled="(formTO.status!=='For Approval')?true:false"
                       />
                   </div>
                     <TransitionRoot
@@ -437,25 +438,25 @@ onMounted(async ()=>{
             </div>
             <div class="col-span-12 md:col-span-6">
                 <FormLabel htmlFor="modal-form-3">No. of Days</FormLabel>
-                <FormInput type="number" v-model="formTODetail.noOfDay" class="col-span-12 sm:col-span-6" required />
+                <FormInput type="number" v-model="formTODetail.noOfDay" class="col-span-12 sm:col-span-6" required :disabled="(formTO.status!=='For Approval')?true:false" />
             </div>
             <div class="col-span-12 md:col-span-6">
                 <FormLabel htmlFor="modal-form-3">Travel Expense</FormLabel>
-                <FormInput type="text" v-model="formTODetail.travelExpense" class="col-span-12 sm:col-span-6" required />
+                <FormInput type="text" v-model="formTODetail.travelExpense" class="col-span-12 sm:col-span-6" required :disabled="(formTO.status!=='For Approval')?true:false"/>
             </div>
             <div class="col-span-12 md:col-span-6">
                 <FormLabel htmlFor="modal-form-3">Departure Month</FormLabel>
-                <FormInput type="month" v-model="formTODetail.departureMonth" class="col-span-12 sm:col-span-6" required />
+                <FormInput type="month" v-model="formTODetail.departureMonth" class="col-span-12 sm:col-span-6" required :disabled="(formTO.status!=='For Approval')?true:false"/>
             </div>
             <div class="col-span-12 md:col-span-6">
                 <FormLabel htmlFor="modal-form-3">Arrival Month</FormLabel>
-                <FormInput type="month" v-model="formTODetail.arrivalMonth" class="col-span-12 sm:col-span-6" required />
+                <FormInput type="month" v-model="formTODetail.arrivalMonth" class="col-span-12 sm:col-span-6" required :disabled="(formTO.status!=='For Approval')?true:false"/>
             </div>
-            <div class="col-span-4 sm:col-span-12" v-if="formTO.status==='Approved'">
+            <div class="col-span-4 sm:col-span-12" v-if="formTO.status!=='For Approval'">
               <FormLabel htmlFor="modal-form-3"> CA Scanned URL</FormLabel>
               <div class="grid grid-cols-12 gap-5 mt-5 intro-y">
                 <div class="col-span-11 sm:col-span-11">
-                  <FormInput type="url" v-model="formTODetail.certificateOfAppearance" class="col-span-12 sm:col-span-6"  :required="(formTO.status==='Approved')?true:false"/>
+                  <FormInput type="url" v-model="formTODetail.certificateOfAppearance" class="col-span-12 sm:col-span-6"  :required="(formTO.status!=='For Approval')?true:false"/>
                 </div>
                 <div class="col-span-1 sm:col-span-1">
                   <Button type="button" class="-ml-5 bg-primary" 
@@ -468,7 +469,7 @@ onMounted(async ()=>{
             </div>
             <div class="col-span-12 md:col-span-12">
                 <FormLabel htmlFor="modal-form-3">Inclusive Date</FormLabel>
-                <ClassicEditor v-model="formTODetail.inclusiveDate" />
+                <ClassicEditor v-model="formTODetail.inclusiveDate" :disabled="(formTO.status!=='For Approval')?true:false"/>
             </div>
 
         </div>

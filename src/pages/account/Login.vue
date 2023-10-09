@@ -96,7 +96,7 @@ const onSubmit = async () => {
         <div class="flex-col hidden min-h-screen xl:flex">
           <div class="my-auto">
             <img
-              alt="CFIPD Template"
+              alt="ECPMS Template"
               class="w-64 -mt-16 -intro-y ml-16"
               :src="illustrationUrl"
             />
@@ -113,7 +113,8 @@ const onSubmit = async () => {
         <div class="flex h-screen py-5 my-10 xl:h-auto xl:py-0 xl:my-0">
           <div
             class="w-full px-5 py-8 mx-auto my-auto bg-white rounded-md shadow-md xl:ml-20 dark:bg-darkmode-600 xl:bg-transparent sm:px-8 xl:p-0 xl:shadow-none sm:w-3/4 lg:w-2/4 xl:w-auto"
-          >
+          
+            >
             <h2
               class="text-2xl font-bold text-center intro-x xl:text-3xl xl:text-left"
             >
