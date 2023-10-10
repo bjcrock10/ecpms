@@ -105,7 +105,10 @@ const onSubmit = async () => {
       messageDetail.value = "You successfully created new TO"
       router.push({path: `/toprofile/${response.data.id}`});
       toId.value = response.data.id
-    })
+    }).catch((e:Error)=>{
+      successNotification.value.showToast();
+      messageDetail.value = e.message
+    });
   }
   else{
     formTO.office = office.value;
@@ -114,6 +117,9 @@ const onSubmit = async () => {
       formTODetail.toNo = response.data.toNo
       successNotification.value.showToast();
       messageDetail.value = "You successfully updated TO number: " + response.data.toNo
+    }).catch((e:Error)=>{
+      successNotification.value.showToast();
+      messageDetail.value = e.message
     });
   }
 }
