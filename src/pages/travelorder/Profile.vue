@@ -251,7 +251,7 @@ onMounted(async ()=>{
                 <div class="grid grid-cols-12 gap-5 mt-5 intro-y">
                     <div class="col-span-12 sm:col-span-12">
                         <FormLabel htmlFor="modal-form-3"> TO Number </FormLabel>
-                        <FormInput type="text" v-model="formTO.toNo" class="col-span-12 sm:col-span-6" required :disabled="(office==='RO' && formTO.status==='For Approval')?false:true"/>
+                        <FormInput type="text" v-model="formTO.toNo" class="col-span-12 sm:col-span-6" required :disabled="(formTO.status==='For Approval')?false:true"/>
                     </div>
                     <div class="col-span-4 sm:col-span-12">
                         <FormLabel htmlFor="modal-form-3"> TO Date </FormLabel>
