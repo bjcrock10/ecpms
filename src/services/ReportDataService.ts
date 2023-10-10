@@ -12,6 +12,9 @@ class ReportDataService {
     getAllClientAssistance(): Promise<any> {
         return http.get("/clientassistance/?id=1");
     }
+    getAllToReport(): Promise<any> {
+      return http.get("/traveldetail/?rpt=1");
+    }
   }
   
   export default new ReportDataService();

@@ -112,10 +112,37 @@ export function useBusinessReport(){
             }
         ],
     }
+    const slicerTO = {
+        "reportFilters": [
+            {
+                "uniqueName": "departureMonth.Month"
+            }
+        ],
+        "rows": [
+            {
+                "uniqueName": "office"
+            },
+            {
+                "uniqueName": "fullName"
+            }
+        ],
+        "columns": [
+            {
+                "uniqueName": "Measures"
+            }
+        ],
+        "measures": [
+            {
+                "uniqueName": "city",
+                "aggregation": "count"
+            },
+        ],
+    }
     return{
         slicer,
         slicerBusinessAssistance,
         slicerClientAssistance,
+        slicerTO,
         businessData,
     } 
 }

@@ -103,6 +103,8 @@ const onSubmit = async () => {
       getTOInfo(response.data.id);
       successNotification.value.showToast();
       messageDetail.value = "You successfully created new TO"
+      router.push({path: `/toprofile/${response.data.id}`});
+      toId.value = response.data.id
     })
   }
   else{
@@ -224,10 +226,7 @@ onMounted(async ()=>{
             </Menu.Button>
             <Menu.Items class="w-40">
               <Menu.Item>
-                <Lucide icon="FilePlus" class="w-4 h-4 mr-2" /> New Category
-              </Menu.Item>
-              <Menu.Item>
-                <Lucide icon="UserPlus" class="w-4 h-4 mr-2" /> New Group
+                <a href="https://drive.google.com/drive/folders/1SvUGlFvJcNdBNk4P9Mu9KN8K4wmURVII?usp=drive_link" target="__blank"><Lucide icon="FilePlus" class="w-4 h-4 mr-2" /> Upload Files</a>
               </Menu.Item>
             </Menu.Items>
           </Menu>
@@ -236,7 +235,7 @@ onMounted(async ()=>{
       <!-- BEGIN: HTML Table Data -->
     <div class="grid grid-cols-12 gap-5 mt-5 intro-y">
         <div class="col-span-12 intro-y lg:col-span-4">
-            <form class="validate-form" @submit="onSubmit">
+            <form class="validate-form" @submit.prevent="onSubmit">
                 <div class="grid grid-cols-12 gap-5 mt-5 intro-y">
                     <div class="col-span-12 sm:col-span-12">
                         <FormLabel htmlFor="modal-form-3"> TO Number </FormLabel>
@@ -307,7 +306,7 @@ onMounted(async ()=>{
                     <Button class="mr-2 shadow-md" as="addNew" href="#" variant="primary" @click="(event: MouseEvent) => {
                         event.preventDefault();
                         setAddModal(true);
-                        resetFields();}" v-if="toId!=='0'">
+                        resetFields();}" v-if="toId!=='0' && formTO.status==='For Approval'">
                         <Lucide icon="PlusCircle"></Lucide> Add New
                     </Button>
                 </div>

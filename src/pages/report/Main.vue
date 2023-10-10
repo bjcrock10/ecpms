@@ -11,7 +11,7 @@
   import { FormLabel, FormSelect } from "../../base-components/Form";
 import { assign } from 'lodash';
 
-  const {slicer, businessData, slicerBusinessAssistance, slicerClientAssistance} = useBusinessReport();
+  const {slicer, businessData, slicerBusinessAssistance, slicerClientAssistance, slicerTO} = useBusinessReport();
   const componentKey = ref(0)
   const tomData = ref("")
   const slicerData = ref({})
@@ -40,6 +40,12 @@ import { assign } from 'lodash';
       })
       slicerData.value = slicerClientAssistance
     }
+    else if(tomData.value.toString()==="4"){
+      ReportDataService.getAllToReport().then((response: ResponseData)=>{
+        businessData.value = response.data
+      })
+      slicerData.value = slicerTO
+    }
     forceRerender();
   }
   onMounted(async()=>{
@@ -57,6 +63,7 @@ import { assign } from 'lodash';
         <option value="1">Business Complete Data</option>
         <option value="2">Business and Assistance Data</option>
         <option value="3">Client and Assistance Data</option>
+        <option value="4">Travel Order</option>
       </FormSelect>
       
     </div>
