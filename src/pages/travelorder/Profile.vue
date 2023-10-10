@@ -125,7 +125,11 @@ const onSubmit1 = async () => {
       messageDetail.value = "You successfully added Employee: " + formTODetail.fullName
       dataTable()
       addModal.value = false
-    });
+    }).catch((e:Error)=>{
+      successNotification.value.showToast();
+      messageDetail.value = e.message
+    }
+    );
   }
   else{
     formTODetail.userId = selectEmployee.value.toString()
