@@ -281,6 +281,23 @@ onMounted(async () => {
                           <FormLabel  htmlFor="modal-form-1"> Job Position </FormLabel>
                           <FormInput  :rounded="rounded" v-model="formClient.designation" type="text" placeholder=""/>
                         </div>
+                        <div class="col-span-12 sm:col-span-8">
+                          <FormLabel  htmlFor="modal-form-1"> Are you a member of a organization? </FormLabel>
+                          <TomSelect
+                            v-model="selectOrganization"
+                            :options="{
+                              placeholder: 'Select item below. If not exist please specify...',
+                              persist: false,
+                              createOnBlur: true,
+                              create: true,
+                              maxItems:1,
+                            }"
+                            class="w-full" multiple
+                          >
+                            <option v-for="item in orgList" :value="item['title']" :key="item['id']">{{item['title']}}</option>
+                            <option value="No">Not a member of any organization</option>
+                          </TomSelect>
+                        </div>
                         <fieldset class="grid grid-cols-12 col-span-12 gap-4 gap-y-3 border border-solid border-gray-300 p-3">
                           <legend class="text-xs">Address</legend>
                           <div class="col-span-12 sm:col-span-6">
@@ -361,8 +378,8 @@ onMounted(async () => {
                             placeholder="If applicable"/>
                           </div>
                         </fieldset>
-                        <fieldset class="grid grid-cols-12 col-span-12 gap-4 gap-y-3 
-                      border border-solid border-gray-300 p-2">
+                        <!-- <fieldset class="grid grid-cols-12 col-span-12 gap-4 gap-y-3 
+                      border border-solid border-gray-300 p-2" >
                       <legend class="text-sm font-bold">CFIDP</legend>
                       <div class="col-span-12 sm:col-span-4">
                         <FormLabel  htmlFor="modal-form-1"> Classification </FormLabel>
@@ -401,7 +418,7 @@ onMounted(async () => {
                         </InputGroup>
                       </div>
                       <div class="col-span-12 sm:col-span-8">
-                        <FormLabel  htmlFor="modal-form-1"> Are you a member of a farm/coconut organization? </FormLabel>
+                        <FormLabel  htmlFor="modal-form-1"> Are you a member of a organization? </FormLabel>
                         <TomSelect
                           v-model="selectOrganization"
                           :options="{
@@ -416,14 +433,6 @@ onMounted(async () => {
                           <option v-for="item in orgList" :value="item['title']" :key="item['id']">{{item['title']}}</option>
                           <option value="No">Not a member of any organization</option>
                         </TomSelect>
-                        <!-- <InputGroup class="grid grid-cols-12">
-                          <FormSelect  v-model="organization" class="col-span-12 sm:col-span-2" @change="dOrganization" required>
-                            <option value="Yes">Yes</option>
-                            <option value="No">No</option>
-                          </FormSelect>
-                          <FormInput  :rounded="rounded" v-model="formClient.ipGroup" 
-                              type="text" placeholder="Name of organization" class="col-span-12 sm:col-span-10" :disabled="disOrganization" required/>
-                        </InputGroup> -->
                       </div>
                       <div class="col-span-12 sm:col-span-4">
                         <FormLabel  htmlFor="modal-form-1"> Is your organization accredited/registered? </FormLabel>
@@ -438,7 +447,7 @@ onMounted(async () => {
                               type="text" placeholder="Accreditation/Registration Number..." class="col-span-12 sm:col-span-9" :disabled="disAccreditation" required/>
                         </InputGroup>
                       </div>
-                    </fieldset>
+                    </fieldset> -->
                   </fieldset>
                 </div>
               </Dialog.Description>

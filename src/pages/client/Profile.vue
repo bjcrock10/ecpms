@@ -137,7 +137,7 @@ onMounted(async () => {
             class="relative flex-none w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32 image-fit"
           >
             <img
-              alt="CFIDP Template"
+              alt="ECPMS Template"
               class="rounded-full"
               :src="logoUrl"
             />
@@ -308,92 +308,116 @@ onMounted(async () => {
                             </FormSelect>
                             </div>
                             <div class="col-span-12 md:col-span-4">
-                            <FormLabel  htmlFor="modal-form-1"> Job Position </FormLabel>
-                            <FormInput form-input-size="sm"  :rounded="rounded" v-model="formClient.designation" type="text" placeholder=""/>
+                              <FormLabel  htmlFor="modal-form-1"> Job Position </FormLabel>
+                              <FormInput form-input-size="sm"  :rounded="rounded" v-model="formClient.designation" type="text" placeholder=""/>
+                            </div>
+                            <div class="col-span-12 md:col-span-8">
+                              <FormLabel  htmlFor="modal-form-1"> Are you a member of a organization/cooperative? </FormLabel>
+                              <TomSelect
+                                    v-model="selectOrganization"
+                                    :options="{
+                                      placeholder: 'Select item below. If not exist please specify...',
+                                      persist: false,
+                                      createOnBlur: true,
+                                      create: true,
+                                      maxItems:1,
+                                    }"
+                                    class="w-full" multiple
+                                  >
+                                  <option v-for="item in orgList" :value="item['title']" :key="item['id']">{{item['title']}}</option>
+                                  <option value="No">Not a member of any organization</option>
+                              </TomSelect>
+                            </div>
+                            <div class="col-span-12 md:col-span-2">
+                              <FormLabel htmlFor="modal-form-3"> Are you an Investor </FormLabel>
+                              <FormSelect form-select-size="sm"  v-model="formClient.investor" required>
+                                  <option value="Yes">Abled</option>
+                                  <option value="No">Indigenous Person</option>
+                              </FormSelect>
                             </div>
                             <fieldset class="grid grid-cols-12 col-span-12 gap-4 gap-y-3 border border-solid border-gray-300 p-3">
-                            <legend class="text-xs">Address</legend>
-                            <div class="col-span-12 md:col-span-6">
-                                <FormLabel  htmlFor="modal-form-1"> House No./Street Name</FormLabel>
-                                <FormInput form-input-size="sm"  v-model="formClient.address" type="text"
-                                placeholder="House/Building No. / Room & Floor No./ Building Name" required/>
-                            </div>
-                            <div class="col-span-12 md:col-span-3">
-                                <FormLabel  htmlFor="modal-form-3"> Longitude </FormLabel>
-                                <FormInput form-input-size="sm"  v-model="formClient.longitude" type="text"
-                                placeholder="If applicable"/>
-                            </div>
-                            <div class="col-span-12 md:col-span-3">
-                                <FormLabel  htmlFor="modal-form-3"> Latitude </FormLabel>
-                                <FormInput form-input-size="sm"  v-model="formClient.latitude" type="text"
-                                placeholder="If applicable"/>
-                            </div>
-                            <!-- BEGIN: Search -->
-                            <div class="col-span-12 md:col-span-12">
-                                <div class="col-span-12 md:col-span-3">
-                                <FormLabel  htmlFor="modal-form-1"> Barangay / Municipality or City / Region  </FormLabel>
-                                <FormInput form-input-size="sm"
-                                    type="text"
-                                    placeholder="Search Barangay..."
-                                    @focus="showSearchBrgy"
-                                    @blur="hideSearchBrgy"
-                                    v-model="addressSelect.addressName"
-                                />
-                            </div>
-                                <TransitionRoot
-                                as="template"
-                                :show="brgyDropdown"
-                                enter="transition-all ease-linear duration-150"
-                                enterFrom="mt-5 invisible opacity-0 translate-y-1"
-                                enterTo="mt-[3px] visible opacity-100 translate-y-0"
-                                entered="mt-[3px]"
-                                leave="transition-all ease-linear duration-150"
-                                leaveFrom="mt-[3px] visible opacity-100 translate-y-0"
-                                leaveTo="mt-5 invisible opacity-0 translate-y-1"
-                                >
-                                <div class="absolute right-100 z-50 mt-[3px]">
-                                    <div class="w-auto p-5 box">
-                                    <div class="mb-2 font-medium">List of Barangay</div>
-                                    <div class="mb-5 hover:bg-slate-400" v-for="item in brgySelect" :key="item['id']" :value="item['id']" @click="checkBa(item)">
-                                        <button href="" class="flex items-center" type="button">
-                                        <div
-                                            class="flex items-center justify-center w-8 h-8 rounded-full bg-success/20 dark:bg-success/10 text-success"
-                                        >
-                                            <Lucide icon="MapPin" class="w-4 h-4" />
-                                        </div>
-                                        <div class="ml-3">{{item['address']}}</div>
-                                        </button>
-                                    </div>
-                                    </div>
+                                <legend class="text-xs">Address</legend>
+                                <div class="col-span-12 md:col-span-6">
+                                    <FormLabel  htmlFor="modal-form-1"> House No./Street Name</FormLabel>
+                                    <FormInput form-input-size="sm"  v-model="formClient.address" type="text"
+                                    placeholder="House/Building No. / Room & Floor No./ Building Name" required/>
                                 </div>
-                                </TransitionRoot>
-                            </div>
-                            <!-- END: Search -->
+                                <div class="col-span-12 md:col-span-3">
+                                    <FormLabel  htmlFor="modal-form-3"> Longitude </FormLabel>
+                                    <FormInput form-input-size="sm"  v-model="formClient.longitude" type="text"
+                                    placeholder="If applicable"/>
+                                </div>
+                                <div class="col-span-12 md:col-span-3">
+                                    <FormLabel  htmlFor="modal-form-3"> Latitude </FormLabel>
+                                    <FormInput form-input-size="sm"  v-model="formClient.latitude" type="text"
+                                    placeholder="If applicable"/>
+                                </div>
+                                <!-- BEGIN: Search -->
+                                <div class="col-span-12 md:col-span-12">
+                                    <div class="col-span-12 md:col-span-3">
+                                    <FormLabel  htmlFor="modal-form-1"> Barangay / Municipality or City / Region  </FormLabel>
+                                    <FormInput form-input-size="sm"
+                                        type="text"
+                                        placeholder="Search Barangay..."
+                                        @focus="showSearchBrgy"
+                                        @blur="hideSearchBrgy"
+                                        v-model="addressSelect.addressName"
+                                    />
+                                </div>
+                                    <TransitionRoot
+                                    as="template"
+                                    :show="brgyDropdown"
+                                    enter="transition-all ease-linear duration-150"
+                                    enterFrom="mt-5 invisible opacity-0 translate-y-1"
+                                    enterTo="mt-[3px] visible opacity-100 translate-y-0"
+                                    entered="mt-[3px]"
+                                    leave="transition-all ease-linear duration-150"
+                                    leaveFrom="mt-[3px] visible opacity-100 translate-y-0"
+                                    leaveTo="mt-5 invisible opacity-0 translate-y-1"
+                                    >
+                                    <div class="absolute right-100 z-50 mt-[3px]">
+                                        <div class="w-auto p-5 box">
+                                        <div class="mb-2 font-medium">List of Barangay</div>
+                                        <div class="mb-5 hover:bg-slate-400" v-for="item in brgySelect" :key="item['id']" :value="item['id']" @click="checkBa(item)">
+                                            <button href="" class="flex items-center" type="button">
+                                            <div
+                                                class="flex items-center justify-center w-8 h-8 rounded-full bg-success/20 dark:bg-success/10 text-success"
+                                            >
+                                                <Lucide icon="MapPin" class="w-4 h-4" />
+                                            </div>
+                                            <div class="ml-3">{{item['address']}}</div>
+                                            </button>
+                                        </div>
+                                        </div>
+                                    </div>
+                                    </TransitionRoot>
+                                </div>
+                                <!-- END: Search -->
+                                </fieldset>
+                                <fieldset class="grid grid-cols-12 col-span-12 gap-4 gap-y-3 border border-solid border-gray-300 p-3">
+                                <legend class="text-xs">Contact Details</legend>
+                                <div class="col-span-12 md:col-span-3">
+                                    <FormLabel  htmlFor="modal-form-3"> Landline Number </FormLabel>
+                                    <FormInput form-input-size="sm"  v-model="formClient.telNo" type="text"
+                                    placeholder="If applicable"/>
+                                </div>
+                                <div class="col-span-12 md:col-span-3">
+                                    <FormLabel  htmlFor="modal-form-3"> Mobile Number </FormLabel>
+                                    <FormInput form-input-size="sm"  v-model="formClient.mobileNo" type="text"
+                                    placeholder="If applicable"/>
+                                </div>
+                                <div class="col-span-12 md:col-span-3">
+                                    <FormLabel  htmlFor="modal-form-3"> Fax Number </FormLabel>
+                                    <FormInput form-input-size="sm"  v-model="formClient.faxNo" type="text"
+                                    placeholder="If applicable"/>
+                                </div>
+                                <div class="col-span-12 md:col-span-3">
+                                    <FormLabel  htmlFor="modal-form-3"> Email Address </FormLabel>
+                                    <FormInput form-input-size="sm"  v-model="formClient.email" type="email"
+                                    placeholder="If applicable"/>
+                                </div>
                             </fieldset>
-                            <fieldset class="grid grid-cols-12 col-span-12 gap-4 gap-y-3 border border-solid border-gray-300 p-3">
-                            <legend class="text-xs">Contact Details</legend>
-                            <div class="col-span-12 md:col-span-3">
-                                <FormLabel  htmlFor="modal-form-3"> Landline Number </FormLabel>
-                                <FormInput form-input-size="sm"  v-model="formClient.telNo" type="text"
-                                placeholder="If applicable"/>
-                            </div>
-                            <div class="col-span-12 md:col-span-3">
-                                <FormLabel  htmlFor="modal-form-3"> Mobile Number </FormLabel>
-                                <FormInput form-input-size="sm"  v-model="formClient.mobileNo" type="text"
-                                placeholder="If applicable"/>
-                            </div>
-                            <div class="col-span-12 md:col-span-3">
-                                <FormLabel  htmlFor="modal-form-3"> Fax Number </FormLabel>
-                                <FormInput form-input-size="sm"  v-model="formClient.faxNo" type="text"
-                                placeholder="If applicable"/>
-                            </div>
-                            <div class="col-span-12 md:col-span-3">
-                                <FormLabel  htmlFor="modal-form-3"> Email Address </FormLabel>
-                                <FormInput form-input-size="sm"  v-model="formClient.email" type="email"
-                                placeholder="If applicable"/>
-                            </div>
-                            </fieldset>
-                            <fieldset class="grid grid-cols-12 col-span-12 gap-4 gap-y-3 
+                            <!-- <fieldset class="grid grid-cols-12 col-span-12 gap-4 gap-y-3 
                         border border-solid border-gray-300 p-2">
                         <legend class="text-sm font-bold">Farmers</legend>
                         <div class="col-span-12 md:col-span-4">
@@ -433,7 +457,7 @@ onMounted(async () => {
                             </InputGroup>
                         </div>
                         <div class="col-span-12 md:col-span-8">
-                            <FormLabel  htmlFor="modal-form-1"> Are you a member of a farm/coconut organization? </FormLabel>
+                            <FormLabel  htmlFor="modal-form-1"> Are you a member of a organization? </FormLabel>
                             <TomSelect
                                   v-model="selectOrganization"
                                   :options="{
@@ -462,7 +486,7 @@ onMounted(async () => {
                                 type="text" placeholder="Accreditation/Registration Number..." class="col-span-12 md:col-span-9" :disabled="disAccreditation" required/>
                             </InputGroup>
                         </div>
-                        </fieldset>
+                        </fieldset> --->
                     </fieldset>
                   <Button type="submit" variant="primary" elevated class="w-auto bg-primary">
                     <Lucide icon="Save" class="w-4 h-4 mr-2" />Update

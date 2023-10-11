@@ -5,6 +5,7 @@ import ResponseData from "./response";
 export function useTravelOrder(){
     const date = new Date();
     const current_date = date.getFullYear()+"-"+(date.getMonth()+1)+"-"+ date.getDate();
+    const current_time = date.getMinutes()+date.getSeconds()
     const formTO = reactive({
         'id':'0',
         'toNo':'',
@@ -352,5 +353,6 @@ export function useTravelOrder(){
         brgyDropdown,
         checkBa,
         current_date,
+        current_time
     }
 }

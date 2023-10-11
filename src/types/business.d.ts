@@ -47,6 +47,10 @@ export function useBusiness(){
         'ecommerce': '',
         'ecommerceUrl': '',
         'sourcing': '',
+        'priorityIndustry':'',
+        'psicSection': '',
+        'psicDivision': '',
+        'psicGroup': '',
         'rawMatsSources': '',
         'estimatedVolume': '',
         'volumeUom':'0',
@@ -238,6 +242,7 @@ export function useBusiness(){
     const selectBusinessOwner = ref([formBusiness.businessOwnership]);
     const selectLineOfBusiness = ref([formBusiness.lineOfBusiness]);
     const selectStandardCertification = ref([formBusiness.standardCertification]);
+    const selectPriorityIndustry = ref([formBusiness.priorityIndustry]);
     const selectSocialMed = ref(["0"]);
     const selectEcommerce = ref(["0"]);
     const selectBOwner = ref(["0"]);
@@ -290,6 +295,6 @@ export function useBusiness(){
         formMarketPlan,
         formMarketTraining,
         selectMarketPlan,
-        selectMarketTraining, selectOrganization, formOrganization, orgList
+        selectMarketTraining, selectOrganization, formOrganization, orgList, selectPriorityIndustry
     }
 }

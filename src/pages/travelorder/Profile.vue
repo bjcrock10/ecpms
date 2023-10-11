@@ -21,7 +21,7 @@ import LocationDataService from "../../services/LocationDataService";
 import { reposition } from 'toastify-js';
 import { now } from 'lodash';
 
-const {formTO,columnData, formTODetail, brgySelect, addressSelect, brgyDropdown, showSearchBrgy, hideSearchBrgy, checkBa, current_date} = useTravelOrder();
+const {formTO,columnData, formTODetail, brgySelect, addressSelect, brgyDropdown, showSearchBrgy, hideSearchBrgy, checkBa, current_date, current_time} = useTravelOrder();
 const {initTabulator, reInitOnResizeWindow, 
 filter, onFilter, 
 onExportCsv, onExportHtml, 
@@ -189,7 +189,7 @@ const getTOInfo = async(toId: any) =>{
       formTO.dateApproved = response.data.dateApproved
   })
   if(formTO.toNo===""){
-    formTO.toNo = sessionStorage.getItem('office') + '-' + current_date + "-"
+    formTO.toNo = sessionStorage.getItem('office') + '-' + current_date + "-" + current_time
   }
 }
 const openUrl = (url: any) =>{

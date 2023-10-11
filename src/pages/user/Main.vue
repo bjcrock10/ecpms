@@ -41,6 +41,7 @@ const tableRef = ref<HTMLDivElement>();
 
 const onSubmit = async () => {
   if(formUsers.id==="0"){
+    formUsers.username = formUsers.email
     UserDataService.create(formUsers).then((response: ResponseData)=>{
       successNotification.value.showToast();
       addModal.value = false
@@ -51,6 +52,7 @@ const onSubmit = async () => {
     })
   }
   else{
+    formUsers.username = formUsers.email
     UserDataService.update(formUsers.id,formUsers).then((response: ResponseData)=>{
       successNotification.value.showToast();
       addModal.value = false
