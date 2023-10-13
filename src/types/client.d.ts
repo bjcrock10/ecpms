@@ -389,6 +389,8 @@ export function useClient(){
         formClient.age = response.data[0].age
         formClient.civilStatus = response.data[0].civilStatus
         formClient.tenurialStatus = response.data[0].tenurialStatus.toUpperCase()
+        formClient.investor = response.data[0].investor
+        formClient.typeOfInvestment = response.data[0].typeOfInvestment.toUpperCase()
         formClient.classification = response.data[0].classification
         formClient.telNo = response.data[0].telNo.toUpperCase()
         formClient.personNotify = response.data[0].personNotify.toUpperCase()

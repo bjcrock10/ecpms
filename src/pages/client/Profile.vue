@@ -31,8 +31,12 @@ import Product from "../../components/Product";
 import MarketProfile from '../../components/MarketProfile';
 import Business from '../../components/Business'
 import Assistance from '../../components/Assistance';
+import CodeBook from "../../services/CodeBook";
 
-const componentKey = ref(0)
+const date = new Date();
+const current_date = date.getFullYear()+"-"+(date.getMonth()+1)+"-"+ date.getDate();
+const current_time = date.getHours()+"."+date.getMinutes()+date.getSeconds();
+const componentKey = ref(0);
 const forceRerender = () => {
       componentKey.value += 1;
 }
@@ -74,6 +78,10 @@ watch(
 );
 const orgId = ref(0)
 const onSubmit = () =>{
+ if(formClient.farmerId===""){
+  formClient.farmerId = sessionStorage.getItem("office")+"-"+current_date+"-"+current_time
+ }
+ 
  formClient.ipGroup = selectOrganization.value.toString()
  formClient.fullName = formClient.lname.toUpperCase() + ", " + formClient.fname.toUpperCase() + " " + formClient.mname.toUpperCase();
  formOrganization.title = selectOrganization.value.toString()
@@ -89,6 +97,7 @@ const retrieveBusinessId = async () => {
     formClient.id = response.data[0].id
   })
 }
+const priorityIndustry = ref([])
 onMounted(async () => {
   getClientInfo(clientID.value);
   if(sessionStorage.getItem('userId') === null){
@@ -101,6 +110,9 @@ onMounted(async () => {
     messageDetail.value = "You don't have access to this page. Redirecting you the landing page."
     router.push({path: "/dashboard"});
   }
+  CodeBook.getType(11).then((resp: ResponseData)=>{
+    priorityIndustry.value = resp.data
+  })
 });
 
 </script>
@@ -311,7 +323,7 @@ onMounted(async () => {
                               <FormLabel  htmlFor="modal-form-1"> Job Position </FormLabel>
                               <FormInput form-input-size="sm"  :rounded="rounded" v-model="formClient.designation" type="text" placeholder=""/>
                             </div>
-                            <div class="col-span-12 md:col-span-8">
+                            <div class="col-span-12 md:col-span-4">
                               <FormLabel  htmlFor="modal-form-1"> Are you a member of a organization/cooperative? </FormLabel>
                               <TomSelect
                                     v-model="selectOrganization"
@@ -328,12 +340,29 @@ onMounted(async () => {
                                   <option value="No">Not a member of any organization</option>
                               </TomSelect>
                             </div>
-                            <div class="col-span-12 md:col-span-2">
+                            <div class="col-span-12 md:col-span-4">
                               <FormLabel htmlFor="modal-form-3"> Are you an Investor </FormLabel>
                               <FormSelect form-select-size="sm"  v-model="formClient.investor" required>
-                                  <option value="Yes">Abled</option>
-                                  <option value="No">Indigenous Person</option>
+                                  <option value="Yes">Yes</option>
+                                  <option value="No">No</option>
                               </FormSelect>
+                            </div>
+                            <div class="col-span-12 md:col-span-4" v-if="formClient.investor==='Yes'">
+                                <FormLabel  htmlFor="modal-form-1"> Priority Industry </FormLabel>
+                                <TomSelect
+                                      v-model="formClient.typeOfInvestment"
+                                      :options="{
+                                        placeholder: 'Select item below. If not exist please specify...',
+                                        persist: false,
+                                        createOnBlur: true,
+                                        create: true,
+                                      }"
+                                      class="w-full" :required="(formClient.investor==='Yes')?true:false"
+                                    >
+                                    <option value="">N/A</option>
+                                    <option v-for="item in priorityIndustry" :value="item['textdata']" :key="item['id']">{{item['textdata']}}</option>
+                                    <option :value="formClient.typeOfInvestment">{{formClient.typeOfInvestment}}</option>
+                                </TomSelect>
                             </div>
                             <fieldset class="grid grid-cols-12 col-span-12 gap-4 gap-y-3 border border-solid border-gray-300 p-3">
                                 <legend class="text-xs">Address</legend>

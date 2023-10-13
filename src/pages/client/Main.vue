@@ -19,6 +19,7 @@ import Toastify from "toastify-js";
 import { createIcons, icons } from "lucide";
 import { useRouter } from "vue-router";
 import LoadingIcon from "../../base-components/LoadingIcon";
+import CodeBook from "../../services/CodeBook";
 
 const router = useRouter();
 const {formClient, errorMessage, isError, columnData, addModal, rounded,  brgyDropdown,
@@ -119,6 +120,7 @@ const showSearchLnamewithParam = async () => {
   //       console.log(clientList.value)
   //     })
 }
+const priorityIndustry = ref([])
 onMounted(async () => {
   initTabulator(columnData.value, ClientDataService, tableClient);
   reInitOnResizeWindow();
@@ -133,6 +135,9 @@ onMounted(async () => {
       router.push({ path:'/login'})
       sessionStorage.clear()
     }
+  CodeBook.getType(11).then((resp: ResponseData)=>{
+    priorityIndustry.value = resp.data
+  })
 });
 </script>
 <template>
@@ -281,7 +286,7 @@ onMounted(async () => {
                           <FormLabel  htmlFor="modal-form-1"> Job Position </FormLabel>
                           <FormInput  :rounded="rounded" v-model="formClient.designation" type="text" placeholder=""/>
                         </div>
-                        <div class="col-span-12 sm:col-span-8">
+                        <div class="col-span-12 sm:col-span-4">
                           <FormLabel  htmlFor="modal-form-1"> Are you a member of a organization? </FormLabel>
                           <TomSelect
                             v-model="selectOrganization"
@@ -297,6 +302,30 @@ onMounted(async () => {
                             <option v-for="item in orgList" :value="item['title']" :key="item['id']">{{item['title']}}</option>
                             <option value="No">Not a member of any organization</option>
                           </TomSelect>
+                        </div>
+                        <div class="col-span-12 md:col-span-4">
+                          <FormLabel htmlFor="modal-form-3"> Are you an Investor </FormLabel>
+                          <FormSelect form-select-size="sm"  v-model="formClient.investor" required>
+                              <option value="Yes">Yes</option>
+                              <option value="No">No</option>
+                          </FormSelect>
+                        </div>
+                        <div class="col-span-12 md:col-span-4" v-if="formClient.investor==='Yes'">
+                            <FormLabel  htmlFor="modal-form-1"> Priority Industry </FormLabel>
+                            <TomSelect
+                                  v-model="formClient.typeOfInvestment"
+                                  :options="{
+                                    placeholder: 'Select item below. If not exist please specify...',
+                                    persist: false,
+                                    createOnBlur: true,
+                                    create: true,
+                                  }"
+                                  class="w-full" :required="(formClient.investor==='Yes')?true:false"
+                                >
+                                <option value="">N/A</option>
+                                <option v-for="item in priorityIndustry" :value="item['textdata']" :key="item['id']">{{item['textdata']}}</option>
+                                <option :value="formClient.typeOfInvestment">{{formClient.typeOfInvestment}}</option>
+                            </TomSelect>
                         </div>
                         <fieldset class="grid grid-cols-12 col-span-12 gap-4 gap-y-3 border border-solid border-gray-300 p-3">
                           <legend class="text-xs">Address</legend>

@@ -301,6 +301,7 @@ onMounted(async ()=>{
                         <FormLabel htmlFor="modal-form-3"> Status </FormLabel>
                         <FormSelect   v-model="formTO.status">
                             <option value="For Approval">For Approval</option>
+                            <option value="Printed">Printed</option>
                             <option value="Approved">Approved</option>
                             <option value="Disapproved">Disapproved</option>
                             <option value="Completed">Completed</option>
