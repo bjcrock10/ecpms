@@ -95,9 +95,10 @@ const dataTable = () =>{
   })
 };
 const office = ref()
+const office2 = ref()
 const onSubmit = async () => {
   if(toId.value==='0'){
-    formTO.office = office.value
+    formTO.office = office2.value
     TravelOrderService.create(formTO).then((response: ResponseData)=>{
       router.push({path: `/toprofile/${response.data.id}`});
       getTOInfo(response.data.id);
@@ -111,7 +112,7 @@ const onSubmit = async () => {
     });
   }
   else{
-    formTO.office = office.value;
+    formTO.office = office2.value;
     TravelOrderService.update(toId.value,formTO).then((response: ResponseData)=>{
       formTODetail.toId = response.data.id
       formTODetail.toNo = response.data.toNo
@@ -187,7 +188,7 @@ const getTOInfo = async(toId: any) =>{
       formTODetail.toId = response.data.id
       formTODetail.toNo = response.data.toNo
       formTO.dateApproved = response.data.dateApproved
-      office.value = response.data.office
+      office2.value = response.data.office
   })
   if(formTO.toNo===""){
     formTO.toNo = sessionStorage.getItem('office') + '-' + current_date + "-" + current_time
@@ -202,9 +203,7 @@ onMounted(async ()=>{
         employeeList.value = response.data
     })
    getTOInfo(toId.value);
-   if(office.value===""){
-    office.value = sessionStorage.getItem('office');
-   }
+   office.value = sessionStorage.getItem('office');
     if(sessionStorage.getItem('userId') === null){
       router.push({ path:'/login'})
       sessionStorage.clear()
