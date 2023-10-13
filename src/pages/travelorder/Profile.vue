@@ -187,6 +187,7 @@ const getTOInfo = async(toId: any) =>{
       formTODetail.toId = response.data.id
       formTODetail.toNo = response.data.toNo
       formTO.dateApproved = response.data.dateApproved
+      office.value = response.data.office
   })
   if(formTO.toNo===""){
     formTO.toNo = sessionStorage.getItem('office') + '-' + current_date + "-" + current_time
@@ -201,7 +202,9 @@ onMounted(async ()=>{
         employeeList.value = response.data
     })
    getTOInfo(toId.value);
-   office.value = sessionStorage.getItem('office');
+   if(office.value===""){
+    office.value = sessionStorage.getItem('office');
+   }
     if(sessionStorage.getItem('userId') === null){
       router.push({ path:'/login'})
       sessionStorage.clear()
