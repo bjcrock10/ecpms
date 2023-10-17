@@ -72,7 +72,6 @@ export function tabulatorFunc(){
         }
         if(status!==""){
           if (tableRef.value) {
-            alert("bang")
             dataService.getStatus(status,office)
             .then((response: ResponseData) => {
               tabulator.value.setData(response.data)
