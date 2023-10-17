@@ -2,7 +2,7 @@
 import Lucide from "../../base-components/Lucide";
 import LoadingIcon from "../../base-components/LoadingIcon";
 import { tabulatorFunc } from "../../types/tabulator.d";
-import { Menu, Dialog } from "../../base-components/Headless";
+import { Menu, Dialog, Tab } from "../../base-components/Headless";
 import Button from "../../base-components/Button";
 import { FormInput, FormSelect, InputGroup, FormLabel, FormTextarea, FormSwitch} from "../../base-components/Form";
 import { onMounted, ref, reactive, watch, provide, toRefs} from "vue";
@@ -11,13 +11,14 @@ import Tippy from "../../base-components/Tippy";
 import { useRouter } from "vue-router";
 import TravelOrderService from '../../services/TravelOrder';
 import { useTravelOrder } from "../../types/travelorder.d";
+import ResponseData from '../../types/response';
 
 const message = ref("");
 const messageDetail = ref("");
 const router = useRouter();
 const tableTO = ref<HTMLDivElement>();
 const {columnDataTO} = useTravelOrder();
-const {initTabulator, reInitOnResizeWindow,
+const {initTabulator, initTabulatorJsonResp, reInitOnResizeWindow,
 onExportCsv, onExportHtml, 
 onExportJson, onExportXlsx, 
 onPrint, tabulator, loadingIcon} = tabulatorFunc();
@@ -47,16 +48,32 @@ const onResetFilter = (defaultField:any = "toNo") => {
   onFilter();
 };
 const buttonTitle = ref("Submit")
-const dataTable = () =>{
-  initTabulator(columnDataTO.value, TravelOrderService, tableTO);
+
+const loadData = (id:any) =>{
+  let status = ""
+  if(id==="1"){
+    status = 'For Approval'
+  }
+  else if(id==="2"){
+    status = 'Printed'
+  }
+  else if(id==="3"){
+    status = 'Approved'
+  }
+  else if(id==="4"){
+    status = 'Disapproved'
+  }
+  else if(id==="5"){
+    status = 'Completed'
+  }
+  initTabulator(columnDataTO.value, TravelOrderService, tableTO,'0',false,status);
   reInitOnResizeWindow();
   tabulator.value?.on("rowClick",(e, cell)=>{
     router.push({path: `/toprofile/${cell.getData().id}`})
   })
 };
-
 onMounted(async ()=>{
-    dataTable();
+  loadData('1');
     if(sessionStorage.getItem('userId') === null){
       router.push({ path:'/login'})
       sessionStorage.clear()
@@ -217,14 +234,49 @@ onMounted(async ()=>{
             </Menu>
           </div>
         </div>
-        <div class="overflow-x-auto scrollbar-hidden">
-          <div id="tabulator" ref="tableTO" class="mt-5"></div>
-          <div v-if="loadingIcon===true"
-            class="flex flex-col items-center justify-end col-span-6 sm:col-span-3 xl:col-span-2"
-          >
-              <LoadingIcon icon="grid" class="w-8 h-8" />
-          <div class="mt-2 text-xs text-center">Loading Data...</div>
-        </div>
-        </div>
+        <Tab.Group>
+          <Tab.List variant="link-tabs"
+                    class="flex-col justify-center text-center sm:flex-row lg:justify-start p-5">
+              <Tab :fullWidth="false">
+                  <Tab.Button class="flex items-center py-4 cursor-pointer" @click="loadData('1')">
+                      For Approval
+                  </Tab.Button>
+              </Tab>
+              <Tab :fullWidth="false">
+                  <Tab.Button class="flex items-center py-4 cursor-pointer"  @click="loadData('2')">
+                      Printed
+                  </Tab.Button>
+              </Tab>
+              <Tab :fullWidth="false">
+                  <Tab.Button class="flex items-center py-4 cursor-pointer"  @click="loadData('3')">
+                      Approved
+                  </Tab.Button>
+              </Tab>
+              <Tab :fullWidth="false">
+                  <Tab.Button class="flex items-center py-4 cursor-pointer"  @click="loadData('4')">
+                      Disapproved
+                  </Tab.Button>
+              </Tab>
+              <Tab :fullWidth="false">
+                  <Tab.Button class="flex items-center py-4 cursor-pointer"  @click="loadData('5')">
+                      Completed
+                  </Tab.Button>
+              </Tab>
+          </Tab.List>
+          <!-- <Tab.Panels class="mt-5">
+              <Tab.Panel class="leading-relaxed"> -->
+          <div class="overflow-x-auto scrollbar-hidden leading-relaxed">
+            <div id="tabulator" ref="tableTO" class="mt-5"></div>
+                <div v-if="loadingIcon===true"
+                  class="flex flex-col items-center justify-end col-span-6 sm:col-span-3 xl:col-span-2"
+                >
+                    <LoadingIcon icon="grid" class="w-8 h-8" />
+                <div class="mt-2 text-xs text-center">Loading Data...</div>
+              </div>
+          </div>
+              <!-- </Tab.Panel>
+          </Tab.Panels> -->
+        </Tab.Group>
+        
       </div>  
 </template>

@@ -21,6 +21,10 @@ class TravelOrderService {
       return http.get(`/travelorder/${id}/`);
     }
 
+    getStatus(status: any, office: any): Promise<any> {
+      return http.get(`/travelorder/?status=${status}`);
+    }
+
     create(data: any): Promise<any> {
       return http.post("/travelorder/", data);
     }
