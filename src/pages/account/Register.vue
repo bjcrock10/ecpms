@@ -2,7 +2,7 @@
 import DarkModeSwitcher from "../../components/DarkModeSwitcher";
 import MainColorSwitcher from "../../components/MainColorSwitcher";
 import logoUrl from "../assets/images/logo.png";
-import illustrationUrl from "../../assets/images/illustration.png";
+import illustrationUrl from "../../assets/images/logo.svg";
 import { FormInput, FormCheck } from "../../base-components/Form";
 import Button from "../../base-components/Button";
 import { useRouter } from "vue-router";
@@ -137,8 +137,8 @@ provide("bind[successNotification]", (el: any) => {
             <div
               class="mt-10 text-4xl font-medium leading-tight text-white -intro-x"
             >
-              Coconut Farmers & Industry <br />
-              Development Plan
+            ECPM <br />
+            System
             </div>
             <!-- <div
               class="mt-5 text-lg text-white -intro-x text-opacity-70 dark:text-slate-400"

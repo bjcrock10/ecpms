@@ -73,6 +73,14 @@ watch(addModal,(addModal, oldAdm)=> {
 });
 const frmModal = ref([]);
 
+const deleteUser = (id: any) => {
+  UserDataService.delete(id).then((resp: ResponseData)=>{
+    successNotification.value.showToast();
+      addModal.value = false
+      messageDetail.value = "You successfully deleted an account for "+resp.data.email
+  })
+}
+
 onMounted(async () => {
   initTabulator(columnData.value, UserDataService, tableRef);
   if(sessionStorage.getItem('userId') === null){
@@ -240,6 +248,14 @@ onMounted(async () => {
                 </Button>
                 <Button type="submit" variant="primary" elevated class=" w-auto">
                   <Lucide icon="Save" class="w-4 h-4 mr-2" />{{buttonTitle}}
+                </Button>
+                <Button type="button" variant="outline-secondary" @click="
+                            () => {
+                              deleteUser(formUsers.id);
+                            }
+                          " class="w-auto mr-1">
+                          <Lucide icon="XSquare" class="w-4 h-4 mr-2" />
+                    Delete User
                 </Button>
             </Dialog.Footer>
           </form>
