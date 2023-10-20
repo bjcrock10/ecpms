@@ -359,6 +359,7 @@ const selectOwner = (item:any)=>{
   formBusiness.faxNo = item.faxNo
   formBusiness.website = item.website
   formBusiness.email = item.email
+  formBusiness.priorityIndustry = item.priorityIndustry
   loadSocial(item.id);
   loadEcommerce(item.id);
   loadBusinessOwner(item.id);

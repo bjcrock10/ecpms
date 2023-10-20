@@ -224,6 +224,7 @@ export function useBusiness(){
             formBusiness.email = response.data[0].email
             formBusiness.website = response.data[0].website
             formBusiness.organization = response.data[0].organization
+            formBusiness.priorityIndustry = response.data[0].priorityIndustry
             addressSelectBus.businessAddress = response.data[0].businessBrgyAddress
             addressSelectBus.plantAddress = response.data[0].plantBrgyAddress
             businessID.value = response.data[0].id

@@ -42,6 +42,7 @@ provide("bind[successNotification]", (el: any) => {
 
 const onSubmit = () => {
   brgyId.value = addressSelect.addressName.split(", ")
+  formClient.farmerId = currentClientId.value
   formClient.barangay = brgyId.value[0]
   formClient.lgu = brgyId.value[1]
   formClient.province = brgyId.value[2]
@@ -121,9 +122,13 @@ const showSearchLnamewithParam = async () => {
   //     })
 }
 const priorityIndustry = ref([])
+const currentClientId = ref();
 onMounted(async () => {
   initTabulator(columnData.value, ClientDataService, tableClient);
   reInitOnResizeWindow();
+  ClientDataService.getAll().then((resp: ResponseData)=>{
+    currentClientId.value = sessionStorage.getItem('office') + resp.data.length.toString()
+  })
   OrganizationDataService.getAll().then((response: ResponseData)=>{
     orgList.value = response.data
   })

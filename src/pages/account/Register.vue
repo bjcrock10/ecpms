@@ -233,7 +233,7 @@ provide("bind[successNotification]", (el: any) => {
                   class="mr-2 border"
                 />
                 <label class="cursor-pointer select-none" htmlFor="remember-me">
-                  I agree to the CFIDP
+                  I agree to the ECPMS privacy
                 </label>
                 <a class="ml-1 text-primary dark:text-slate-200" href="">
                   Privacy Policy

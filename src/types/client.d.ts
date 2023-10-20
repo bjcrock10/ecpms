@@ -34,7 +34,7 @@ export function useClient(){
         download: false
       },
       {
-        title: "Farmers Id",
+        title: "Client Id",
         minWidth: 100,
         maxWidth: 150,
         field: "farmerId",
