@@ -104,12 +104,12 @@ onMounted(async () => {
       router.push({ path:'/login'})
       sessionStorage.clear()
     }
-  if(sessionStorage.getItem("privileges")==="0"){
-    successNotification.value.showToast();
-    message.value = "Redirecting...."
-    messageDetail.value = "You don't have access to this page. Redirecting you the landing page."
-    router.push({path: "/dashboard"});
-  }
+  // if(sessionStorage.getItem("privileges")==="0"){
+  //   successNotification.value.showToast();
+  //   message.value = "Redirecting...."
+  //   messageDetail.value = "You don't have access to this page. Redirecting you the landing page."
+  //   router.push({path: "/dashboard"});
+  // }
   CodeBook.getType(11).then((resp: ResponseData)=>{
     priorityIndustry.value = resp.data
   })
