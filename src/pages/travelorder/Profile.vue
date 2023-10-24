@@ -438,7 +438,7 @@ onMounted(async ()=>{
                         @focus="showSearchBrgy"
                         @blur="hideSearchBrgy"
                         v-model="addressSelect.addressName"
-                        :disabled="(formTO.status!=='For Approval')?true:false"
+                        :disabled="(formTO.status!=='For Approval')?true:false" required
                       />
                   </div>
                     <TransitionRoot
