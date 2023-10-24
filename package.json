@@ -49,6 +49,7 @@
     "vue-router": "^4.1.6",
     "webdatarocks": "^1.4.7",
     "xlsx": "^0.18.5",
+    "yarn": "^1.22.19",
     "zoom-vanilla.js": "^2.0.6"
   },
   "devDependencies": {

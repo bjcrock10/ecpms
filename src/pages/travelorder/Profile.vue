@@ -96,6 +96,14 @@ const dataTable = () =>{
 };
 const office = ref()
 const office2 = ref()
+const deleteToDetail = (id: any) => {
+  TravelOrderDetailService.delete(id).then((resp: ResponseData)=>{
+    successNotification.value.showToast();
+    messageDetail.value = "You successfully deleted TO Detail"
+    dataTable()
+    addModal.value = false
+  })
+}
 const onSubmit = async () => {
   if(toId.value==='0'){
     formTO.office = office2.value
@@ -124,30 +132,49 @@ const onSubmit = async () => {
     });
   }
 }
+const checkEmployeeInfo = (id: any) => {
+  UserDataService.get(id).then((resp: ResponseData)=>{
+      formTODetail.lname = resp.data.lname;
+      formTODetail.fname = resp.data.fname;
+      formTODetail.mname = resp.data.mname;
+      formTODetail.fullName = resp.data.lname + ", " + resp.data.fname
+      formTODetail.office = resp.data.office
+      formTODetail.designation = resp.data.jobs
+    }).catch((e: Error)=>{
+      alert(e.message)
+    });
+}
 const onSubmit1 = async () => {
   if(formTODetail.id===""){
     formTODetail.userId = selectEmployee.value.toString()
-    TravelOrderDetailService.create(formTODetail).then((resp: ResponseData)=>{
-      successNotification.value.showToast();
-      messageDetail.value = "You successfully added Employee: " + formTODetail.fullName
-      dataTable()
-      addModal.value = false
-    }).catch((e:Error)=>{
-      successNotification.value.showToast();
-      messageDetail.value = e.message
-    });
+    checkEmployeeInfo(formTODetail.userId);
+    if(formTODetail.fullName===""){
+      TravelOrderDetailService.create(formTODetail).then((resp: ResponseData)=>{
+        successNotification.value.showToast();
+        messageDetail.value = "You successfully added Employee: " + formTODetail.fullName
+        dataTable()
+        addModal.value = false
+      }).catch((e:Error)=>{
+        successNotification.value.showToast();
+        messageDetail.value = e.message
+      });
+    }
+    
   }
   else{
     formTODetail.userId = selectEmployee.value.toString()
-    TravelOrderDetailService.update(formTODetail.id, formTODetail).then((resp: ResponseData) => {
-      successNotification.value.showToast();
-      messageDetail.value = "You successfully updated Employee: " + formTODetail.fullName
-      dataTable()
-      addModal.value = false
-    }).catch((e:Error)=>{
-      successNotification.value.showToast();
-      messageDetail.value = e.message
-    });
+    checkEmployeeInfo(formTODetail.userId);
+    if(formTODetail.fullName!==""){
+      TravelOrderDetailService.update(formTODetail.id, formTODetail).then((resp: ResponseData) => {
+        successNotification.value.showToast();
+        messageDetail.value = "You successfully updated Employee: " + resp.data.fullName
+        dataTable()
+        addModal.value = false
+      }).catch((e:Error)=>{
+        successNotification.value.showToast();
+        messageDetail.value = e.message
+      });
+    }
   }
 }
 watch(
@@ -166,16 +193,7 @@ watch(
     }
 )
 watch(() => (selectEmployee.value), async(employee, preEmp) =>{
-  UserDataService.get(employee).then((resp: ResponseData)=>{
-    formTODetail.lname = resp.data.lname;
-    formTODetail.fname = resp.data.fname;
-    formTODetail.mname = resp.data.mname;
-    formTODetail.fullName = resp.data.lname + ", " + resp.data.fname
-    formTODetail.office = resp.data.office
-    formTODetail.designation = resp.data.jobs
-  }).catch((e: Error)=>{
-    alert(e.message)
-  });
+ checkEmployeeInfo(employee);
 })
 const getTOInfo = async(toId: any) =>{
   TravelOrderService.get(toId).then((response: ResponseData)=>{
@@ -499,6 +517,9 @@ onMounted(async ()=>{
             </Button>
             <Button type="submit" variant="primary" elevated class="w-auto" >
                 <Lucide icon="Save" class="w-4 h-4 mr-2" />{{ buttonTitle }}
+            </Button>
+            <Button v-if="formTODetail.id!==''" variant="warning" elevated class="w-auto mr-10" @click="deleteToDetail(formTODetail.id)">
+                <Lucide icon="Save" class="w-4 h-4 mr-2" />Delete
             </Button>
         </Dialog.Footer>
         </form>
