@@ -58,6 +58,7 @@ const resetFields = () =>{
     formTODetail.certificateOfAppearance = ''
     addressSelect.addressName = ''
     buttonTitle.value = "Save"
+    selectEmployee.value = ([""])
 }
 const setAddModal = (value: boolean) => {
   addModal.value = value;
@@ -142,6 +143,8 @@ const checkEmployeeInfo = (id: any) => {
       formTODetail.designation = resp.data.jobs
     }).catch((e: Error)=>{
       alert(e.message)
+      formTODetail.fullName = ""
+      selectEmployee.value = ([""])
     });
 }
 const onSubmit1 = async () => {
