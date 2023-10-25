@@ -192,9 +192,9 @@ watch(
     }
     }
 )
-watch(() => (selectEmployee.value), async(employee, preEmp) =>{
- checkEmployeeInfo(employee);
-})
+// watch(() => (selectEmployee.value), async(employee, preEmp) =>{
+//  checkEmployeeInfo(employee);
+// })
 const getTOInfo = async(toId: any) =>{
   TravelOrderService.get(toId).then((response: ResponseData)=>{
       formTO.toNo =  response.data.toNo
