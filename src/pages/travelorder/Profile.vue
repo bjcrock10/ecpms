@@ -147,8 +147,7 @@ const checkEmployeeInfo = (id: any) => {
 const onSubmit1 = async () => {
   if(formTODetail.id===""){
     formTODetail.userId = selectEmployee.value.toString()
-    checkEmployeeInfo(formTODetail.userId);
-    if(formTODetail.fullName===""){
+    if(formTODetail.userId!=="0"){
       TravelOrderDetailService.create(formTODetail).then((resp: ResponseData)=>{
         successNotification.value.showToast();
         messageDetail.value = "You successfully added Employee: " + formTODetail.fullName
@@ -163,8 +162,7 @@ const onSubmit1 = async () => {
   }
   else{
     formTODetail.userId = selectEmployee.value.toString()
-    checkEmployeeInfo(formTODetail.userId);
-    if(formTODetail.fullName!==""){
+    if(formTODetail.userId!=="0"){
       TravelOrderDetailService.update(formTODetail.id, formTODetail).then((resp: ResponseData) => {
         successNotification.value.showToast();
         messageDetail.value = "You successfully updated Employee: " + resp.data.fullName
@@ -192,9 +190,9 @@ watch(
     }
     }
 )
-// watch(() => (selectEmployee.value), async(employee, preEmp) =>{
-//  checkEmployeeInfo(employee);
-// })
+watch(() => (selectEmployee.value), async(employee, preEmp) =>{
+ checkEmployeeInfo(employee);
+})
 const getTOInfo = async(toId: any) =>{
   TravelOrderService.get(toId).then((response: ResponseData)=>{
       formTO.toNo =  response.data.toNo
@@ -427,6 +425,13 @@ onMounted(async ()=>{
                     <option v-for="item in employeeList" :value="item['id']" :key="item['id']">{{item['lname']+', '+item['fname']}}</option>
                     <option :value="formTODetail.userId">{{formTODetail.fullName}}</option>
                 </TomSelect>
+            </div>
+            <div class=" hidden">
+              <FormInput type="text" v-model="formTODetail.lname" class="col-span-12 sm:col-span-6" required/>
+              <FormInput type="text" v-model="formTODetail.fname" class="col-span-12 sm:col-span-6" required/>
+              <FormInput type="text" v-model="formTODetail.designation" class="col-span-12 sm:col-span-6" required/>
+              <FormInput type="text" v-model="formTODetail.fullName" class="col-span-12 sm:col-span-6" required/>
+              <FormInput type="text" v-model="formTODetail.office" class="col-span-12 sm:col-span-6" required/>
             </div>
             <div class="col-span-12 md:col-span-12">
                 <div class="col-span-12 sm:col-span-12">
