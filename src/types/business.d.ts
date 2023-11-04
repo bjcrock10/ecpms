@@ -264,7 +264,80 @@ export function useBusiness(){
     });
     const selectOrganization = ref([formBusiness.organization]);
     const orgList = ref([]);
+    const columnData = ref([
+        {
+        title: "",
+        formatter: "responsiveCollapse",
+        width: 40,
+        minWidth: 30,
+        hozAlign: "center",
+        resizable: false,
+        headerSort: false,
+        },
+  
+        // For HTML table
+        {
+          title: "No",
+          minWidth: 100,
+          maxWidth: 100,
+          field: "id",
+          hozAlign: "center",
+          headerHozAlign: "center",
+          vertAlign: "middle",
+          print: false,
+          download: false
+        },
+        {
+          title: "Business Name",
+          minWidth: 100,
+          maxWidth: 150,
+          field: "businessName",
+          hozAlign: "center",
+          headerHozAlign: "center",
+          vertAlign: "middle",
+          print: false,
+          download: false,
+          formatter(cell) {
+              return `<div>
+                  <div class="font-medium whitespace-nowrap">${cell.getData().businessName}</div>
+                  
+              </div>`;
+          },
+        },
+        {
+        title: "Business Ownership",
+        minWidth: 200,
+        responsive: 0,
+        field: "businessOwnership",
+        hozAlign: "center",
+        headerHozAlign: "center",
+        vertAlign: "middle",
+        print: false,
+        download: false,
+        },
+        {
+        title: "Line Of Business",
+        minWidth: 200,
+        field: "lineOfBusiness",
+        hozAlign: "center",
+        headerHozAlign: "center",
+        vertAlign: "middle",
+        print: false,
+        download: false,
+        },
+        {
+        title: "Capitalization",
+        minWidth: 200,
+        field: "capitalization",
+        hozAlign: "center",
+        headerHozAlign: "center",
+        vertAlign: "middle",
+        print: false,
+        download: false,
+        },
+    ])
     return {
+        columnData,
         formBusiness,
         formSocialMedia,
         formBusinessOwner,

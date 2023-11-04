@@ -11,6 +11,10 @@ class BusinessDataService {
     get(id: any): Promise<any> {
       return http.get(`/business/?id=${id}`);
     }
+
+    getByClient(id: any): Promise<any> {
+      return http.get(`/business/?cid=${id}`);
+    }
   
     create(data: any): Promise<any> {
       return http.post("/business/", data);

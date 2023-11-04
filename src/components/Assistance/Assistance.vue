@@ -25,7 +25,7 @@ import LoadingIcon from "../../base-components/LoadingIcon";
 import { ClassicEditor } from "../../base-components/Ckeditor";
 
 const {formAssistance, columnData} = useAssistance();
-const {initTabulator, reInitOnResizeWindow, 
+const {initTabulator,initTabulatorByClient, reInitOnResizeWindow, 
 filter, onFilter, 
 onExportCsv, onExportHtml, 
 onExportJson, onExportXlsx, 
@@ -122,7 +122,12 @@ const loadAssistanceSubType = (assistanceTitle: any) => {
   })
 }
 const dataTable = () =>{
-  initTabulator(columnData.value, AssistanceDataService, tableClient,props.business,true);
+  if(props.business!=="0"){
+    initTabulator(columnData.value, AssistanceDataService, tableClient,props.business,true);
+  }
+  else{
+    initTabulatorByClient(columnData.value, AssistanceDataService, tableClient, props.clientId);
+  }
   reInitOnResizeWindow();
   tabulator.value?.on("rowClick",(e, cell)=>{
     formAssistance.id = cell.getData().id
@@ -170,7 +175,7 @@ onMounted(async () => {
         <Button class="mr-2 shadow-md" as="a" href="#" variant="primary" @click="(event: MouseEvent) => {
             event.preventDefault();
             setAddModal(true);
-          }" v-if="props.business!=='0'">
+          }">
           Add New Assistance
         </Button>
         <!-- BEGIN: Notification Content -->
@@ -364,7 +369,7 @@ onMounted(async () => {
                               <Lucide icon="XSquare" class="w-4 h-4 mr-2" />
                         Cancel
                     </Button>
-                    <Button type="submit" variant="primary" elevated class="w-auto" v-if="props.business!=='0'">
+                    <Button type="submit" variant="primary" elevated class="w-auto">
                       <Lucide icon="Save" class="w-4 h-4 mr-2" />{{buttonTitle}}
                     </Button>
                 </Dialog.Footer>

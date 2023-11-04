@@ -98,6 +98,52 @@ export function tabulatorFunc(){
         // })
       };
 
+      const initTabulatorByClient = (columnData:any, dataService:any, tableRef:any,id:any="0") => {
+        tabulator.value = new Tabulator(tableRef.value, {
+            data: [],
+            progressiveRender: true, //enable progressive rendering
+            progressiveRenderSize:10, //sets the number of rows to render per block (default = 20)
+            progressiveRenderMargin:50,
+            paginationMode: "local",
+            filterMode: "local",
+            sortMode: "local",
+            printAsHtml: true,
+            printStyled: true,
+            pagination: true,
+            paginationSize: 10,
+            paginationSizeSelector: [10, 20, 30, 40],
+            layout: "fitColumns",
+            responsiveLayout: "collapse",
+            placeholder: "No matching records found",
+            columns: columnData
+        });
+        if (tableRef.value) {
+          dataService.getByClient(id)
+          .then((response: ResponseData) => {
+           
+            tabulator.value.setData(response.data)
+          })
+          .catch((e: Error)=>{
+              console.log(e)
+          })
+          .finally(()=> {
+            loadingIcon.value = false
+          })
+        }
+        tabulator.value?.on("renderComplete", () => {
+          createIcons({
+            icons,
+            attrs: {
+              "stroke-width": 1.5,
+            },
+            nameAttr: "data-lucide",
+          });
+        });
+        // tabulator.value?.on("rowClick",()=>{
+        //   alert("bang")
+        // })
+      };
+
       const initTabulatorJsonResp = (columnData:any, dataService:any, tableRef:any, status: any, office: any='') =>{
         tabulator.value = new Tabulator(tableRef.value, {
             data: [],
@@ -213,6 +259,7 @@ export function tabulatorFunc(){
       };
 return{
     initTabulator,
+    initTabulatorByClient,
     initTabulatorJsonResp,
     onExportCsv,
     onExportHtml,
