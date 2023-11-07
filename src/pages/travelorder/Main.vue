@@ -142,8 +142,9 @@ onMounted(async ()=>{
                 v-model="filter.field"
                 class="w-full mt-2 2xl:w-full sm:mt-0 sm:w-auto"
               >
-                <option value="id">No.</option>
+                <option value="purpose">Purpose</option>
                 <option value="toNo">TO No.</option>
+                <option value="id">No.</option>
                 <option value="office">Office</option>
                 <option value="status">Status</option>
               </FormSelect>
