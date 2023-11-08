@@ -197,23 +197,22 @@ onMounted(async () => {
                         border border-solid border-gray-300 p-2">
                         <legend class="text-sm font-bold">Personal Information</legend>
                         <div class="col-span-12 sm:col-span-1">
-                          <FormLabel htmlFor="modal-form-3"> Prefix </FormLabel>
-                          <FormSelect  v-model="formClient.prefix" class="col-span-12 sm:col-span-2" @change="aNcfrs" required>
+                          <FormLabel htmlFor="modal-form-3"> Prefix<span class="requiredTag"> *</span></FormLabel>
+                          <FormSelect  v-model="formClient.prefix" class="col-span-12 sm:col-span-2" @change="aNcfrs" placeholder="Required Fields *" required>
                             <option value="Mr.">Mr.</option>
                             <option value="Ms.">Ms.</option>
                             <option value="Mrs.">Mrs.</option>
                           </FormSelect>
                         </div>
                         <div class="col-span-12 sm:col-span-4">
-                          <FormLabel htmlFor="modal-form-2"> Last Name </FormLabel>
+                          <FormLabel htmlFor="modal-form-2"> Last Name<span class="requiredTag"> *</span> </FormLabel>
                           <FormInput  :rounded="rounded" 
-                            v-model="formClient.lname" type="text" placeholder=""
-                             required/>
+                            v-model="formClient.lname" type="text" placeholder="Required Fields *" required/>
                         </div>
                         <div class="col-span-12 sm:col-span-3">
-                            <FormLabel  htmlFor="modal-form-1"> First Name </FormLabel>
+                            <FormLabel  htmlFor="modal-form-1"> First Name<span class="requiredTag"> *</span> </FormLabel>
                             <FormInput  :rounded="rounded" 
-                              v-model="formClient.fname" type="text" placeholder="" @focus="showSearchLnamewithParam"
+                              v-model="formClient.fname" type="text" placeholder="Required Fields *" @focus="showSearchLnamewithParam"
                               @blur="hideSearchLname"
                               required/>
                             <TransitionRoot
@@ -254,16 +253,16 @@ onMounted(async () => {
                           <FormInput  :rounded="rounded" v-model="formClient.suffix" type="text" placeholder="Sr/Jr/III" />
                         </div>
                         <div class="col-span-12 sm:col-span-2">
-                            <FormLabel htmlFor="modal-form-3"> Sex </FormLabel>
-                            <FormSelect  v-model="formClient.gender" required>
+                            <FormLabel htmlFor="modal-form-3"> Sex<span class="requiredTag"> *</span> </FormLabel>
+                            <FormSelect  v-model="formClient.gender" placeholder="Required Fields *" required>
                               <option value="FEMALE">Female</option>
                               <option value="MALE">Male</option>
                               <option value="Other">Other</option>
                             </FormSelect>
                         </div>
                         <div class="col-span-12 sm:col-span-2">
-                          <FormLabel htmlFor="modal-form-3"> Civil Status </FormLabel>
-                          <FormSelect  v-model="formClient.civilStatus" required>
+                          <FormLabel htmlFor="modal-form-3"> Civil Status<span class="requiredTag"> *</span> </FormLabel>
+                          <FormSelect  v-model="formClient.civilStatus" placeholder="Required Fields *" required>
                             <option value="Single">Single</option>
                             <option value="Married">Married</option>
                             <option value="Widowed">Widowed</option>
@@ -271,8 +270,8 @@ onMounted(async () => {
                           </FormSelect>
                         </div>
                         <div class="col-span-12 sm:col-span-2">
-                          <FormLabel htmlFor="modal-form-3"> Social Classification </FormLabel>
-                          <FormSelect  v-model="formClient.socialClassification" required>
+                          <FormLabel htmlFor="modal-form-3"> Social Classification<span class="requiredTag"> *</span> </FormLabel>
+                          <FormSelect  v-model="formClient.socialClassification" placeholder="Required Fields *" required>
                             <option value="Abled">Abled</option>
                             <option value="Indigenous Person">Indigenous Person</option>
                             <option value="Differently-Abled (PWD)">Differently-Abled (PWD)</option>
@@ -280,8 +279,8 @@ onMounted(async () => {
                           </FormSelect>
                         </div>
                         <div class="col-span-12 sm:col-span-2">
-                          <FormLabel  htmlFor="modal-form-1"> Age </FormLabel>
-                          <FormSelect  v-model="formClient.age" required>
+                          <FormLabel  htmlFor="modal-form-1"> Age<span class="requiredTag"> *</span> </FormLabel>
+                          <FormSelect  v-model="formClient.age"  placeholder="Required Fields *" required>
                             <option value="18 - 35 years old">18 - 35 years old</option>
                             <option value="above 35 – below 60 years old">above 35 – below 60 years old</option>
                             <option value="60 years old and  above">60 years old and  above</option>
@@ -309,8 +308,8 @@ onMounted(async () => {
                           </TomSelect>
                         </div>
                         <div class="col-span-12 md:col-span-4">
-                          <FormLabel htmlFor="modal-form-3"> Are you an Investor </FormLabel>
-                          <FormSelect form-select-size="sm"  v-model="formClient.investor" required>
+                          <FormLabel htmlFor="modal-form-3"> Are you an Investor<span class="requiredTag"> *</span> </FormLabel>
+                          <FormSelect form-select-size="sm"  v-model="formClient.investor" placeholder="Required Fields *" required>
                               <option value="Yes">Yes</option>
                               <option value="No">No</option>
                           </FormSelect>
@@ -333,7 +332,7 @@ onMounted(async () => {
                             </TomSelect>
                         </div>
                         <fieldset class="grid grid-cols-12 col-span-12 gap-4 gap-y-3 border border-solid border-gray-300 p-3">
-                          <legend class="text-xs">Address</legend>
+                          <legend class="text-xs">Address<span class="requiredTag"> *</span></legend>
                           <div class="col-span-12 sm:col-span-6">
                             <FormLabel  htmlFor="modal-form-1"> House No./Street Name</FormLabel>
                             <FormInput  v-model="formClient.address" type="text"
@@ -352,13 +351,14 @@ onMounted(async () => {
                           <!-- BEGIN: Search -->
                           <div class="col-span-12 sm:col-span-12">
                             <div class="col-span-12 sm:col-span-3">
-                              <FormLabel  htmlFor="modal-form-1"> Barangay / Municipality or City / Region  </FormLabel>
+                              <FormLabel  htmlFor="modal-form-1"> Barangay / Municipality or City / Region<span class="requiredTag"> *</span>  </FormLabel>
                               <FormInput
                                 type="text"
                                 placeholder="Search Barangay..."
                                 @focus="showSearchBrgy"
                                 @blur="hideSearchBrgy"
                                 v-model="addressSelect.addressName"
+                                required
                               />
                           </div>
                             <TransitionRoot
@@ -408,7 +408,7 @@ onMounted(async () => {
                           </div>
                           <div class="col-span-12 sm:col-span-3">
                             <FormLabel  htmlFor="modal-form-3"> Email Address </FormLabel>
-                            <FormInput  v-model="formClient.email" type="email"
+                            <FormInput  v-model="formClient.email" type="text"
                             placeholder="If applicable"/>
                           </div>
                         </fieldset>
@@ -649,5 +649,16 @@ onMounted(async () => {
 <style scoped>
   input{
     text-transform: uppercase;
+  }
+  ::placeholder {
+    color: red;
+    opacity: 1;
+  }
+  ::-ms-input-placeholder {
+    color: red;
+  }
+  .requiredTag{
+    color: red;
+    opacity: 1;
   }
 </style>
