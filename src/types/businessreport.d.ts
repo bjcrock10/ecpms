@@ -89,26 +89,28 @@ export function useBusinessReport(){
                 "uniqueName": "fullName"
             },
             {
-                "uniqueName": "msmeProgram"
+                "uniqueName": "digitalLevel"
             }
         ],
         "columns": [
+            {
+                "uniqueName": "edtLevel"
+            },
+            {
+                "uniqueName": "capitalization"
+            },
             {
                 "uniqueName": "Measures"
             }
         ],
         "measures": [
             {
-                "uniqueName": "amountLoan",
-                "aggregation": "sum"
-            },
-            {
-                "uniqueName": "investmentGen",
-                "aggregation": "sum"
-            },
-            {
-                "uniqueName": "jobsGen",
-                "aggregation": "sum"
+                "uniqueName": "edtLevel",
+                "aggregation": "count",
+                "availableAggregations": [
+                    "count",
+                    "distinctcount"
+                ]
             }
         ],
     }

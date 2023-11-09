@@ -46,6 +46,12 @@ const onSubmit = () => {
   formClient.barangay = brgyId.value[0]
   formClient.lgu = brgyId.value[1]
   formClient.province = brgyId.value[2]
+  if(formClient.province===undefined){
+    addressSelect.addressName = ""
+    successNotification.value.showToast();
+    messageDetail.value = "Error Occured, Please Select a proper Barangay/City or Municipality/Province"
+    return
+  }
   formClient.lname.toUpperCase();
   formClient.fname.toUpperCase();
   formClient.mname.toUpperCase();

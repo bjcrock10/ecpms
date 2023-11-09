@@ -44,7 +44,7 @@ const {formClient, errorMessage, isError, columnData, addModal, rounded,  brgyDr
         message, messageDetail, buttonTitle, buttonIcon, setAddModal, select, brgy, sendButtonRef, ncfrs, tenurial,
         accreditation, organization, disNcfrs, disTenurial, disAccreditation, disOrganization, brgySelect, citySelect,
         clientList, addressSelect, checkBa, aNcfrs, dTenurial, dOrganization, dAccreditation, getClientInfo, 
-        updateClientInfo, clientSubmit, patchClientInfo, formOrganization, orgList, selectOrganization} = useClient();
+        updateClientInfo, clientSubmit, patchClientInfo, formOrganization, orgList, selectOrganization, brgyId} = useClient();
 
 const clientID = ref(router.currentRoute.value.params.id);
 const tableClient = ref<HTMLDivElement>();
@@ -75,19 +75,30 @@ watch(
     }
 );
 const orgId = ref(0)
+const currentClientId = ref();
 const onSubmit = () =>{
- if(formClient.farmerId===""){
-  formClient.farmerId = sessionStorage.getItem("office")+"-"+current_date+"-"+current_time
- }
- 
- formClient.ipGroup = selectOrganization.value.toString()
- formClient.fullName = formClient.lname.toUpperCase() + ", " + formClient.fname.toUpperCase() + " " + formClient.mname.toUpperCase();
- formOrganization.title = selectOrganization.value.toString()
- updateClientInfo(clientID.value,formClient).then();
- if(clientSubmit.value===true){
+  brgyId.value = addressSelect.addressName.split(", ")
+  formClient.farmerId = currentClientId.value
+  formClient.barangay = brgyId.value[0]
+  formClient.lgu = brgyId.value[1]
+  formClient.province = brgyId.value[2]
+  if(formClient.farmerId===""){
+    formClient.farmerId = sessionStorage.getItem("office")+"-"+current_date+"-"+current_time
+  }
+  if(formClient.province===undefined){
+    addressSelect.addressName = ""
     successNotification.value.showToast();
-    messageDetail.value = "You successfully updated client profile..."
- }
+    messageDetail.value = "Error Occured, Please Select a proper Barangay/City or Municipality/Province"
+    return
+  }
+  formClient.ipGroup = selectOrganization.value.toString()
+  formClient.fullName = formClient.lname.toUpperCase() + ", " + formClient.fname.toUpperCase() + " " + formClient.mname.toUpperCase();
+  formOrganization.title = selectOrganization.value.toString()
+  updateClientInfo(clientID.value,formClient).then();
+  if(clientSubmit.value===true){
+      successNotification.value.showToast();
+      messageDetail.value = "You successfully updated client profile..."
+  }
 };
 const retrieveBusinessId = async () => {
   ClientDataService.get(formClient.id).then((response: ResponseData)=>{
@@ -357,6 +368,7 @@ onMounted(async () => {
                                             @focus="showSearchBrgy"
                                             @blur="hideSearchBrgy"
                                             v-model="addressSelect.addressName"
+                                            required
                                         />
                                     </div>
                                         <TransitionRoot
