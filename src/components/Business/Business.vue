@@ -221,11 +221,16 @@ const onAddBusiness = async () => {
   formBusiness.businessBrgy = brgyId.value[0]
   formBusiness.businessCity = brgyId.value[1]
   formBusiness.businessProvince = brgyId.value[2]
+  brgyId.value = addressSelectBus.plantAddress.split(", ")
+  formBusiness.plantBrgy = brgyId.value[0]
+  formBusiness.plantCity = brgyId.value[1]
+  formBusiness.plantProvince = brgyId.value[2]
   formBusiness.organization = selectOrganization.value.toString();
   formBusiness.clientId = props.clientId;
   if(formBusiness.businessProvince===undefined){
     addressSelectBus.businessAddress = ""
     successNotification.value.showToast();
+    message.value = "Error in Saving!!!!!"
     messageDetail.value = "Error Occured, Please Select a proper Barangay/City or Municipality/Province"
     return
   }
