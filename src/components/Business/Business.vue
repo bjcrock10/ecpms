@@ -210,14 +210,25 @@ const removeMarketTraining = async (id: any) =>{
     console.log(e.message)
   })
 }
+const brgyId = ref()
 const onAddBusiness = async () => {
   formBusiness.businessOwnership = selectBusinessOwner.value.toString();
   formBusiness.lineOfBusiness = selectLineOfBusiness.value.toString();
   formBusiness.standardCertification = selectStandardCertification.value.toString();
   formBusiness.plantBrgyAddress = addressSelectBus.plantAddress;
   formBusiness.businessBrgyAddress = addressSelectBus.businessAddress;
+  brgyId.value = addressSelectBus.businessAddress.split(", ")
+  formBusiness.businessBrgy = brgyId.value[0]
+  formBusiness.businessCity = brgyId.value[1]
+  formBusiness.businessProvince = brgyId.value[2]
   formBusiness.organization = selectOrganization.value.toString();
   formBusiness.clientId = props.clientId;
+  if(formBusiness.businessProvince===undefined){
+    addressSelectBus.businessAddress = ""
+    successNotification.value.showToast();
+    messageDetail.value = "Error Occured, Please Select a proper Barangay/City or Municipality/Province"
+    return
+  }
   if(formBusiness.id==="0"){
     BusinessDataService.create(formBusiness).then((response: ResponseData)=>{
       businessID.value = response.data.id
