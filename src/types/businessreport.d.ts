@@ -43,17 +43,17 @@ export function useBusinessReport(){
         "reportFilters": [
             {
                 "uniqueName": "dateProvidedTo.Month"
-            },
-            {
-                "uniqueName": "assistingStaff"
             }
         ],
         "rows": [
             {
-                "uniqueName": "businessName"
+                "uniqueName": "office"
             },
             {
-                "uniqueName": "fullName"
+                "uniqueName": "assistingStaff"
+            },
+            {
+                "uniqueName": "businessName"
             }
         ],
         "columns": [
