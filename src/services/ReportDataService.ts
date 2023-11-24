@@ -5,12 +5,12 @@ class ReportDataService {
       return http.get("/businessreport/?id=1");
     }
 
-    getAllBusinessAssistance(): Promise<any> {
-        return http.get("/businessassistance/?id=1");
+    getAllBusinessAssistance(month:any, office:any): Promise<any> {
+        return http.get(`/businessassistance/?id=1&month=${month}&office=${office}`);
     }
 
-    getAllClientAssistance(): Promise<any> {
-        return http.get("/clientassistance/?id=1");
+    getAllClientAssistance(month:any,office:any): Promise<any> {
+        return http.get(`/clientassistance/?id=1&month=${month}&office=${office}`);
     }
     getAllToReport(): Promise<any> {
       return http.get("/traveldetail/?rpt=1");

@@ -42,7 +42,12 @@ export function useBusinessReport(){
     const slicerBusinessAssistance = {
         "reportFilters": [
             {
-                "uniqueName": "dateProvidedTo.Month"
+                "uniqueName": "encodedDate.Month",
+                "filter": {
+                    "members": [
+                        "encodedDate.Month.November"
+                    ]
+                }
             }
         ],
         "rows": [
@@ -51,6 +56,9 @@ export function useBusinessReport(){
             },
             {
                 "uniqueName": "assistingStaff"
+            },
+            {
+                "uniqueName": "staffStation"
             },
             {
                 "uniqueName": "businessName"
