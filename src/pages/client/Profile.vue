@@ -214,14 +214,14 @@ onMounted(async () => {
             <Lucide icon="User" class="w-4 h-4 mr-2" /> Profile
             </Tab.Button>
         </Tab>
-        <Tab :fullWidth="false" v-if="formClient.businessId==='0'">
-            <Tab.Button class="flex items-center py-4 cursor-pointer" @click="retrieveBusinessId()">
-            <Lucide icon="Settings" class="w-4 h-4 mr-2" /> Assistance
-            </Tab.Button>
-        </Tab>
         <Tab :fullWidth="false">
             <Tab.Button class="flex items-center py-4 cursor-pointer">
             <Lucide icon="Shield" class="w-4 h-4 mr-2" /> Business Information
+            </Tab.Button>
+        </Tab>
+        <Tab :fullWidth="false" v-if="formClient.businessId==='0'">
+            <Tab.Button class="flex items-center py-4 cursor-pointer" @click="retrieveBusinessId()">
+            <Lucide icon="Settings" class="w-4 h-4 mr-2" /> Assistance for Potential Clients
             </Tab.Button>
         </Tab>
       </Tab.List>
@@ -434,6 +434,10 @@ onMounted(async () => {
               </div>
             </div>  
       </Tab.Panel>
+      <!-- END: Business Information -->
+      <Tab.Panel>
+        <Business :clientId="clientID"/>
+      </Tab.Panel>
       <!-- BEGIN: Assistance Information -->
       <Tab.Panel v-if="formClient.businessId==='0'">
         <div class="grid grid-cols-12 gap-12">
@@ -445,10 +449,6 @@ onMounted(async () => {
         </div>
       </Tab.Panel>
       <!-- END: Assistance Information -->
-      <!-- END: Business Information -->
-      <Tab.Panel>
-        <Business :clientId="clientID"/>
-      </Tab.Panel>
     </Tab.Panels>
   </Tab.Group>
 </template>

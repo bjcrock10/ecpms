@@ -100,7 +100,7 @@
             </div>
             <div class="col-span-12 md:col-span-6">
                 <FormLabel htmlFor="modal-form-3">Departure Month</FormLabel>
-                <FormInput type="month" v-model="formTODetail.departureMonth" class="col-span-12 sm:col-span-6" required :disabled="(formTO.status!=='For Approval')?true:false"/>
+                <FormInput type="month" v-model="formTODetail.departureMonth" class="col-span-12 sm:col-span-6" required />
             </div>
         </div>
     </form>

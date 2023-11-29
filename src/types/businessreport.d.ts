@@ -89,10 +89,16 @@ export function useBusinessReport(){
     const slicerClientAssistance = {
         "reportFilters": [
             {
-                "uniqueName": "dateProvidedTo.Month"
+                "uniqueName": "encodedDate"
             }
         ],
         "rows": [
+            {
+                "uniqueName": "assistingStaff"
+            },
+            {
+                "uniqueName": "staffStation"
+            },
             {
                 "uniqueName": "fullName"
             },
@@ -103,9 +109,6 @@ export function useBusinessReport(){
         "columns": [
             {
                 "uniqueName": "edtLevel"
-            },
-            {
-                "uniqueName": "capitalization"
             },
             {
                 "uniqueName": "Measures"

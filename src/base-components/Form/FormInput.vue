@@ -12,6 +12,7 @@ import { ProvideFormInline } from "./FormInline.vue";
 import { ProvideInputGroup } from "./InputGroup/InputGroup.vue";
 
 interface FormInputProps extends /* @vue-ignore */ InputHTMLAttributes {
+  value?: InputHTMLAttributes["value"];
   modelValue?: InputHTMLAttributes["value"];
   formInputSize?: "sm" | "lg";
   rounded?: boolean;
@@ -22,9 +23,7 @@ interface FormInputEmit {
 }
 
 const props = defineProps<FormInputProps>();
-
 const attrs = useAttrs();
-
 const formInline = inject<ProvideFormInline>("formInline", false);
 const inputGroup = inject<ProvideInputGroup>("inputGroup", false);
 
@@ -47,7 +46,7 @@ const emit = defineEmits<FormInputEmit>();
 
 const localValue = computed({
   get() {
-    return props.modelValue;
+    return props.modelValue === undefined ? props.value : props.modelValue;
   },
   set(newValue) {
     emit("update:modelValue", newValue);
@@ -59,7 +58,6 @@ const localValue = computed({
   <input
     :class="computedClass"
     :type="props.type"
-    form-input-size="sm"
     v-bind="_.omit(attrs, 'class')"
     v-model="localValue"
   />

@@ -65,10 +65,10 @@ export default {
             "name": "",
             "thousandsSeparator": ",",
             "decimalSeparator": ".",
-            "decimalPlaces": 2,
+            "decimalPlaces": 0,
             "currencySymbol": "",
             "currencySymbolAlign": "left",
-            "nullValue": "0",
+            "nullValue": "",
             "textAlign": "right",
             "isPercent": false
         }],

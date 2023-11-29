@@ -43,7 +43,7 @@ export function tabulatorFunc(){
         }
         if(byId==="0" && status===""){
           if (tableRef.value) {
-            dataService.getLimit(500)
+            dataService.getAll()
             .then((response: ResponseData) => {
              
               tabulator.value.setData(response.data)

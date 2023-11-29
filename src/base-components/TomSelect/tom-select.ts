@@ -52,7 +52,7 @@ const init = (
       ...computedOptions,
     };
   }
-
+  /* @ts-ignore */
   clonedEl.TomSelect = new TomSelect(clonedEl, computedOptions);
 
   // On change
