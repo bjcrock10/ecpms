@@ -57,6 +57,7 @@ export function useBusiness(){
         'organization':'',
         'encodedBy': sessionStorage.getItem('userId'),
         'encodedByName': sessionStorage.getItem('name'),
+        'office':sessionStorage.getItem('office'),
         'encodedDate':current_date,
         'recStat':'0',
     });
@@ -65,6 +66,10 @@ export function useBusiness(){
         'business' : '0',
         'platForm' : '0',
         'url' : '0',
+        'encodedBy': sessionStorage.getItem('userId'),
+        'encodedByName': sessionStorage.getItem('name'),
+        'office':sessionStorage.getItem('office'),
+        'encodedDate':current_date,
         'recStat' : '0',
     });
     const formEcommerce = reactive({
@@ -72,6 +77,10 @@ export function useBusiness(){
         'business' : '0',
         'platForm' : '0',
         'url' : '0',
+        'encodedBy': sessionStorage.getItem('userId'),
+        'encodedByName': sessionStorage.getItem('name'),
+        'office':sessionStorage.getItem('office'),
+        'encodedDate':current_date,
         'recStat' : '0',
     });
     const formBusinessOwner = reactive({
@@ -84,6 +93,10 @@ export function useBusiness(){
         'mname' : '',
         'contactNo' : '',
         'email' : '',
+        'encodedBy': sessionStorage.getItem('userId'),
+        'encodedByName': sessionStorage.getItem('name'),
+        'office':sessionStorage.getItem('office'),
+        'encodedDate':current_date,
         'recStat' : '0',
     });
     const formMarketPlan = reactive({
@@ -93,6 +106,7 @@ export function useBusiness(){
         'specific' : '',
         'encodedBy': sessionStorage.getItem('userId'),
         'encodedByName': sessionStorage.getItem('name'),
+        'office':sessionStorage.getItem('office'),
         'encodedDate':current_date,
         'recStat':'0',
     });
@@ -103,6 +117,7 @@ export function useBusiness(){
         'targetYear' : '',
         'encodedBy': sessionStorage.getItem('userId'),
         'encodedByName': sessionStorage.getItem('name'),
+        'office':sessionStorage.getItem('office'),
         'encodedDate':current_date,
         'recStat':'0',
     });

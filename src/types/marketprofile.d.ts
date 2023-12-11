@@ -24,6 +24,7 @@ export function useMarketProfile(){
         'encodedBy': sessionStorage.getItem('userId'),
         'encodedByName': sessionStorage.getItem('name'),
         'encodedDate':current_date,
+        'office':sessionStorage.getItem('office'),
         'recStat':'1',
     });
     const formMaterialSource = reactive({
@@ -36,6 +37,7 @@ export function useMarketProfile(){
         'encodedBy': sessionStorage.getItem('userId'),
         'encodedByName': sessionStorage.getItem('name'),
         'encodedDate':current_date,
+        'office':sessionStorage.getItem('office'),
         'recStat':'1',
     });
     const columnData = ref([

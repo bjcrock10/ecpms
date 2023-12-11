@@ -17,6 +17,7 @@ export function useProduct(){
         'certification':'',
         'encodedBy': sessionStorage.getItem('userId'),
         'encodedByName': sessionStorage.getItem('name'),
+        'office':sessionStorage.getItem('office'),
         'encodedDate':current_date,
         'recStat':'1',
     });
