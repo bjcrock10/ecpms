@@ -241,6 +241,7 @@ const onAddBusiness = async () => {
         patchClientInfo(formBusiness.clientId,{'businessId':businessID.value})
       }
       successNotification.value.showToast();
+      message.value = "SUCESSFULL!!!!!"
       messageDetail.value = "You successfully business profile with a Business ID "+businessID.value;
       formBusiness.id = businessID.value.toString();
       dataTable();
