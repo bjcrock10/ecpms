@@ -30,6 +30,7 @@ import { Disclosure } from "../../base-components/Headless";
 import Business from '../../components/Business'
 import Assistance from '../../components/Assistance';
 import CodeBook from "../../services/CodeBook";
+import { integer } from "@vuelidate/validators";
 
 const date = new Date();
 const current_date = date.getFullYear()+"-"+(date.getMonth()+1)+"-"+ date.getDate();
@@ -219,7 +220,7 @@ onMounted(async () => {
             <Lucide icon="Shield" class="w-4 h-4 mr-2" /> Business Information
             </Tab.Button>
         </Tab>
-        <Tab :fullWidth="false" v-if="formClient.businessId==='0'">
+        <Tab :fullWidth="false" v-if="parseInt(formClient.businessId)===0">
             <Tab.Button class="flex items-center py-4 cursor-pointer" @click="retrieveBusinessId()">
             <Lucide icon="Settings" class="w-4 h-4 mr-2" /> Assistance for Potential Clients
             </Tab.Button>
@@ -439,7 +440,7 @@ onMounted(async () => {
         <Business :clientId="clientID"/>
       </Tab.Panel>
       <!-- BEGIN: Assistance Information -->
-      <Tab.Panel v-if="formClient.businessId==='0'">
+      <Tab.Panel v-if="parseInt(formClient.businessId)===0">
         <div class="grid grid-cols-12 gap-12">
           <div class="col-span-12 intro-y box lg:col-span-12">
             <div class="p-2">
