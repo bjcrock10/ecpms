@@ -122,7 +122,7 @@ const loadAssistanceSubType = (assistanceTitle: any) => {
   })
 }
 const dataTable = () =>{
-  if(props.business!=="0"){
+  if(props.business!==0){
     initTabulator(columnData.value, AssistanceDataService, tableClient,props.business,true);
   }
   else{
