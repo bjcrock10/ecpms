@@ -554,7 +554,7 @@ const sendButtonRef = ref(null);
                                           class="w-full"
                                         >
                                         <option v-for="item in priorityIndustry" :value="item['textdata']" :key="item['id']">{{item['textdata']}}</option>
-                                        <option :value="formBusiness.priorityIndustry">{{formBusiness.priorityIndustry}}</option>
+                                        <option v-if="parseInt(formBusiness.id) === 0" :value="formBusiness.priorityIndustry">{{formBusiness.priorityIndustry}}</option>
                                     </TomSelect>
                                 </div>
                                   <div class="col-span-12 md:col-span-4">
