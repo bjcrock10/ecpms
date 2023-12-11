@@ -345,6 +345,10 @@ onMounted(async () => {
     priorityIndustry.value = resp.data
   })
   dataTable();
+
+  formBusiness.noOfFemaleEmployee = "0"
+  formBusiness.noOfMaleEmployee = "0"
+  formBusiness.priorityIndustry = "BAMBOO"
 });
 const capitalized = (item: any) =>{
   const capitalizedFirst = item[0].toUpperCase();
