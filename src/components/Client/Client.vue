@@ -51,7 +51,7 @@
     successNotification.value = el;
     });
     onMounted(async ()=>{
-        initTabulatorSearchClientName(columnData.value, ClientDataService, tableClient, prop.clientName);
+        initTabulatorSearchClientName(columnData.value, ClientDataService, tableClient, props.clientName);
         reInitOnResizeWindow();
         tabulator.value?.on("rowClick",(e, cell)=>{
             const id = cell.getData().id
