@@ -230,6 +230,7 @@ export function tabulatorFunc(){
         });
       }
         const initTabulatorSearchClientName = (columnData:any, dataService:any, tableRef:any, fullName:any="") => {
+          loadingIcon.value = true
           tabulator.value = new Tabulator(tableRef.value, {
               data: [],
               progressiveRender: true, //enable progressive rendering

@@ -87,6 +87,8 @@ const onSubmit = () => {
     }).catch((e : Error)=>{
       message.value = "Error occurred!!!"
       messageDetail.value = e.message.toString()
+      formClient.fullName = formClient.lname.toUpperCase() + ", " + formClient.fname.toUpperCase() + " " + formClient.mname.toUpperCase();
+      setAddModalSearch(true);
     })
 };
 watch(addModal,(addModal, oldAdm)=> {
@@ -108,18 +110,18 @@ watch(
       }
     }
 )
-watch(
-  () => (formClient.fname), async(lname, prevToe) => {
-    if(lname.length>=2){
-        lname = formClient.lname + ", " + lname
-        ClientDataService.findByLname(lname).then((response: ResponseData)=>{
-          clientList.value = response.data
-        }).catch((e: Error)=>{
-          console.log(clientList.value)
-        })
-      }
-    }
-)
+// watch(
+//   () => (formClient.fname), async(lname, prevToe) => {
+//     if(lname.length>=2){
+//         lname = formClient.lname + ", " + lname
+//         ClientDataService.findByLname(lname).then((response: ResponseData)=>{
+//           clientList.value = response.data
+//         }).catch((e: Error)=>{
+//           console.log(clientList.value)
+//         })
+//       }
+//     }
+// )
 const showSearchLnamewithParam = async () => {
   lnameDropdown.value = true
   // ClientDataService.findByLname(formClient.lname+", "+formClient.fname+" "+formClient.mname)
@@ -205,7 +207,7 @@ onMounted(async () => {
                   </button>
               </Dialog.Title>
               <Dialog.Description class="text-xs">
-                <Client />
+                <Client :clientName="formClient.fullName"/>
               </Dialog.Description>
           </Dialog.Panel>
       </Dialog>
@@ -255,7 +257,7 @@ onMounted(async () => {
                               v-model="formClient.fname" type="text" placeholder="Required Fields *" @focus="showSearchLnamewithParam"
                               @blur="hideSearchLname"
                               required/>
-                            <TransitionRoot
+                            <!-- <TransitionRoot
                               as="template"
                               :show="lnameDropdown"
                               enter="transition-all ease-linear duration-150"
@@ -280,7 +282,7 @@ onMounted(async () => {
                                     </button>
                                  </div>
                               </div>
-                            </TransitionRoot>
+                            </TransitionRoot> -->
                         </div>
                         <div class="col-span-12 sm:col-span-3">
                           <FormLabel htmlFor="modal-form-3">Middle Name</FormLabel>

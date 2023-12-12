@@ -30,14 +30,18 @@
     onExportCsv, onExportHtml, 
     onExportJson, onExportXlsx, 
     onPrint, onResetFilter, tabulator, loadingIcon} = tabulatorFunc();
+
+    interface ClientName {
+        clientName?: any;
+    }
+    const props = defineProps<ClientName>(); 
     const onSubmit = () =>{
-        initTabulatorSearchClientName(columnData.value, ClientDataService, tableClient, formClient.fullName,);
+        initTabulatorSearchClientName(columnData.value, ClientDataService, tableClient, formClient.fullName);
         reInitOnResizeWindow();
         tabulator.value?.on("rowClick",(e, cell)=>{
             const id = cell.getData().id
             router.push({path:`/client/${id}`, params:{id}})
         })
-        alert('bang')
     }
     const clinetList = ref([])
     const tableClient = ref<HTMLDivElement>();
@@ -47,7 +51,7 @@
     successNotification.value = el;
     });
     onMounted(async ()=>{
-        initTabulatorSearchClientName(columnData.value, ClientDataService, tableClient, formClient.fullName,);
+        initTabulatorSearchClientName(columnData.value, ClientDataService, tableClient, prop.clientName);
         reInitOnResizeWindow();
         tabulator.value?.on("rowClick",(e, cell)=>{
             const id = cell.getData().id
