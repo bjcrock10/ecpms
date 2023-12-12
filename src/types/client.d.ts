@@ -252,6 +252,7 @@ export function useClient(){
         'recStat':'1',
     });
     const addModal = ref(false);
+    const addModalSearch = ref(false);
     const rounded = ref(false);
     const errorMessage = ref();
     const isError = ref(false);
@@ -276,6 +277,9 @@ export function useClient(){
     const buttonIcon = ref("Save");
     const setAddModal = (value: boolean) => {
       addModal.value = value;
+    };
+    const setAddModalSearch = (value: boolean) => {
+      addModalSearch.value = value;
     };
     const select = ref("1");
     const brgy = ref();
@@ -430,12 +434,13 @@ export function useClient(){
         columnData,
         formClient,
         addModal,
+        addModalSearch,
         errorMessage,
         isError,
         rounded,
         brgyDropdown,
         lnameDropdown, showSearchBrgy, hideSearchBrgy, showSearchLname, hideSearchLname, 
-        message, messageDetail, buttonTitle, buttonIcon, setAddModal, select, brgy, sendButtonRef, ncfrs, tenurial,
+        message, messageDetail, buttonTitle, buttonIcon, setAddModal,setAddModalSearch, select, brgy, sendButtonRef, ncfrs, tenurial,
         accreditation, organization, disNcfrs, disTenurial, disAccreditation, disOrganization, brgySelect, citySelect,
         clientList, addressSelect, checkBa, aNcfrs, dTenurial, dOrganization, dAccreditation, getClientInfo, 
         updateClientInfo, clientSubmit, patchClientInfo, brgyId, formOrganization, selectOrganization, orgList

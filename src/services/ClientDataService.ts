@@ -35,7 +35,9 @@ class ClientDataService {
     findByLname(lname: String): Promise<any> {
       return http.get(`/client/?lname=${lname}`);
     }
-
+    search(name: String): Promise<any> {
+      return http.get(`/client/?lname=${name}`);
+    }
     count(): Promise<any> {
       return http.get(`/client/?count=1`)
     }

@@ -20,13 +20,15 @@ import { createIcons, icons } from "lucide";
 import { useRouter } from "vue-router";
 import LoadingIcon from "../../base-components/LoadingIcon";
 import CodeBook from "../../services/CodeBook";
+import Client from "../../components/Client/Client.vue"
 
 const router = useRouter();
 const {formClient, errorMessage, isError, columnData, addModal, rounded,  brgyDropdown,
         lnameDropdown, showSearchBrgy, hideSearchBrgy, showSearchLname, hideSearchLname, 
         message, messageDetail, buttonTitle, buttonIcon, setAddModal, select, brgy, sendButtonRef, ncfrs, tenurial,
         accreditation, organization, disNcfrs, disTenurial, disAccreditation, disOrganization, brgySelect, citySelect,
-        clientList, addressSelect, checkBa, aNcfrs, dTenurial, dOrganization, dAccreditation, brgyId, formOrganization, orgList, selectOrganization} = useClient();
+        clientList, addressSelect, checkBa, aNcfrs, dTenurial, dOrganization, dAccreditation, brgyId, formOrganization, 
+        setAddModalSearch,addModalSearch,orgList, selectOrganization} = useClient();
 const {initTabulator, reInitOnResizeWindow, 
 filter, onFilter, 
 onExportCsv, onExportHtml, 
@@ -161,6 +163,12 @@ onMounted(async () => {
         }">
         Add New Client Profile
       </Button>
+      <Button class="mr-2 shadow-md" as="a" href="#" variant="success" @click="(event: MouseEvent) => {
+          event.preventDefault();
+          setAddModalSearch(true);
+        }">
+        Search Client
+      </Button>
       <!-- BEGIN: Notification Content -->
         <Notification refKey="successNotification" :options="{
           duration: 3000,
@@ -176,6 +184,32 @@ onMounted(async () => {
         </div>s
         </Notification>
     <!-- END: Notification Content -->
+    <!-- Search Modal -->
+      <Dialog size="2xl" :open="addModalSearch" @close="
+                        () => {
+                          setAddModalSearch(false);
+                        }
+                      " :initialFocus="sendButtonRef"
+                      :draggable="true">
+          <Dialog.Panel class="z-40 top-0 left-0 w-full h-full outline-none overflow-x-hidden overflow-y-auto">
+              <Dialog.Title>
+                  <h2 class="mr-auto text-base font-medium">
+                      Client Profile
+                  </h2>
+                  <button type="button" variant="outline-secondary" @click="
+                            () => {
+                              setAddModalSearch(false);
+                            }
+                          " class="w-auto mr-1">
+                          <Lucide icon="XSquare" class="w-4 h-4 mr-2" />
+                  </button>
+              </Dialog.Title>
+              <Dialog.Description class="text-xs">
+                <Client />
+              </Dialog.Description>
+          </Dialog.Panel>
+      </Dialog>
+    <!-- END: Search Modal -->
       <!-- BEGIN: Modal Content -->
       <Dialog size="2xl" :open="addModal" @close="
                       () => {
@@ -418,76 +452,6 @@ onMounted(async () => {
                             placeholder="If applicable"/>
                           </div>
                         </fieldset>
-                        <!-- <fieldset class="grid grid-cols-12 col-span-12 gap-4 gap-y-3 
-                      border border-solid border-gray-300 p-2" >
-                      <legend class="text-sm font-bold">CFIDP</legend>
-                      <div class="col-span-12 sm:col-span-4">
-                        <FormLabel  htmlFor="modal-form-1"> Classification </FormLabel>
-                        <FormSelect v-model="formClient.classification" required>
-                          <option value="Individual Farmer">Individual Farmer</option>
-                          <option value="Association/Cooperative">Association/Cooperative</option>
-                          <option value="MSME">MSME</option>
-                        </FormSelect>
-                      </div>
-                      <div class="col-span-12 sm:col-span-4">
-                          <FormLabel  htmlFor="modal-form-1"> Are you NCFRS-Registered? </FormLabel>
-                          <InputGroup class="grid grid-cols-12">
-                            <FormSelect  v-model="ncfrs" class="col-span-12 sm:col-span-2" @change="aNcfrs" required>
-                              <option value="Yes">Yes</option>
-                              <option value="No">No</option>
-                              <option value="Not Sure">Not Sure</option>
-                            </FormSelect>
-                            <FormInput  :rounded="rounded" v-model="formClient.farmerId" 
-                                type="text" placeholder="Farmer's ID" class="col-span-12 sm:col-span-10" :disabled="disNcfrs" required/>
-                          </InputGroup>
-                      </div>
-                      <div class="col-span-12 sm:col-span-4">
-                        <FormLabel  htmlFor="modal-form-1"> Tenurial Status </FormLabel>
-                        <InputGroup class="grid grid-cols-12">
-                          <FormSelect  v-model="tenurial" class="col-span-12 sm:col-span-2" @change="dTenurial" required>
-                            <option value="Owner">Owner</option>
-                            <option value="Owner-Tiller">Owner-Tiller</option>
-                            <option value="Grower">Grower</option>
-                            <option value="Tenant">Tenant</option>
-                            <option value="Tenant-Worker">Tenant-Worker</option>
-                            <option value="Worker-Laborer">Worker-Laborer</option>
-                            <option value="Others">Others</option>
-                          </FormSelect>
-                          <FormInput  :rounded="rounded" v-model="formClient.tenurialStatus" 
-                              type="text" placeholder="Please Specify......" class="col-span-12 sm:col-span-10" :disabled="disTenurial" required/>
-                        </InputGroup>
-                      </div>
-                      <div class="col-span-12 sm:col-span-8">
-                        <FormLabel  htmlFor="modal-form-1"> Are you a member of a organization? </FormLabel>
-                        <TomSelect
-                          v-model="selectOrganization"
-                          :options="{
-                            placeholder: 'Select item below. If not exist please specify...',
-                            persist: false,
-                            createOnBlur: true,
-                            create: true,
-                            maxItems:1,
-                          }"
-                          class="w-full" multiple
-                        >
-                          <option v-for="item in orgList" :value="item['title']" :key="item['id']">{{item['title']}}</option>
-                          <option value="No">Not a member of any organization</option>
-                        </TomSelect>
-                      </div>
-                      <div class="col-span-12 sm:col-span-4">
-                        <FormLabel  htmlFor="modal-form-1"> Is your organization accredited/registered? </FormLabel>
-                        <InputGroup class="grid grid-cols-12">
-                          <FormSelect  v-model="accreditation" class="col-span-12 sm:col-span-3" @change="dAccreditation" required>
-                            <option value="PCA">PCA-</option>
-                            <option value="CDA">CDA-</option>
-                            <option value="SEC">SEC-</option>
-                            <option value="No">No</option>
-                          </FormSelect>
-                          <FormInput  :rounded="rounded" v-model="formClient.accreditation" 
-                              type="text" placeholder="Accreditation/Registration Number..." class="col-span-12 sm:col-span-9" :disabled="disAccreditation" required/>
-                        </InputGroup>
-                      </div>
-                    </fieldset> -->
                   </fieldset>
                 </div>
               </Dialog.Description>
@@ -527,118 +491,6 @@ onMounted(async () => {
   </div>
   <!-- BEGIN: HTML Table Data -->
   <div class="p-5 mt-5 intro-y box">
-    <div class="flex flex-col sm:flex-row sm:items-end xl:items-start">
-      <form
-        id="tabulator-html-filter-form"
-        class="xl:flex sm:mr-auto"
-        @submit="
-          (e) => {
-            e.preventDefault();
-            onFilter();
-          }
-        "
-      >
-        <div class="items-center sm:flex sm:mr-4 sm:w-auto">
-          <label class="flex-none w-12 mr-2 xl:w-auto xl:flex-initial">
-            Field
-          </label>
-          <FormSelect
-            id="tabulator-html-filter-field"
-            v-model="filter.field"
-            class="w-full mt-2 2xl:w-full sm:mt-0 sm:w-auto"
-          >
-            <option value="id">No.</option>
-            <option value="name">Name</option>
-            <option value="farmerId">Farmers Id</option>
-            <option value="province">Province</option>
-          </FormSelect>
-        </div>
-        <div class="items-center mt-2 sm:flex sm:mr-4 xl:mt-0">
-          <label class="flex-none w-12 mr-2 xl:w-auto xl:flex-initial">
-            Type
-          </label>
-          <FormSelect
-            id="tabulator-html-filter-type"
-            v-model="filter.type"
-            class="w-full mt-2 sm:mt-0 sm:w-auto"
-          >
-            <option value="like">like</option>
-            <option value="=">=</option>
-            <option value="<">&lt;</option>
-            <option value="<=">&lt;=</option>
-            <option value=">">&gt;</option>
-            <option value=">=">&gt;=</option>
-            <option value="!=">!=</option>
-          </FormSelect>
-        </div>
-        <div class="items-center mt-2 sm:flex sm:mr-4 xl:mt-0">
-          <label class="flex-none w-12 mr-2 xl:w-auto xl:flex-initial">
-            Value
-          </label>
-          <FormInput
-            id="tabulator-html-filter-value"
-            v-model="filter.value"
-            type="text"
-            class="mt-2 sm:w-40 2xl:w-full sm:mt-0"
-            placeholder="Search..."
-          />
-        </div>
-        <div class="mt-2 xl:mt-0">
-          <Button
-            id="tabulator-html-filter-go"
-            variant="primary"
-            type="button"
-            class="w-full sm:w-16"
-            @click="onFilter"
-          >
-            Go
-          </Button>
-          <Button
-            id="tabulator-html-filter-reset"
-            variant="secondary"
-            type="button"
-            class="w-full mt-2 sm:w-16 sm:mt-0 sm:ml-1"
-            @click="onResetFilter('name')"
-          >
-            Reset
-          </Button>
-        </div>
-      </form>
-      <div class="flex mt-5 sm:mt-0">
-        <Button
-          id="tabulator-print"
-          variant="outline-secondary"
-          class="w-1/2 mr-2 sm:w-auto"
-          @click="onPrint"
-        >
-          <Lucide icon="Printer" class="w-4 h-4 mr-2" /> Print
-        </Button>
-        <Menu class="w-1/2 sm:w-auto">
-          <Menu.Button
-            :as="Button"
-            variant="outline-secondary"
-            class="w-full sm:w-auto"
-          >
-            <Lucide icon="FileText" class="w-4 h-4 mr-2" /> Export
-            <Lucide icon="ChevronDown" class="w-4 h-4 ml-auto sm:ml-2" />
-          </Menu.Button>
-          <Menu.Items class="w-40">
-            <Menu.Item @click="onExportCsv">
-              <Lucide icon="FileText" class="w-4 h-4 mr-2" /> Export CSV
-            </Menu.Item>
-            <Menu.Item @click="onExportJson">
-              <Lucide icon="FileText" class="w-4 h-4 mr-2" /> Export JSON
-            </Menu.Item>
-            <Menu.Item @click="onExportXlsx">
-              <Lucide icon="FileText" class="w-4 h-4 mr-2" /> Export XLSX
-            </Menu.Item>
-            <Menu.Item @click="onExportHtml">
-              <Lucide icon="FileText" class="w-4 h-4 mr-2" /> Export HTML
-            </Menu.Item>
-          </Menu.Items>
-        </Menu>
-      </div>
-    </div>
     <div class="overflow-x-auto scrollbar-hidden">
       <div id="tabulator" ref="tableClient" class="mt-5"></div>
       <div v-if="loadingIcon===true"
