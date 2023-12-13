@@ -167,6 +167,11 @@ onMounted(async () => {
     }).catch((e: Error)=>{
         console.log(e.message)
     })
+    formAssistance.jobsGen = "0";
+    formAssistance.investmentGen = "0";
+    formAssistance.exportSalesGen = "0";
+    formAssistance.amountLoan = "0";
+    formAssistance.referTo = "Negosyo Center";
 });
 </script>
 

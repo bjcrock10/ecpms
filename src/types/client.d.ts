@@ -420,9 +420,6 @@ export function useClient(){
       }).catch((e: Error)=>{
           console.log(e.message)
       })
-      OrganizationDataService.getAll().then((response: ResponseData)=>{
-        orgList.value = response.data
-      })
     }
     const formOrganization = reactive({
       title : '',

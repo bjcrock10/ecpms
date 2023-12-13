@@ -251,9 +251,10 @@ export function useBusiness(){
             console.log(e.message)
             businessID.value = 0
         })
-        OrganizationDataService.getAll().then((response: ResponseData)=>{
-            orgList.value = response.data
-        })
+
+        // OrganizationDataService.getAll().then((response: ResponseData)=>{
+        //     orgList.value = response.data
+        // })
     }
     const selectBusinessOwner = ref([formBusiness.businessOwnership]);
     const selectLineOfBusiness = ref([formBusiness.lineOfBusiness]);

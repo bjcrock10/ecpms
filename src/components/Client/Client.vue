@@ -67,7 +67,7 @@
             </p>
             <div class="col-span-12 md:col-span-12">
                 <FormLabel htmlFor="modal-form-3">Client Full Name</FormLabel>
-                <FormInput type="month" v-model="formClient.fullName" class="col-span-12 sm:col-span-6" placeholder="LAST NAME, FIRST NAME MIDDLE NAME" required />
+                <FormInput type="text" v-model="formClient.fullName" class="col-span-12 sm:col-span-6" placeholder="LAST NAME, FIRST NAME MIDDLE NAME" required />
             </div>
             <Button type="submit" variant="primary" elevated class="w-auto bg-primary">
                 <Lucide icon="Search" class="w-4 h-4 mr-2" />Search

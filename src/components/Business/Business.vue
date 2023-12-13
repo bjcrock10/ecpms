@@ -92,28 +92,46 @@ watch(sameAddress, (sameAddress, prevAddProjectModal) => {
   }
   
 })
-watch(
-  () => (addressSelectBus.businessAddress), async(address, prevToe) => {
-    if(address.length>4){
-        LocationDataService.getBarangayVal(address).then((response: ResponseData)=>{
+// watch(
+//   () => (addressSelectBus.businessAddress), async(address, prevToe) => {
+//     if(address.length>4){
+//         LocationDataService.getBarangayVal(address).then((response: ResponseData)=>{
+//         brgySelect.value = response.data
+//         }).catch((e: Error)=>{
+//           console.log(brgySelect.value)
+//         })
+//       }
+//     }
+// )
+// watch(
+//   () => (addressSelectBus.plantAddress), async(address, prevToe) => {
+//     if(address.length>4){
+//         LocationDataService.getBarangayVal(address).then((response: ResponseData)=>{
+//         brgySelect.value = response.data
+//         }).catch((e: Error)=>{
+//           console.log(brgySelect.value)
+//         })
+//       }
+//     }
+// )
+const searchLeo = () => {
+  if(addressSelectBus.businessAddress.length>4){
+        LocationDataService.getBarangayVal(addressSelectBus.businessAddress).then((response: ResponseData)=>{
         brgySelect.value = response.data
         }).catch((e: Error)=>{
           console.log(brgySelect.value)
         })
       }
-    }
-)
-watch(
-  () => (addressSelectBus.plantAddress), async(address, prevToe) => {
-    if(address.length>4){
-        LocationDataService.getBarangayVal(address).then((response: ResponseData)=>{
+}
+const searchLeoPlant = () => {
+  if(addressSelectBus.plantAddress.length>4){
+        LocationDataService.getBarangayVal(addressSelectBus.plantAddress).then((response: ResponseData)=>{
         brgySelect.value = response.data
         }).catch((e: Error)=>{
           console.log(brgySelect.value)
         })
       }
-    }
-)
+}
 watch(
   () => (formBusinessOwner.lname), async(lname, prevToe) => {
     if(lname.length>4){
@@ -682,6 +700,8 @@ const sendButtonRef = ref(null);
                                               @focus="showSearchBrgyBusiness"
                                               @blur="hideSearchBrgyBusiness"
                                               v-model="addressSelectBus.businessAddress"
+                                              @keyup="searchLeo"
+                                              @paste="searchLeo"
                                           />
                                       </div>
                                       <TransitionRoot
@@ -746,6 +766,8 @@ const sendButtonRef = ref(null);
                                               @focus="showSearchBrgyPlant"
                                               @blur="hideSearchBrgyPlant"
                                               v-model="addressSelectBus.plantAddress" :disabled="disAbled"
+                                              @keyup="searchLeoPlant"
+                                              @paste="searchLeoPlant"
                                           />
                                       </div>
                                       <TransitionRoot

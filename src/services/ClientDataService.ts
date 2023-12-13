@@ -2,7 +2,7 @@ import http from '../http-common';
 
 class ClientDataService {
     getAll(): Promise<any> {
-      return http.get("/client/");
+      return http.get("/client/?limit=1");
     }
     getLimit(limit: any): Promise<any> {
       return http.get(`/client/?limit=${limit}`);

@@ -64,17 +64,15 @@ const item = reactive({
 const sameAddress = ref(false);
 const disAbled = ref(false);
 
-watch(
-  () => (addressSelect.addressName), async(address, prevToe) => {
-    if(address.length>4){
-        LocationDataService.getBarangayVal(address).then((response: ResponseData)=>{
+const searchLeo = () => {
+  if(addressSelect.addressName.length>4){
+        LocationDataService.getBarangayVal(addressSelect.addressName).then((response: ResponseData)=>{
         brgySelect.value = response.data
         }).catch((e: Error)=>{
           console.log(citySelect.value)
         })
       }
-    }
-);
+}
 const orgId = ref(0)
 const currentClientId = ref();
 const onSubmit = () =>{
@@ -108,21 +106,26 @@ const retrieveBusinessId = async () => {
   })
 }
 const priorityIndustry = ref([])
+const loadOrganization = () =>{
+  if(orgList.value.length===0){
+    OrganizationDataService.getAll().then((response: ResponseData)=>{
+      orgList.value = response.data
+    })
+  }
+}
+const loadPriority = () => {
+  if(priorityIndustry.value.length===0){
+    CodeBook.getType(11).then((resp: ResponseData)=>{
+    priorityIndustry.value = resp.data
+  })
+  }
+}
 onMounted(async () => {
   getClientInfo(clientID.value);
   if(sessionStorage.getItem('userId') === null){
       router.push({ path:'/login'})
       sessionStorage.clear()
     }
-  // if(sessionStorage.getItem("privileges")==="0"){
-  //   successNotification.value.showToast();
-  //   message.value = "Redirecting...."
-  //   messageDetail.value = "You don't have access to this page. Redirecting you the landing page."
-  //   router.push({path: "/dashboard"});
-  // }
-  CodeBook.getType(11).then((resp: ResponseData)=>{
-    priorityIndustry.value = resp.data
-  })
 });
 
 </script>
@@ -247,6 +250,11 @@ onMounted(async () => {
                                     <FormLabel  htmlFor="modal-form-1"> Last Name </FormLabel>
                                     <FormInput form-input-size="sm"  :rounded="rounded" 
                                     v-model="formClient.lname" type="text" placeholder=""
+                                    autofocus
+                                    @blur="
+                                        () => {
+                                          loadOrganization();
+                                    }"
                                     required/>
                                 </div>
                                 <div class="col-span-12 md:col-span-4">
@@ -313,6 +321,10 @@ onMounted(async () => {
                                           maxItems:1,
                                         }"
                                         class="w-full" multiple
+                                        @focus="() => {
+                                                    loadOrganization();
+                                                    loadPriority();
+                                        }"
                                       >
                                       <option v-for="item in orgList" :value="item['title']" :key="item['id']">{{item['title']}}</option>
                                       <option value="No">Not a member of any organization</option>
@@ -320,7 +332,8 @@ onMounted(async () => {
                                 </div>
                                 <div class="col-span-12 md:col-span-4">
                                   <FormLabel htmlFor="modal-form-3"> Are you an Investor </FormLabel>
-                                  <FormSelect form-select-size="sm"  v-model="formClient.investor" required>
+                                  <FormSelect form-select-size="sm"  v-model="formClient.investor"
+                                      @change="loadPriority()" required>
                                       <option value="Yes">Yes</option>
                                       <option value="No">No</option>
                                   </FormSelect>
@@ -369,6 +382,8 @@ onMounted(async () => {
                                             @focus="showSearchBrgy"
                                             @blur="hideSearchBrgy"
                                             v-model="addressSelect.addressName"
+                                            @keyup="searchLeo"
+                                            @paste="searchLeo"
                                             required
                                         />
                                     </div>

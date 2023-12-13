@@ -20,7 +20,7 @@ import { createIcons, icons } from "lucide";
 import { useRouter } from "vue-router";
 import LoadingIcon from "../../base-components/LoadingIcon";
 import CodeBook from "../../services/CodeBook";
-import Client from "../../components/Client/Client.vue"
+import Client from "../../components/Client/Client.vue";
 
 const router = useRouter();
 const {formClient, errorMessage, isError, columnData, addModal, rounded,  brgyDropdown,
@@ -41,6 +41,16 @@ provide("bind[successNotification]", (el: any) => {
   // Binding
   successNotification.value = el;
   });
+
+  const searchLeo = () => {
+  if(addressSelect.addressName.length>4){
+        LocationDataService.getBarangayVal(addressSelect.addressName).then((response: ResponseData)=>{
+        brgySelect.value = response.data
+        }).catch((e: Error)=>{
+          console.log(citySelect.value)
+        })
+      }
+}
 
 const onSubmit = () => {
   brgyId.value = addressSelect.addressName.split(", ")
@@ -87,7 +97,7 @@ const onSubmit = () => {
     }).catch((e : Error)=>{
       message.value = "Error occurred!!!"
       messageDetail.value = e.message.toString()
-      formClient.fullName = formClient.lname.toUpperCase() + ", " + formClient.fname.toUpperCase() + " " + formClient.mname.toUpperCase();
+      formClient.fullName = formClient.lname.toUpperCase();
       setAddModalSearch(true);
     })
 };
@@ -99,17 +109,17 @@ watch(addModal,(addModal, oldAdm)=> {
     buttonIcon.value = "Edit"
   }
 });
-watch(
-  () => (addressSelect.addressName), async(address, prevToe) => {
-    if(address.length>2){
-        LocationDataService.getBarangayVal(address).then((response: ResponseData)=>{
-        brgySelect.value = response.data
-        }).catch((e: Error)=>{
-          console.log(citySelect.value)
-        })
-      }
-    }
-)
+// watch(
+//   () => (addressSelect.addressName), async(address, prevToe) => {
+//     if(address.length>2){
+//         LocationDataService.getBarangayVal(address).then((response: ResponseData)=>{
+//         brgySelect.value = response.data
+//         }).catch((e: Error)=>{
+//           console.log(citySelect.value)
+//         })
+//       }
+//     }
+// )
 // watch(
 //   () => (formClient.fname), async(lname, prevToe) => {
 //     if(lname.length>=2){
@@ -131,6 +141,20 @@ const showSearchLnamewithParam = async () => {
   //       console.log(clientList.value)
   //     })
 }
+const loadOrganization = () =>{
+  if(orgList.value.length===0){
+    OrganizationDataService.getAll().then((response: ResponseData)=>{
+      orgList.value = response.data
+    })
+  }
+}
+const loadPriority = () => {
+  if(priorityIndustry.value.length===0){
+    CodeBook.getType(11).then((resp: ResponseData)=>{
+    priorityIndustry.value = resp.data
+  })
+  }
+}
 const priorityIndustry = ref([])
 const currentClientId = ref();
 onMounted(async () => {
@@ -139,9 +163,7 @@ onMounted(async () => {
   ClientDataService.getAll().then((resp: ResponseData)=>{
     currentClientId.value = sessionStorage.getItem('office') + resp.data.length.toString()
   })
-  OrganizationDataService.getAll().then((response: ResponseData)=>{
-    orgList.value = response.data
-  })
+  
   tabulator.value?.on("rowClick",(e, cell)=>{
     const id = cell.getData().id
     router.push({path:`/client/${id}`, params:{id}})
@@ -150,9 +172,6 @@ onMounted(async () => {
       router.push({ path:'/login'})
       sessionStorage.clear()
     }
-  CodeBook.getType(11).then((resp: ResponseData)=>{
-    priorityIndustry.value = resp.data
-  })
 });
 </script>
 <template>
@@ -249,7 +268,12 @@ onMounted(async () => {
                         <div class="col-span-12 sm:col-span-4">
                           <FormLabel htmlFor="modal-form-2"> Last Name<span class="requiredTag"> *</span> </FormLabel>
                           <FormInput  :rounded="rounded" 
-                            v-model="formClient.lname" type="text" placeholder="Required Fields *" required/>
+                            v-model="formClient.lname" type="text" placeholder="Required Fields *" 
+                            v-focus 
+                            @blur="
+                                () => {
+                                  loadOrganization();
+                            }" required/>
                         </div>
                         <div class="col-span-12 sm:col-span-3">
                             <FormLabel  htmlFor="modal-form-1"> First Name<span class="requiredTag"> *</span> </FormLabel>
@@ -351,7 +375,7 @@ onMounted(async () => {
                         </div>
                         <div class="col-span-12 md:col-span-4">
                           <FormLabel htmlFor="modal-form-3"> Are you an Investor<span class="requiredTag"> *</span> </FormLabel>
-                          <FormSelect form-select-size="sm"  v-model="formClient.investor" placeholder="Required Fields *" required>
+                          <FormSelect form-select-size="sm"  v-model="formClient.investor" placeholder="Required Fields *" @change="loadPriority()" required>
                               <option value="Yes">Yes</option>
                               <option value="No">No</option>
                           </FormSelect>
@@ -400,6 +424,8 @@ onMounted(async () => {
                                 @focus="showSearchBrgy"
                                 @blur="hideSearchBrgy"
                                 v-model="addressSelect.addressName"
+                                @keyup="searchLeo"
+                                @paste="searchLeo"
                                 required
                               />
                           </div>
