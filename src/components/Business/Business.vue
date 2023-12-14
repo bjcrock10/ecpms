@@ -132,6 +132,15 @@ const searchLeoPlant = () => {
         })
       }
 }
+const searchBN = () => {
+  if(formBusiness.businessName.length>4){
+        BusinessDataService.findByName(formBusiness.businessName).then((response: ResponseData)=>{
+          businessList.value = response.data
+        }).catch((e: Error)=>{
+          console.log(businessList.value)
+        })
+  }
+}
 watch(
   () => (formBusinessOwner.lname), async(lname, prevToe) => {
     if(lname.length>4){
@@ -264,8 +273,9 @@ const onAddBusiness = async () => {
       formBusiness.id = businessID.value.toString();
       dataTable();
     }).catch((e:Error)=>{
+      successNotification.value.showToast();
       message.value = "Error in Saving!!!!!"
-      messageDetail.value = e.message
+      messageDetail.value = e.message + " Details: Business Name Exists"
     })
   }else{
     BusinessDataService.update(formBusiness.id, formBusiness).then((response: ResponseData)=>{
@@ -278,6 +288,7 @@ const onAddBusiness = async () => {
       formBusiness.id = businessID.value.toString()
       dataTable();
     }).catch((e:Error)=>{
+      successNotification.value.showToast();
       message.value = "Error in Saving!!!!!"
       messageDetail.value = e.message
     })
@@ -707,7 +718,7 @@ const sendButtonRef = ref(null);
                                               @focus="showSearchBrgyBusiness"
                                               @blur="hideSearchBrgyBusiness"
                                               v-model="addressSelectBus.businessAddress"
-                                              @keyup="searchLeo"
+                                              @keyup.space="searchLeo"
                                               @paste="searchLeo"
                                           />
                                       </div>
@@ -773,7 +784,7 @@ const sendButtonRef = ref(null);
                                               @focus="showSearchBrgyPlant"
                                               @blur="hideSearchBrgyPlant"
                                               v-model="addressSelectBus.plantAddress" :disabled="disAbled"
-                                              @keyup="searchLeoPlant"
+                                              @keyup.space="searchLeoPlant"
                                               @paste="searchLeoPlant"
                                           />
                                       </div>

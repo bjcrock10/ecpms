@@ -424,7 +424,7 @@ onMounted(async () => {
                                 @focus="showSearchBrgy"
                                 @blur="hideSearchBrgy"
                                 v-model="addressSelect.addressName"
-                                @keyup="searchLeo"
+                                @keyup.space="searchLeo"
                                 @paste="searchLeo"
                                 required
                               />
