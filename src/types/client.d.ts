@@ -417,6 +417,7 @@ export function useClient(){
         formClient.zipcode = response.data[0].zipcode
         formClient.designation = response.data[0].designation.toUpperCase()
         formClient.recStat = response.data[0].recStat
+        formClient.encodedDate = response.data[0].encodedDate
       }).catch((e: Error)=>{
           console.log(e.message)
       })

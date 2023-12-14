@@ -149,6 +149,7 @@ const dataTable = () =>{
     formAssistance.dateProvidedTo = cell.getData().dateProvidedTo
     formAssistance.assistanceRemarks = cell.getData().assistanceRemarks
     formAssistance.title = cell.getData().title
+    formAssistance.encodedDate = cell.getData().encodedDate
     addModal.value = true
     buttonTitle.value = "Update"
   })

@@ -243,6 +243,7 @@ export function useBusiness(){
             addressSelectBus.businessAddress = response.data[0].businessBrgyAddress
             addressSelectBus.plantAddress = response.data[0].plantBrgyAddress
             businessID.value = response.data[0].id
+            formBusiness.encodedDate = response.data[0].encodedDate
             selectBusinessOwner.value = ([formBusiness.businessOwnership]);
             selectLineOfBusiness.value = ([formBusiness.lineOfBusiness]);
             selectStandardCertification.value = ([formBusiness.standardCertification]);
@@ -385,6 +386,7 @@ export function useBusiness(){
         formMarketPlan,
         formMarketTraining,
         selectMarketPlan,
-        selectMarketTraining, selectOrganization, formOrganization, orgList, selectPriorityIndustry
+        selectMarketTraining, selectOrganization, formOrganization, orgList, selectPriorityIndustry,
+        current_date
     }
 }

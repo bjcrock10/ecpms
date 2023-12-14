@@ -264,7 +264,8 @@ const onAddBusiness = async () => {
       formBusiness.id = businessID.value.toString();
       dataTable();
     }).catch((e:Error)=>{
-      console.log(e.message)
+      message.value = "Error in Saving!!!!!"
+      messageDetail.value = e.message
     })
   }else{
     BusinessDataService.update(formBusiness.id, formBusiness).then((response: ResponseData)=>{
@@ -277,7 +278,8 @@ const onAddBusiness = async () => {
       formBusiness.id = businessID.value.toString()
       dataTable();
     }).catch((e:Error)=>{
-      console.log(e.message)
+      message.value = "Error in Saving!!!!!"
+      messageDetail.value = e.message
     })
   }
   formOrganization.title = formBusiness.organization.toUpperCase();
@@ -299,7 +301,8 @@ const onAddBSocial = async () => {
     formSocialMedia.url = ""
     selectSocialMed.value = ["1"]
   }).catch((e:Error)=>{
-    console.log(e.message)
+    message.value = "Error in Saving!!!!!"
+      messageDetail.value = e.message
   })
 }
 const onAddBusinessOwner = async () => {
@@ -312,7 +315,8 @@ const onAddBusinessOwner = async () => {
     formBusinessOwner.contactNo = ""
     formBusinessOwner.email ="" 
   }).catch((e:Error)=>{
-    console.log(e.message)
+    message.value = "Error in Saving!!!!!"
+      messageDetail.value = e.message
   })
 }
 const onAddEcommerce = async () => {
@@ -323,7 +327,8 @@ const onAddEcommerce = async () => {
     formEcommerce.url = ""
     selectEcommerce.value = ["1"]
   }).catch((e:Error)=>{
-    console.log(e.message)
+    message.value = "Error in Saving!!!!!"
+      messageDetail.value = e.message
   })
 }
 const onAddMarketPlan = async () => {
@@ -334,7 +339,8 @@ const onAddMarketPlan = async () => {
     formMarketPlan.specific = ""
     selectMarketPlan.value = ["1"]
   }).catch((e:Error)=>{
-    console.log(e.message)
+    message.value = "Error in Saving!!!!!"
+      messageDetail.value = e.message
   })
 }
 const onAddMarketTraining = async () => {
@@ -345,7 +351,8 @@ const onAddMarketTraining = async () => {
     formMarketTraining.targetYear = ""
     selectMarketTraining.value = ["1"]
   }).catch((e:Error)=>{
-    console.log(e.message)
+    message.value = "Error in Saving!!!!!"
+      messageDetail.value = e.message
   })
 }
 onMounted(async () => {
