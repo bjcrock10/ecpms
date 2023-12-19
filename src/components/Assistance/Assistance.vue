@@ -181,6 +181,7 @@ onMounted(async () => {
     dataTable();
     formAssistance.business = props.business;
     formAssistance.client = props.clientId;
+    alert(formAssistance.business)
     AssistanceDataService.getAllMsmeProgram().then((response: ResponseData)=>{
         msmeProgram.value = response.data
     }).catch((e: Error)=>{
@@ -270,8 +271,8 @@ onMounted(async () => {
                       <div class="col-span-12 md:col-span-6">
                             <FormLabel  htmlFor="modal-form-1">Assistance Level (EDT)</FormLabel>
                             <FormSelect form-select-size="sm"  v-model="formAssistance.edtLevel" class="col-span-12 md:col-span-3" required>
-                                <option v-if="formAssistance.business==='0'" value="Level 0 – Potential Entrepreneurs">Level 0 – Potential Entrepreneurs-</option>
-                                <option v-if="formAssistance.business==='0'" value="Level 1 – Nurturing Startup">Level 1 – Nurturing Startup</option>
+                                <option v-if="parseInt(formAssistance.business)===0" value="Level 0 – Potential Entrepreneurs">Level 0 – Potential Entrepreneurs-</option>
+                                <option v-if="parseInt(formAssistance.business)===0" value="Level 1 – Nurturing Startup">Level 1 – Nurturing Startup</option>
                                 <option value="Level 1.1 (Unregistered)">Level 1.1 (Unregistered)</option>
                                 <option value="Level 1.2 (Partially Registered)">Level 1.2 (Partially Registered)</option>
                                 <option value="Level 2 – Growing Entrepreneurs">Level 2 – Growing Entrepreneurs</option>
