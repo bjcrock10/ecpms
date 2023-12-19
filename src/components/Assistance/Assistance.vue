@@ -49,24 +49,27 @@ const buttonTitle = ref("Save");
 const msmeProgram = ref([])
 const assistanceType = ref([])
 const subTypeAssistance = ref([])
+const buttonSubmitDisable = ref(false)
 const resetFields = () =>{
     selectAssistance.value = (["0"]);
     selectSubType.value = (["0"]);
     selectMsmeProgram.value = (["0"]);
-    selectReferTo.value = (["0"]);
+    selectReferTo.value = (["4"]);
     formAssistance.title = ""
-    formAssistance.jobsGen = ""
-    formAssistance.amountLoan = ""
+    formAssistance.jobsGen = "0"
+    formAssistance.amountLoan = "0"
     formAssistance.assistanceRemarks = ""
     formAssistance.edtLevel = ""
     formAssistance.digitalLevel = ""
-    formAssistance.investmentGen = ""
-    formAssistance.domesticSalesGen = ""
-    formAssistance.exportSalesGen = ""
+    formAssistance.investmentGen = "0"
+    formAssistance.domesticSalesGen = "0"
+    formAssistance.exportSalesGen = "0"
     formAssistance.dateProvidedFrom = ""
     formAssistance.dateProvidedTo = ""
+    formAssistance.id = "0"
 }
 const onSubmit = async () =>{
+    buttonSubmitDisable.value = true;
     formAssistance.assistanceType = selectAssistance.value.toString();
     formAssistance.subTypeAssistance = selectSubType.value.toString();
     formAssistance.msmeProgram = selectMsmeProgram.value.toString();
@@ -82,6 +85,7 @@ const onSubmit = async () =>{
         console.log(e.message)
       }).finally(()=>{
         resetFields();
+        buttonSubmitDisable.value = false;
       })
     }
     else{
@@ -94,6 +98,7 @@ const onSubmit = async () =>{
         console.log(e.message)
       }).finally(()=>{
         resetFields();
+        buttonSubmitDisable.value = false;
       })
     }
 };
@@ -150,10 +155,28 @@ const dataTable = () =>{
     formAssistance.assistanceRemarks = cell.getData().assistanceRemarks
     formAssistance.title = cell.getData().title
     formAssistance.encodedDate = cell.getData().encodedDate
+    formAssistance.encodedBy = cell.getData().encodedBy
     addModal.value = true
     buttonTitle.value = "Update"
+    if(sessionStorage.getItem('userId')===formAssistance.encodedBy){
+        canDelete.value = true
+    }
   })
 };
+const deleteAssistance = (id:any) => {
+  AssistanceDataService.delete(id).then((resp:Response)=>{
+    successNotification.value.showToast();
+    addModal.value = false;
+    messageDetail.value = "You successfully deleted the data...";
+    dataTable();
+  }).catch((e:Error)=>{
+    successNotification.value.showToast();
+    messageDetail.value = "You successfully deleted the data...";
+  }).finally(()=>{
+    resetFields();
+  })
+}
+const canDelete = ref(false)
 onMounted(async () => {
     dataTable();
     formAssistance.business = props.business;
@@ -172,7 +195,9 @@ onMounted(async () => {
     formAssistance.investmentGen = "0";
     formAssistance.exportSalesGen = "0";
     formAssistance.amountLoan = "0";
+    formAssistance.domesticSalesGen = "0"
     formAssistance.referTo = "Negosyo Center";
+    selectReferTo.value = (["Negosyo Center"]);
 });
 </script>
 
@@ -231,7 +256,7 @@ onMounted(async () => {
                           :options="{
                             placeholder: 'Select item below. If others please specify.',
                           }"
-                          class="w-full" multiple
+                          class="w-full"
                         >
                           <option v-for="item in msmeProgram" :value="item['title']" :key="item['id']">{{item['title']}}</option>
                           <!-- <option :value="formAssistance.msmeProgram">{{formAssistance.msmeProgram}}</option> -->
@@ -244,9 +269,9 @@ onMounted(async () => {
                       </div>
                       <div class="col-span-12 md:col-span-6">
                             <FormLabel  htmlFor="modal-form-1">Assistance Level (EDT)</FormLabel>
-                            <FormSelect form-select-size="sm"  v-model="formAssistance.edtLevel" class="col-span-12 md:col-span-3">
-                                <option value="Level 0 – Potential Entrepreneurs">Level 0 – Potential Entrepreneurs-</option>
-                                <option value="Level 1 – Nurturing Startup">Level 1 – Nurturing Startup</option>
+                            <FormSelect form-select-size="sm"  v-model="formAssistance.edtLevel" class="col-span-12 md:col-span-3" required>
+                                <option v-if="formAssistance.business==='0'" value="Level 0 – Potential Entrepreneurs">Level 0 – Potential Entrepreneurs-</option>
+                                <option v-if="formAssistance.business==='0'" value="Level 1 – Nurturing Startup">Level 1 – Nurturing Startup</option>
                                 <option value="Level 1.1 (Unregistered)">Level 1.1 (Unregistered)</option>
                                 <option value="Level 1.2 (Partially Registered)">Level 1.2 (Partially Registered)</option>
                                 <option value="Level 2 – Growing Entrepreneurs">Level 2 – Growing Entrepreneurs</option>
@@ -256,7 +281,7 @@ onMounted(async () => {
                         </div>
                         <div class="col-span-12 md:col-span-6">
                             <FormLabel  htmlFor="modal-form-1">Level of Digitalization</FormLabel>
-                            <FormSelect form-select-size="sm"  v-model="formAssistance.digitalLevel" class="col-span-12 md:col-span-3">
+                            <FormSelect form-select-size="sm"  v-model="formAssistance.digitalLevel" class="col-span-12 md:col-span-3" required>
                                 <option value="Level 0 – No use of Digital Tools">Level 0 – No use of Digital Tools</option>
                                 <option value="Level 1 – Basic. MSMEs that use Basic Digital Tools for Business">Level 1 – Basic. MSMEs that use Basic Digital Tools for Business</option>
                                 <option value="Level 2 – Intermediate. MSMEs that have an Online Presence">Level 2 – Intermediate. MSMEs that have an Online Presence</option>
@@ -282,12 +307,9 @@ onMounted(async () => {
                             v-model="selectSubType"
                             :options="{
                             placeholder: 'Select item below. If others please specify.',
-                            persist: false,
-                            createOnBlur: true,
-                            create: true,
                             maxItems:1
                             }"
-                            class="w-full" multiple required
+                            class="w-full" required
                         >
                            <option v-for="item in subTypeAssistance" :value="item['title']" :key="item['id']">{{item['title']}}</option>
                            <option :value="formAssistance.subTypeAssistance">{{formAssistance.subTypeAssistance}}</option>
@@ -375,8 +397,16 @@ onMounted(async () => {
                               <Lucide icon="XSquare" class="w-4 h-4 mr-2" />
                         Cancel
                     </Button>
-                    <Button type="submit" variant="primary" elevated class="w-auto">
+                    <Button type="submit" variant="primary" elevated class="w-auto" :disabled="buttonSubmitDisable">
                       <Lucide icon="Save" class="w-4 h-4 mr-2" />{{buttonTitle}}
+                    </Button>
+                    <Button v-if="canDelete===true" type="button" variant="warning" @click="
+                                () => {
+                                  deleteAssistance(formAssistance.id);
+                                }
+                              " class="w-auto mr-1">
+                              <Lucide icon="XSquare" class="w-4 h-4 mr-2" />
+                        Delete
                     </Button>
                 </Dialog.Footer>
               </form>
