@@ -15,6 +15,7 @@ import TomSelect from "../../base-components/TomSelect";
 import Button from "../../base-components/Button";
 import { TransitionRoot } from "@headlessui/vue";
 import { useAssistance } from "../../types/assistance.d";
+import { useBusiness } from "../../types/business.d";
 import { tabulatorFunc } from "../../types/tabulator.d";
 import Notification from "../../base-components/Notification";
 import { NotificationElement } from "../../base-components/Notification";
@@ -25,6 +26,7 @@ import LoadingIcon from "../../base-components/LoadingIcon";
 import { ClassicEditor } from "../../base-components/Ckeditor";
 
 const {formAssistance, columnData} = useAssistance();
+const {patchBusiness} = useBusiness();
 const {initTabulator,initTabulatorByClient, reInitOnResizeWindow, 
 filter, onFilter, 
 onExportCsv, onExportHtml, 
@@ -51,10 +53,6 @@ const assistanceType = ref([])
 const subTypeAssistance = ref([])
 const buttonSubmitDisable = ref(false)
 const resetFields = () =>{
-    selectAssistance.value = (["0"]);
-    selectSubType.value = (["0"]);
-    selectMsmeProgram.value = (["0"]);
-    selectReferTo.value = (["4"]);
     formAssistance.title = ""
     formAssistance.jobsGen = "0"
     formAssistance.amountLoan = "0"
@@ -64,15 +62,14 @@ const resetFields = () =>{
     formAssistance.investmentGen = "0"
     formAssistance.domesticSalesGen = "0"
     formAssistance.exportSalesGen = "0"
-    formAssistance.dateProvidedFrom = ""
-    formAssistance.dateProvidedTo = ""
     formAssistance.id = "0"
+    formAssistance.referTo = "Negosyo Center";
+    formAssistance.assistanceType = "Access to Finance";
+    formAssistance.subTypeAssistance = "Grant Application Approved";
+    buttonTitle.value = "Save"
 }
 const onSubmit = async () =>{
     buttonSubmitDisable.value = true;
-    formAssistance.assistanceType = selectAssistance.value.toString();
-    formAssistance.subTypeAssistance = selectSubType.value.toString();
-    formAssistance.msmeProgram = selectMsmeProgram.value.toString();
     formAssistance.referTo = selectReferTo.value.toString();
     if(formAssistance.id === "0"){
     AssistanceDataService.create(formAssistance).then((response: ResponseData)=>{
@@ -81,6 +78,7 @@ const onSubmit = async () =>{
         messageDetail.value = "You successfully added new data...";
         // tabulator.value?.addData(response.data);
         dataTable();
+        patchBusiness(props.business,{'currentEdt':formAssistance.edtLevel,'currentDigital':formAssistance.digitalLevel});
       }).catch((e: Error)=>{
         console.log(e.message)
       }).finally(()=>{
@@ -94,6 +92,7 @@ const onSubmit = async () =>{
         addModal.value = false;
         messageDetail.value = "You successfully updated new data...";
         dataTable();
+        patchBusiness(props.business,{'currentEdt':formAssistance.edtLevel,'currentDigital':formAssistance.digitalLevel});
       }).catch((e: Error)=>{
         console.log(e.message)
       }).finally(()=>{
@@ -104,6 +103,9 @@ const onSubmit = async () =>{
 };
 const setAddModal = (value: boolean) => {
   addModal.value = value;
+  if(value === false){
+    resetFields(); 
+  }
 };
 const successNotification = ref();
 provide("bind[successNotification]", (el: any) => {
@@ -111,11 +113,17 @@ provide("bind[successNotification]", (el: any) => {
   successNotification.value = el;
   });
   
-watch(selectAssistance, (assistanceTitle, prevAddProjectModal) => {
-  loadAssistanceSubType(assistanceTitle);
-})
+// watch(formAssistance.assistanceType, (assistanceTitle, prevAddProjectModal) => {
+//   loadAssistanceSubType(assistanceTitle);
+// })
+
+watch(
+  () => (formAssistance.assistanceType), (assistanceTitle, prevToe) => {
+    loadAssistanceSubType(assistanceTitle);
+  }
+)
 const loadAssistanceSubType = (assistanceTitle: any) => {
-  let assistanceID = "0"
+  let assistanceID = "1"
   assistanceType.value.forEach(element => {
     if(element['title']===assistanceTitle){
         assistanceID = element['id']
@@ -136,11 +144,11 @@ const dataTable = () =>{
   reInitOnResizeWindow();
   tabulator.value?.on("rowClick",(e, cell)=>{
     formAssistance.id = cell.getData().id
-    selectAssistance.value = ([cell.getData().assistanceType])
+    formAssistance.assistanceType = cell.getData().assistanceType
     loadAssistanceSubType(cell.getData().assistanceType)
-    selectMsmeProgram.value = cell.getData().msmeProgram
-    selectSubType.value = ([cell.getData().subTypeAssistance])
-    selectReferTo.value = ([cell.getData().referTo])
+    formAssistance.msmeProgram = cell.getData().msmeProgram
+    formAssistance.subTypeAssistance = cell.getData().subTypeAssistance
+    formAssistance.referTo = cell.getData().referTo
     formAssistance.assistanceRemarks = cell.getData().assistanceRemarks
     formAssistance.dateAvailment = cell.getData().dateAvailment
     formAssistance.edtLevel = cell.getData().edtLevel
@@ -181,7 +189,6 @@ onMounted(async () => {
     dataTable();
     formAssistance.business = props.business;
     formAssistance.client = props.clientId;
-    alert(formAssistance.business)
     AssistanceDataService.getAllMsmeProgram().then((response: ResponseData)=>{
         msmeProgram.value = response.data
     }).catch((e: Error)=>{
@@ -198,7 +205,8 @@ onMounted(async () => {
     formAssistance.amountLoan = "0";
     formAssistance.domesticSalesGen = "0"
     formAssistance.referTo = "Negosyo Center";
-    selectReferTo.value = (["Negosyo Center"]);
+    formAssistance.assistanceType = "Access to Finance";
+    formAssistance.subTypeAssistance = "Grant Application Approved"
 });
 </script>
 
@@ -253,14 +261,14 @@ onMounted(async () => {
                     <div class="col-span-12 md:col-span-6">
                         <FormLabel htmlFor="modal-form-3">MSME Programs</FormLabel>
                         <TomSelect
-                          v-model="selectMsmeProgram"
+                          v-model="formAssistance.msmeProgram"
                           :options="{
                             placeholder: 'Select item below. If others please specify.',
                           }"
-                          class="w-full"
+                          class="w-full" required
                         >
                           <option v-for="item in msmeProgram" :value="item['title']" :key="item['id']">{{item['title']}}</option>
-                          <!-- <option :value="formAssistance.msmeProgram">{{formAssistance.msmeProgram}}</option> -->
+                          <option :value="formAssistance.msmeProgram">{{formAssistance.msmeProgram}}</option>
                         </TomSelect>
                       </div>
                       <div class="col-span-12 sm:col-span-6">
@@ -292,20 +300,20 @@ onMounted(async () => {
                     <div class="col-span-12 md:col-span-6">
                         <FormLabel htmlFor="modal-form-3">Assistance Type</FormLabel>
                         <TomSelect
-                            v-model="selectAssistance"
+                            v-model="formAssistance.assistanceType"
                             :options="{
                             placeholder: 'Select item below. If others please specify.',
                             }"
                             class="w-full" required
                         >
                             <option v-for="item in assistanceType" :value="item['title']" :key="item['id']">{{item['title']}}</option>
-                            <option :value="formAssistance.assistanceType">{{formAssistance.assistanceType}}</option>
+                            <option v-if="formAssistance.id !== '0'" :value="formAssistance.assistanceType">{{formAssistance.assistanceType}}</option>
                         </TomSelect>
                     </div>
                     <div class="col-span-12 md:col-span-6">
                         <FormLabel htmlFor="modal-form-3">Sub-type</FormLabel>
                         <TomSelect
-                            v-model="selectSubType"
+                            v-model="formAssistance.subTypeAssistance"
                             :options="{
                             placeholder: 'Select item below. If others please specify.',
                             maxItems:1
@@ -313,7 +321,7 @@ onMounted(async () => {
                             class="w-full" required
                         >
                            <option v-for="item in subTypeAssistance" :value="item['title']" :key="item['id']">{{item['title']}}</option>
-                           <option :value="formAssistance.subTypeAssistance">{{formAssistance.subTypeAssistance}}</option>
+                           <option v-if="formAssistance.id !== '0'" :value="formAssistance.subTypeAssistance">{{formAssistance.subTypeAssistance}}</option>
                         </TomSelect>
                     </div>
                     <div class="col-span-12 sm:col-span-12">
@@ -356,7 +364,7 @@ onMounted(async () => {
                     <div class="col-span-12 md:col-span-6">
                         <FormLabel htmlFor="modal-form-3">Refer to</FormLabel>
                         <TomSelect
-                            v-model="selectReferTo"
+                            v-model="formAssistance.referTo"
                             :options="{
                             placeholder: 'Select item below. If others please specify.',
                             persist: false,
@@ -370,7 +378,7 @@ onMounted(async () => {
                             <option value="TESDA">TESDA</option>
                             <option value="ATI">ATI</option>
                             <option value="Negosyo Center">Negosyo Center</option>
-                            <option :value="formAssistance.referTo">{{formAssistance.referTo}}</option>
+                            <option v-if="formAssistance.id!=='0'" :value="formAssistance.referTo">{{formAssistance.referTo}}</option>
                         </TomSelect>
                     </div>
                     <p class="col-span-12 sm:col-span-12 w-full p-2 bg-primary text-center text-slate-50 text-lg">

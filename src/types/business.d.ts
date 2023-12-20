@@ -257,6 +257,13 @@ export function useBusiness(){
         //     orgList.value = response.data
         // })
     }
+    const patchBusiness = (id:any, data:any) => {
+        BusinessDataService.patch(id,data).then((resp:ResponseData)=>{
+            console.log(resp.data)
+        }).catch((e:Error)=>{
+            console.log(e.message)
+        })
+    }
     const selectBusinessOwner = ref([formBusiness.businessOwnership]);
     const selectLineOfBusiness = ref([formBusiness.lineOfBusiness]);
     const selectStandardCertification = ref([formBusiness.standardCertification]);
@@ -387,6 +394,7 @@ export function useBusiness(){
         formMarketTraining,
         selectMarketPlan,
         selectMarketTraining, selectOrganization, formOrganization, orgList, selectPriorityIndustry,
-        current_date
+        current_date,
+        patchBusiness
     }
 }
