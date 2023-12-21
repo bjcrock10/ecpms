@@ -1,0 +1,2 @@
+UPDATE app_business t1 inner join app_ticket t2 on t1.id = t2.business
+SET t1.currentEdt = t2.edtLevel, t1.currentDigital = t2.digitalLevel;

@@ -604,11 +604,8 @@ const sendButtonRef = ref(null);
                                       v-model="selectBusinessOwner"
                                       :options="{
                                         placeholder: 'Select item below. If not exist please key it in.',
-                                        persist: false,
-                                        createOnBlur: true,
-                                        create: true,
                                       }"
-                                      class="w-full" multiple
+                                      class="w-full"
                                     >
                                       <option value="Sole Proprietorship">Sole Proprietorship</option>
                                       <option value="Partnership/Corporation">Partnership/Corporation</option>
@@ -623,11 +620,8 @@ const sendButtonRef = ref(null);
                                       v-model="selectLineOfBusiness"
                                       :options="{
                                         placeholder: 'Select item below. If others please specify...',
-                                        persist: false,
-                                        createOnBlur: true,
-                                        create: true,
                                       }"
-                                      class="w-full" multiple
+                                      class="w-full"
                                     >
                                       <option value="Farming">Farming</option>
                                       <option value="Manufacturing/Processing">Manufacturing/Processing</option>
