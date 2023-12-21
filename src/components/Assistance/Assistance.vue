@@ -73,31 +73,35 @@ const onSubmit = async () =>{
     formAssistance.referTo = selectReferTo.value.toString();
     if(formAssistance.id === "0"){
     AssistanceDataService.create(formAssistance).then((response: ResponseData)=>{
+        patchBusiness(props.business,{'currentEdt':formAssistance.edtLevel,'currentDigital':formAssistance.digitalLevel});
         successNotification.value.showToast();
         addModal.value = false;
         messageDetail.value = "You successfully added new data...";
         // tabulator.value?.addData(response.data);
         dataTable();
-        patchBusiness(props.business,{'currentEdt':formAssistance.edtLevel,'currentDigital':formAssistance.digitalLevel});
       }).catch((e: Error)=>{
         console.log(e.message)
       }).finally(()=>{
+        patchBusiness(props.business,{'currentEdt':formAssistance.edtLevel,'currentDigital':formAssistance.digitalLevel});
         resetFields();
         buttonSubmitDisable.value = false;
       })
     }
     else{
     AssistanceDataService.update(formAssistance.id,formAssistance).then((response: ResponseData)=>{
+        patchBusiness(props.business,{'currentEdt':formAssistance.edtLevel,'currentDigital':formAssistance.digitalLevel});
         successNotification.value.showToast();
         addModal.value = false;
         messageDetail.value = "You successfully updated new data...";
         dataTable();
-        patchBusiness(props.business,{'currentEdt':formAssistance.edtLevel,'currentDigital':formAssistance.digitalLevel});
+        
       }).catch((e: Error)=>{
         console.log(e.message)
       }).finally(()=>{
+        patchBusiness(props.business,{'currentEdt':formAssistance.edtLevel,'currentDigital':formAssistance.digitalLevel});
         resetFields();
         buttonSubmitDisable.value = false;
+        
       })
     }
 };
