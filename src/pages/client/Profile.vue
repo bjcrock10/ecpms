@@ -78,9 +78,9 @@ const currentClientId = ref();
 const onSubmit = () =>{
   brgyId.value = addressSelect.addressName.split(", ")
   formClient.farmerId = currentClientId.value
-  formClient.barangay = brgyId.value[0]
-  formClient.lgu = brgyId.value[1]
-  formClient.province = brgyId.value[2]
+  formClient.barangay = brgyId.value[0].trim()
+  formClient.lgu = brgyId.value[1].trim()
+  formClient.province = brgyId.value[2].trim()
   if(formClient.farmerId===""){
     formClient.farmerId = sessionStorage.getItem("office")+"-"+current_date+"-"+current_time
   }
@@ -91,16 +91,26 @@ const onSubmit = () =>{
     return
   }
   formClient.ipGroup = selectOrganization.value.toString()
-  formClient.lname.toUpperCase().trim().replace(/[^a-zA-Z0-9 ]/g, '');
-  formClient.fname.toUpperCase().trim().replace(/[^a-zA-Z0-9 ]/g, '');
-  formClient.mname.toUpperCase().trim().replace(/[^a-zA-Z0-9 ]/g, '');
-  formClient.fullName = formClient.lname.toUpperCase().trim() + ", " + formClient.fname.toUpperCase().trim() + " " + formClient.mname.toUpperCase().trim().replace(/[^a-zA-Z0-9 ]/g, '');
+  formClient.lname.toUpperCase().trim().replace(
+    /[@!^&\/\\#,+()$~%.'":*?<>{}]/g,
+    '',
+  );
+  formClient.fname.toUpperCase().trim().replace(
+    /[@!^&\/\\#,+()$~%.'":*?<>{}]/g,
+    '',
+  );
+  formClient.mname.toUpperCase().trim().replace(
+    /[@!^&\/\\#,+()$~%.'":*?<>{}]/g,
+    '',
+  );
+  formClient.fullName = formClient.lname.toUpperCase().trim() + ", " + formClient.fname.toUpperCase().trim() + " " + formClient.mname.toUpperCase().trim().replace(
+    /[@!^&\/\\#,+()$~%.'":*?<>{}]/g,
+    '',
+  );
   formOrganization.title = selectOrganization.value.toString()
   updateClientInfo(clientID.value,formClient).then();
-  if(clientSubmit.value===true){
       successNotification.value.showToast();
       messageDetail.value = "You successfully updated client profile..."
-  }
 };
 const retrieveBusinessId = async () => {
   ClientDataService.get(formClient.id).then((response: ResponseData)=>{

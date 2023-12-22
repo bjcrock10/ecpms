@@ -55,21 +55,33 @@ provide("bind[successNotification]", (el: any) => {
 const onSubmit = () => {
   brgyId.value = addressSelect.addressName.split(", ")
   formClient.farmerId = currentClientId.value
-  formClient.barangay = brgyId.value[0]
-  formClient.lgu = brgyId.value[1]
-  formClient.province = brgyId.value[2]
+  formClient.barangay = brgyId.value[0].trim()
+  formClient.lgu = brgyId.value[1].trim()
+  formClient.province = brgyId.value[2].trim()
   if(formClient.province===undefined){
     addressSelect.addressName = ""
     successNotification.value.showToast();
     messageDetail.value = "Error Occured, Please Select a proper Barangay/City or Municipality/Province"
     return
   }
-  formClient.lname.toUpperCase().trim().replace(/[^a-zA-Z0-9 ]/g, '');
-  formClient.fname.toUpperCase().trim().replace(/[^a-zA-Z0-9 ]/g, '');
-  formClient.mname.toUpperCase().trim().replace(/[^a-zA-Z0-9 ]/g, '');
-  formClient.fullName = formClient.lname.toUpperCase().trim() + ", " + formClient.fname.toUpperCase().trim() + " " + formClient.mname.toUpperCase().trim().replace(/[^a-zA-Z0-9 ]/g, '');
-  formClient.address.toUpperCase();
-  formClient.barangay.toUpperCase();
+  formClient.lname.toUpperCase().trim().replace(
+    /[@!^&\/\\#,+()$~%.'":*?<>{}]/g,
+    '',
+  );
+  formClient.fname.toUpperCase().trim().replace(
+    /[@!^&\/\\#,+()$~%.'":*?<>{}]/g,
+    '',
+  );
+  formClient.mname.toUpperCase().trim().replace(
+    /[@!^&\/\\#,+()$~%.'":*?<>{}]/g,
+    '',
+  );
+  formClient.fullName = formClient.lname.toUpperCase().trim() + ", " + formClient.fname.toUpperCase().trim() + " " + formClient.mname.toUpperCase().trim().replace(
+    /[@!^&\/\\#,+()$~%.'":*?<>{}]/g,
+    '',
+  );
+  formClient.address.toUpperCase().trim();
+  formClient.barangay.toUpperCase().trim();
   formClient.ipGroup = selectOrganization.value.toString().toUpperCase()
   formOrganization.title = selectOrganization.value.toString().toUpperCase()
   OrganizationDataService.create(formOrganization).then((response: ResponseData)=>{
