@@ -262,6 +262,11 @@ export function useBusiness(){
             console.log(resp.data)
         }).catch((e:Error)=>{
             console.log(e.message)
+            BusinessDataService.patch(id,data).then((resp:ResponseData)=>{
+                console.log(resp.data)
+            }).catch((e:Error)=>{
+                console.log(e.message)
+            })
         })
     }
     const selectBusinessOwner = ref([formBusiness.businessOwnership]);

@@ -91,7 +91,10 @@ const onSubmit = () =>{
     return
   }
   formClient.ipGroup = selectOrganization.value.toString()
-  formClient.fullName = formClient.lname.toUpperCase() + ", " + formClient.fname.toUpperCase() + " " + formClient.mname.toUpperCase();
+  formClient.lname.toUpperCase().trim().replace(/[^a-zA-Z0-9 ]/g, '');
+  formClient.fname.toUpperCase().trim().replace(/[^a-zA-Z0-9 ]/g, '');
+  formClient.mname.toUpperCase().trim().replace(/[^a-zA-Z0-9 ]/g, '');
+  formClient.fullName = formClient.lname.toUpperCase().trim() + ", " + formClient.fname.toUpperCase().trim() + " " + formClient.mname.toUpperCase().trim().replace(/[^a-zA-Z0-9 ]/g, '');
   formOrganization.title = selectOrganization.value.toString()
   updateClientInfo(clientID.value,formClient).then();
   if(clientSubmit.value===true){

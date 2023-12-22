@@ -64,10 +64,10 @@ const onSubmit = () => {
     messageDetail.value = "Error Occured, Please Select a proper Barangay/City or Municipality/Province"
     return
   }
-  formClient.lname.toUpperCase();
-  formClient.fname.toUpperCase();
-  formClient.mname.toUpperCase();
-  formClient.fullName = formClient.lname.toUpperCase() + ", " + formClient.fname.toUpperCase() + " " + formClient.mname.toUpperCase();
+  formClient.lname.toUpperCase().trim().replace(/[^a-zA-Z0-9 ]/g, '');
+  formClient.fname.toUpperCase().trim().replace(/[^a-zA-Z0-9 ]/g, '');
+  formClient.mname.toUpperCase().trim().replace(/[^a-zA-Z0-9 ]/g, '');
+  formClient.fullName = formClient.lname.toUpperCase().trim() + ", " + formClient.fname.toUpperCase().trim() + " " + formClient.mname.toUpperCase().trim().replace(/[^a-zA-Z0-9 ]/g, '');
   formClient.address.toUpperCase();
   formClient.barangay.toUpperCase();
   formClient.ipGroup = selectOrganization.value.toString().toUpperCase()
