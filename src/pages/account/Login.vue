@@ -49,7 +49,7 @@ const onSubmit = async () => {
         errorMessage.value = ""
         setTimeout(function () {
             router.push({path: '/dashboard'})
-        }, 2000);
+        }, 100);
       }
     })
     .catch((e: Error) => {

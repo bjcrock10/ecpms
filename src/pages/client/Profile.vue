@@ -472,7 +472,7 @@ onMounted(async () => {
         <div class="grid grid-cols-12 gap-12">
           <div class="col-span-12 intro-y box lg:col-span-12">
             <div class="p-2">
-                <Assistance :business="formClient.businessId" :clientId="formClient.id" :key="componentKey" @click="forceRerender()"/>
+                <Assistance :business="formClient.businessId" :clientId="formClient.id" :encoded-date="formClient.encodedDate" :key="componentKey" @click="forceRerender()"/>
             </div>
           </div>
         </div>

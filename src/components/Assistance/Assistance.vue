@@ -16,6 +16,7 @@ import Button from "../../base-components/Button";
 import { TransitionRoot } from "@headlessui/vue";
 import { useAssistance } from "../../types/assistance.d";
 import { useBusiness } from "../../types/business.d";
+import { useClient } from "../../types/client.d";
 import { tabulatorFunc } from "../../types/tabulator.d";
 import Notification from "../../base-components/Notification";
 import { NotificationElement } from "../../base-components/Notification";
@@ -26,6 +27,7 @@ import LoadingIcon from "../../base-components/LoadingIcon";
 import { ClassicEditor } from "../../base-components/Ckeditor";
 
 const {formAssistance, columnData} = useAssistance();
+const {patchClientInfo} = useClient();
 const {patchBusiness} = useBusiness();
 const {initTabulator,initTabulatorByClient, reInitOnResizeWindow, 
 filter, onFilter, 
@@ -36,6 +38,7 @@ onPrint, onResetFilter, tabulator, loadingIcon} = tabulatorFunc();
 interface Client {
     clientId?: any;
     business?: any;
+    encodedDate?: any;
 }
 const props = defineProps<Client>();
 const tableClient = ref<HTMLDivElement>();
@@ -68,12 +71,21 @@ const resetFields = () =>{
     formAssistance.subTypeAssistance = "Grant Application Approved";
     buttonTitle.value = "Save"
 }
+const date = new Date();
+const current_date = date.getFullYear()+"-"+(date.getMonth()+1)+"-"+ date.getDate();
+const encodedDate =  new Date(props.encodedDate);
 const onSubmit = async () =>{
     buttonSubmitDisable.value = true;
     formAssistance.referTo = selectReferTo.value.toString();
     if(formAssistance.id === "0"){
-    AssistanceDataService.create(formAssistance).then((response: ResponseData)=>{
-        patchBusiness(props.business,{'currentEdt':formAssistance.edtLevel,'currentDigital':formAssistance.digitalLevel});
+      AssistanceDataService.create(formAssistance).then((response: ResponseData)=>{
+        if(encodedDate.getFullYear()!==date.getFullYear()){
+          patchClientInfo(props.clientId,{'encodedDate':current_date})
+          patchBusiness(props.business,{'currentEdt':formAssistance.edtLevel,'currentDigital':formAssistance.digitalLevel, 'encodedDate':current_date});
+        }
+        else{
+          patchBusiness(props.business,{'currentEdt':formAssistance.edtLevel,'currentDigital':formAssistance.digitalLevel});
+        }
         successNotification.value.showToast();
         addModal.value = false;
         messageDetail.value = "You successfully added new data...";
