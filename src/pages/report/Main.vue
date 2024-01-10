@@ -71,9 +71,9 @@
   
   <div class="grid grid-cols-12 gap-5 mt-5 intro-y">
     <div class="col-span-12 intro-y lg:col-span-12">
-      <iframe title="ECPMS_Report" class="w-full" height="1060" src="https://app.powerbi.com/view?r=eyJrIjoiMmU4YzJmOWUtNDVkMS00YTUyLWI2OWItOGM3ODEwMWYyNWQzIiwidCI6IjNlYzExNDExLTJhNzEtNGExMi1hYzgwLWZiZjkzNTUzZjkxOCIsImMiOjEwfQ%3D%3D" frameborder="0" allowFullScreen="true"></iframe>
+      <iframe title="ECPMS_2024_SQL_Localhost" class="w-full" height="1060" src="https://app.powerbi.com/view?r=eyJrIjoiNjNiOWRmYTktZjFkMi00YmEzLTk0NzgtM2MxZDYxM2VlYWJlIiwidCI6IjNlYzExNDExLTJhNzEtNGExMi1hYzgwLWZiZjkzNTUzZjkxOCIsImMiOjEwfQ%3D%3D" frameborder="0" allowFullScreen="true"></iframe>
     </div>
-      <!-- <div class="col-span-12 intro-y lg:col-span-4">
+    <!-- <div class="col-span-12 intro-y lg:col-span-4">
         <form class="validate-form" @submit.prevent="assignQuery">
           <div class="grid grid-cols-12 gap-5 mt-5 intro-y">
               <div class="col-span-12  sm:col-span-12">
