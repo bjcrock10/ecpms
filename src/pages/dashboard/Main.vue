@@ -15,7 +15,7 @@ import ReportPieChart from "../../components/ReportPieChart";
 import ReportDonutChart1 from "../../components/ReportDonutChart1";
 import SimpleLineChart1 from "../../components/SimpleLineChart1";
 import LeafletMap from "../../components/LeafletMap";
-import { Menu } from "../../base-components/Headless";
+import { Menu, Dialog } from "../../base-components/Headless";
 import Table from "../../base-components/Table";
 import ClientDataService from '../../services/ClientDataService';
 import BuisinessDataService from "../../services/BuisinessDataService";
@@ -59,18 +59,55 @@ const countProduct = async () => {
     noOfProduct.value = response.data[0].productName
   })
 }
+const setSuccessModalPreview = (val:any) =>{
+  successModalPreview.value = val
+};
+const successModalPreview = ref();
+const name = ref();
 onMounted(()=>{
   countClient();
   countBusiness();
   countAssistance();
   countProduct();
+  setSuccessModalPreview(true);
+  name.value = sessionStorage.getItem('name')
 })
 </script>
 
 <template>
+
   <div class="grid grid-cols-12 gap-6">
     <div class="col-span-12 2xl:col-span-9">
       <div class="grid grid-cols-12 gap-6">
+<!-- BEGIN: Modal Content -->
+<Dialog :open="successModalPreview" @close="
+                  () => {
+                    setSuccessModalPreview(false);
+                  }
+                ">
+    <Dialog.Panel>
+        <div class="p-5 text-center">
+            <Lucide icon="CheckCircle" class="w-16 h-16 mx-auto mt-3 text-success" />
+            <div class="mt-2 text-slate-500">
+                Welcome Back !!!!
+            </div>
+            <div class="mt-5 text-3xl">{{ name }}</div>
+            <div class="mt-2 text-slate-500">
+              If you do not own this account, please log in again. Thank you.
+            </div>
+        </div>
+        <div class="px-5 pb-8 text-center">
+            <Button type="button" variant="primary" @click="
+                        () => {
+                          setSuccessModalPreview(false);
+                        }
+                      " class="w-24">
+                Ok
+            </Button>
+        </div>
+    </Dialog.Panel>
+</Dialog>
+<!-- END: Modal Content -->
         <!-- BEGIN: General Report -->
         <div class="col-span-12 mt-8">
           <div class="flex items-center h-10 intro-y">

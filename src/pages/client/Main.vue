@@ -167,7 +167,7 @@ const loadPriority = () => {
   })
   }
 }
-const priorityIndustry = ref([])
+const priorityIndustry = ref([]);
 const currentClientId = ref();
 onMounted(async () => {
   initTabulator(columnData.value, ClientDataService, tableClient);
