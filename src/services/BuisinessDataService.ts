@@ -39,7 +39,9 @@ class BusinessDataService {
     findByName(name: String): Promise<any> {
       return http.get(`/business/?name=${name}`);
     }
-    
+    search(name: String): Promise<any> {
+      return http.get(`/business/?name=${name}`);
+    }
     count(): Promise<any>{
       return http.get(`/business/?count=1`)
     }

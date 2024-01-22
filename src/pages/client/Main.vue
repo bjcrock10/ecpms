@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Lucide from "../../base-components/Lucide";
-import { Menu, Dialog } from "../../base-components/Headless";
+import { Menu, Dialog, Tab } from "../../base-components/Headless";
 import Button from "../../base-components/Button";
 import { onMounted, ref, reactive, watch, provide, toRefs} from "vue";
 import { FormInput, FormSelect, InputGroup, FormLabel, FormTextarea, FormSwitch} from "../../base-components/Form";
@@ -21,6 +21,7 @@ import { useRouter } from "vue-router";
 import LoadingIcon from "../../base-components/LoadingIcon";
 import CodeBook from "../../services/CodeBook";
 import Client from "../../components/Client/Client.vue";
+import SearchBusiness from "../../components/BusinessSearch/SearchBusiness.vue"
 
 const router = useRouter();
 const {formClient, errorMessage, isError, columnData, addModal, rounded,  brgyDropdown,
@@ -238,7 +239,31 @@ onMounted(async () => {
                   </button>
               </Dialog.Title>
               <Dialog.Description class="text-xs">
-                <Client :clientName="formClient.fullName"/>
+                <Tab.Group>
+                  <Tab.List
+                    variant="link-tabs"
+                    class="flex-col justify-center text-center sm:flex-row lg:justify-start"
+                  >
+                      <Tab :fullWidth="false">
+                          <Tab.Button class="flex items-center py-4 cursor-pointer">
+                            <Lucide icon="User" class="w-4 h-4 mr-2" /> Search by Client Information
+                          </Tab.Button>
+                      </Tab>
+                      <Tab :fullWidth="false">
+                          <Tab.Button class="flex items-center py-4 cursor-pointer">
+                            <Lucide icon="Shield" class="w-4 h-4 mr-2" /> Search by Business Information
+                          </Tab.Button>
+                      </Tab>
+                  </Tab.List>
+                  <Tab.Panels class="mt-5 intro-y">
+                      <Tab.Panel>
+                        <Client :clientName="formClient.fullName"/>
+                      </Tab.Panel>
+                      <Tab.Panel>
+                        <SearchBusiness :businessName="EBL"/>
+                      </Tab.Panel>
+                  </Tab.Panels>
+                </Tab.Group>
               </Dialog.Description>
           </Dialog.Panel>
       </Dialog>
