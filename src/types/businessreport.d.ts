@@ -79,18 +79,7 @@ export function useBusinessReport(){
         ],
     }
     const slicerClientAssistance = {
-        "reportFilters": [
-            {
-                "uniqueName": "encodedDate"
-            }
-        ],
         "rows": [
-            {
-                "uniqueName": "assistingStaff"
-            },
-            {
-                "uniqueName": "staffStation"
-            },
             {
                 "uniqueName": "fullName"
             },

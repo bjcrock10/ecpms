@@ -42,7 +42,7 @@
       })
     }
     else if(tomData.value.toString()==="3"){
-      ReportDataService.getAllClientAssistance("",month.value, sessionStorage.getItem('userId')).then((response: ResponseData)=>{
+      ReportDataService.getAllClientAssistance(month.value, sessionStorage.getItem('userId')).then((response: ResponseData)=>{
         businessData.value = response.data
       }).catch((e:Error)=>{
         console.log(e.message);

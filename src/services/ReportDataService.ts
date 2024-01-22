@@ -9,8 +9,8 @@ class ReportDataService {
         return http.get(`/businessassistance/?id=${id}&month=${month}&userid=${userid}`);
     }
 
-    getAllClientAssistance(id:any,month:any,userid: any): Promise<any> {
-        return http.get(`/clientassistance/?id=${id}&month=${month}&userid=${userid}`);
+    getAllClientAssistance(month:any,userid: any): Promise<any> {
+        return http.get(`/clientassistance/?pclientasst=1&month=${month}&userid=${userid}`);
     }
     getAllToReport(): Promise<any> {
       return http.get("/traveldetail/?rpt=1");
