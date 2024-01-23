@@ -260,7 +260,7 @@ onMounted(async () => {
                         <Client :clientName="formClient.fullName"/>
                       </Tab.Panel>
                       <Tab.Panel>
-                        <SearchBusiness :businessName="EBL"/>
+                        <SearchBusiness :businessName='0'/>
                       </Tab.Panel>
                   </Tab.Panels>
                 </Tab.Group>

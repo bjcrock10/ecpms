@@ -318,8 +318,7 @@ export function useBusiness(){
         },
         {
           title: "Business Name",
-          minWidth: 100,
-          maxWidth: 150,
+          minWidth: 200,
           field: "businessName",
           hozAlign: "center",
           headerHozAlign: "center",
