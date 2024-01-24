@@ -80,8 +80,8 @@ const onSubmit = async () =>{
     if(formAssistance.id === "0"){
       AssistanceDataService.create(formAssistance).then((response: ResponseData)=>{
         if(encodedDate.getFullYear()!==date.getFullYear()){
-          patchClientInfo(props.clientId,{'encodedDate':current_date})
-          patchBusiness(props.business,{'currentEdt':formAssistance.edtLevel,'currentDigital':formAssistance.digitalLevel, 'encodedDate':current_date});
+          patchClientInfo(props.clientId,{'encodedDate':current_date,'encodedBy':sessionStorage.getItem('userId'),'encodedByName':sessionStorage.getItem('name')})
+          patchBusiness(props.business,{'currentEdt':formAssistance.edtLevel,'currentDigital':formAssistance.digitalLevel, 'encodedDate':current_date,'encodedBy':sessionStorage.getItem('userId'),'encodedByName':sessionStorage.getItem('name')});
         }
         else{
           patchBusiness(props.business,{'currentEdt':formAssistance.edtLevel,'currentDigital':formAssistance.digitalLevel});
@@ -94,14 +94,26 @@ const onSubmit = async () =>{
       }).catch((e: Error)=>{
         console.log(e.message)
       }).finally(()=>{
-        patchBusiness(props.business,{'currentEdt':formAssistance.edtLevel,'currentDigital':formAssistance.digitalLevel});
+        if(encodedDate.getFullYear()!==date.getFullYear()){
+          patchClientInfo(props.clientId,{'encodedDate':current_date,'encodedBy':sessionStorage.getItem('userId'),'encodedByName':sessionStorage.getItem('name')})
+          patchBusiness(props.business,{'currentEdt':formAssistance.edtLevel,'currentDigital':formAssistance.digitalLevel, 'encodedDate':current_date,'encodedBy':sessionStorage.getItem('userId'),'encodedByName':sessionStorage.getItem('name')});
+        }
+        else{
+          patchBusiness(props.business,{'currentEdt':formAssistance.edtLevel,'currentDigital':formAssistance.digitalLevel});
+        }
         resetFields();
         buttonSubmitDisable.value = false;
       })
     }
     else{
     AssistanceDataService.update(formAssistance.id,formAssistance).then((response: ResponseData)=>{
-        patchBusiness(props.business,{'currentEdt':formAssistance.edtLevel,'currentDigital':formAssistance.digitalLevel});
+      if(encodedDate.getFullYear()!==date.getFullYear()){
+          patchClientInfo(props.clientId,{'encodedDate':current_date,'encodedBy':sessionStorage.getItem('userId'),'encodedByName':sessionStorage.getItem('name')})
+          patchBusiness(props.business,{'currentEdt':formAssistance.edtLevel,'currentDigital':formAssistance.digitalLevel, 'encodedDate':current_date,'encodedBy':sessionStorage.getItem('userId'),'encodedByName':sessionStorage.getItem('name')});
+        }
+        else{
+          patchBusiness(props.business,{'currentEdt':formAssistance.edtLevel,'currentDigital':formAssistance.digitalLevel});
+        }
         successNotification.value.showToast();
         addModal.value = false;
         messageDetail.value = "You successfully updated new data...";
@@ -110,7 +122,13 @@ const onSubmit = async () =>{
       }).catch((e: Error)=>{
         console.log(e.message)
       }).finally(()=>{
-        patchBusiness(props.business,{'currentEdt':formAssistance.edtLevel,'currentDigital':formAssistance.digitalLevel});
+        if(encodedDate.getFullYear()!==date.getFullYear()){
+          patchClientInfo(props.clientId,{'encodedDate':current_date,'encodedBy':sessionStorage.getItem('userId'),'encodedByName':sessionStorage.getItem('name')})
+          patchBusiness(props.business,{'currentEdt':formAssistance.edtLevel,'currentDigital':formAssistance.digitalLevel,'encodedDate':current_date,'encodedBy':sessionStorage.getItem('userId'),'encodedByName':sessionStorage.getItem('name')});
+        }
+        else{
+          patchBusiness(props.business,{'currentEdt':formAssistance.edtLevel,'currentDigital':formAssistance.digitalLevel});
+        }
         resetFields();
         buttonSubmitDisable.value = false;
         
