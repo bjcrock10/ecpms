@@ -70,6 +70,10 @@ const resetFields = () =>{
     formAssistance.assistanceType = "Access to Finance";
     formAssistance.subTypeAssistance = "Grant Application Approved";
     buttonTitle.value = "Save"
+    formAssistance.encodedBy = sessionStorage.getItem('userId');
+    formAssistance.encodedByName = sessionStorage.getItem('name');
+    formAssistance.encodedDate = current_date;
+    canDelete.value = true;
 }
 const date = new Date();
 const current_date = date.getFullYear()+"-"+(date.getMonth()+1)+"-"+ date.getDate();
@@ -78,6 +82,7 @@ const onSubmit = async () =>{
     buttonSubmitDisable.value = true;
     formAssistance.referTo = selectReferTo.value.toString();
     if(formAssistance.id === "0"){
+      
       AssistanceDataService.create(formAssistance).then((response: ResponseData)=>{
         if(encodedDate.getFullYear()!==date.getFullYear()){
           patchClientInfo(props.clientId,{'encodedDate':current_date,'encodedBy':sessionStorage.getItem('userId'),'encodedByName':sessionStorage.getItem('name')})
@@ -93,10 +98,11 @@ const onSubmit = async () =>{
         dataTable();
       }).catch((e: Error)=>{
         console.log(e.message)
+
       }).finally(()=>{
         if(encodedDate.getFullYear()!==date.getFullYear()){
           patchClientInfo(props.clientId,{'encodedDate':current_date,'encodedBy':sessionStorage.getItem('userId'),'encodedByName':sessionStorage.getItem('name')})
-          patchBusiness(props.business,{'currentEdt':formAssistance.edtLevel,'currentDigital':formAssistance.digitalLevel, 'encodedDate':current_date,'encodedBy':sessionStorage.getItem('userId'),'encodedByName':sessionStorage.getItem('name')});
+          patchBusiness(props.business,{'currentEdt':formAssistance.edtLevel,'currentDigital':formAssistance.digitalLevel, 'encodedDate':current_date,'encodedBy':userId.value,'encodedByName':sessionStorage.getItem('name')});
         }
         else{
           patchBusiness(props.business,{'currentEdt':formAssistance.edtLevel,'currentDigital':formAssistance.digitalLevel});
@@ -118,7 +124,6 @@ const onSubmit = async () =>{
         addModal.value = false;
         messageDetail.value = "You successfully updated new data...";
         dataTable();
-        
       }).catch((e: Error)=>{
         console.log(e.message)
       }).finally(()=>{
@@ -131,7 +136,6 @@ const onSubmit = async () =>{
         }
         resetFields();
         buttonSubmitDisable.value = false;
-        
       })
     }
 };
@@ -198,10 +202,14 @@ const dataTable = () =>{
     formAssistance.title = cell.getData().title
     formAssistance.encodedDate = cell.getData().encodedDate
     formAssistance.encodedBy = cell.getData().encodedBy
+    formAssistance.encodedByName = cell.getData().encodedByName
     addModal.value = true
     buttonTitle.value = "Update"
     if(sessionStorage.getItem('userId')===formAssistance.encodedBy){
         canDelete.value = true
+    }
+    else{
+      canDelete.value = false
     }
   })
 };
@@ -218,7 +226,8 @@ const deleteAssistance = (id:any) => {
     resetFields();
   })
 }
-const canDelete = ref(false)
+const canDelete = ref(true)
+const userId = ref();
 onMounted(async () => {
     dataTable();
     formAssistance.business = props.business;
@@ -241,6 +250,7 @@ onMounted(async () => {
     formAssistance.referTo = "Negosyo Center";
     formAssistance.assistanceType = "Access to Finance";
     formAssistance.subTypeAssistance = "Grant Application Approved"
+    userId.value = sessionStorage.getItem('userId');
 });
 </script>
 
@@ -440,7 +450,7 @@ onMounted(async () => {
                               <Lucide icon="XSquare" class="w-4 h-4 mr-2" />
                         Cancel
                     </Button>
-                    <Button type="submit" variant="primary" elevated class="w-auto" :disabled="buttonSubmitDisable">
+                    <Button v-if="canDelete===true" type="submit" variant="primary" elevated class="w-auto" :disabled="buttonSubmitDisable">
                       <Lucide icon="Save" class="w-4 h-4 mr-2" />{{buttonTitle}}
                     </Button>
                     <Button v-if="canDelete===true" type="button" variant="warning" @click="
