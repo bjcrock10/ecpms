@@ -205,7 +205,7 @@ const dataTable = () =>{
     formAssistance.encodedByName = cell.getData().encodedByName
     addModal.value = true
     buttonTitle.value = "Update"
-    if(sessionStorage.getItem('userId')===formAssistance.encodedBy){
+    if(sessionStorage.getItem('userId')===formAssistance.encodedBy?.toString()){
         canDelete.value = true
     }
     else{
