@@ -102,6 +102,7 @@ const onSubmit = () => {
       formClient.organization = response.data[0].id
     }
  })
+ formClient.gender = (formClient.prefix==='Mr.')?"MALE":"FEMALE"
   ClientDataService.create(formClient).then((response: ResponseData)=>{
       successNotification.value.showToast();
       addModal.value = false
@@ -356,7 +357,7 @@ onMounted(async () => {
                           <FormInput  :rounded="rounded" v-model="formClient.suffix" type="text" placeholder="Sr/Jr/III" />
                         </div>
                         <div class="col-span-12 sm:col-span-2">
-                            <FormLabel htmlFor="modal-form-3"> Sex<span class="requiredTag"> *</span> </FormLabel>
+                            <FormLabel htmlFor="modal-form-3"> Sex<span class="requiredTag hidden"> *</span> </FormLabel>
                             <FormSelect  v-model="formClient.gender" placeholder="Required Fields *" required>
                               <option value="FEMALE">Female</option>
                               <option value="MALE">Male</option>

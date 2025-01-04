@@ -108,6 +108,7 @@ const onSubmit = () =>{
     '',
   );
   formOrganization.title = selectOrganization.value.toString()
+  formClient.gender = (formClient.prefix==='Mr.')?"MALE":"FEMALE"
   updateClientInfo(clientID.value,formClient).then();
       successNotification.value.showToast();
       messageDetail.value = "You successfully updated client profile..."
@@ -255,9 +256,13 @@ onMounted(async () => {
                         <fieldset class="grid grid-cols-12 col-span-12 gap-4 gap-y-3 
                                 border border-solid border-gray-300 p-2">
                                 <legend class="text-sm font-bold">Personal Information</legend>
-                                <div class="col-span-12 md:col-span-1">
+                                <div class="col-span-12 md:col-span-1 hidden">
                                     <FormLabel htmlFor="modal-form-3"> Prefix </FormLabel>
-                                    <FormInput form-input-size="sm"  :rounded="rounded" v-model="formClient.prefix" type="text" placeholder="Ms./Mr./Mrs." />
+                                    <FormSelect form-select-size="sm"  v-model="formClient.prefix" required>
+                                      <option value="Mr.">Mr.</option>
+                                      <option value="Ms.">Ms.</option>
+                                      <option value="Mrs.">Mrs.</option>
+                                    </FormSelect>
                                 </div>
                                 <div class="col-span-12 md:col-span-3">
                                     <FormLabel  htmlFor="modal-form-1"> Last Name </FormLabel>
@@ -284,12 +289,12 @@ onMounted(async () => {
                                     <FormLabel htmlFor="modal-form-3"> Suffix </FormLabel>
                                     <FormInput form-input-size="sm"  :rounded="rounded" v-model="formClient.suffix" type="text" placeholder="Sr/Jr/III" />
                                 </div>
-                                <div class="col-span-12 md:col-span-2">
+                                <div class="col-span-12 md:col-span-2 hidden">
                                     <FormLabel htmlFor="modal-form-3"> Sex </FormLabel>
                                     <FormSelect form-select-size="sm"  v-model="formClient.gender" required>
-                                    <option value="FEMALE">Female</option>
-                                    <option value="MALE">Male</option>
-                                    <option value="Other">Other</option>
+                                      <option value="FEMALE">Female</option>
+                                      <option value="MALE">Male</option>
+                                      <option value="Other">Other</option>
                                     </FormSelect>
                                 </div>
                                 <div class="col-span-12 md:col-span-2">
