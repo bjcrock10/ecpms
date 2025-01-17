@@ -38,7 +38,7 @@ const {formBusiness, formBusinessOwner, formEcommerce, formSocialMedia,formMarke
       checkBusinessBrgy, checkPlantBrgy, businessID, businessSubmit, getBusinessInfo, 
       selectBusinessOwner, selectLineOfBusiness, selectStandardCertification, selectSocialMed, selectEcommerce, 
       selectBOwner, selectMarketPlan, selectMarketTraining, showSearchBusiness, hideSearchBusiness, businessList, businessDropdown, formOrganization, 
-      orgList, selectOrganization, selectPriorityIndustry, columnData} = useBusiness();
+      orgList, selectOrganization, selectPriorityIndustry, columnData, selectedFromAddressDropdown} = useBusiness();
 const tableClient = ref<HTMLDivElement>();
 const {initTabulator, initTabulatorByClient, reInitOnResizeWindow, tabulator, loadingIcon} = tabulatorFunc();
 const successNotification = ref();
@@ -55,10 +55,12 @@ interface Business {
     clientId?: any;
     business?: any;
 }
+const selectPsicSection = ref([1]);
 const props = defineProps<Business>();
 const sameAddress = ref(false);
 const disAbled = ref(false);
 const priorityIndustry = ref([]);
+const psicSection = ref([]); 
 const addModal = ref(false)
 const dataTable = () =>{
   initTabulatorByClient(columnData.value, BusinessDataService, tableClient, props.clientId);
@@ -118,6 +120,7 @@ const searchLeo = () => {
   if(addressSelectBus.businessAddress.length>4){
         LocationDataService.getBarangayVal(addressSelectBus.businessAddress).then((response: ResponseData)=>{
         brgySelect.value = response.data
+        selectedFromAddressDropdown.value = false
         }).catch((e: Error)=>{
           console.log(brgySelect.value)
         })
@@ -127,6 +130,7 @@ const searchLeoPlant = () => {
   if(addressSelectBus.plantAddress.length>4){
         LocationDataService.getBarangayVal(addressSelectBus.plantAddress).then((response: ResponseData)=>{
         brgySelect.value = response.data
+        selectedFromAddressDropdown.value = false
         }).catch((e: Error)=>{
           console.log(brgySelect.value)
         })
@@ -239,70 +243,76 @@ const removeMarketTraining = async (id: any) =>{
 }
 const brgyId = ref()
 const onAddBusiness = async () => {
-  formBusiness.businessOwnership = selectBusinessOwner.value.toString();
-  formBusiness.lineOfBusiness = selectLineOfBusiness.value.toString();
-  formBusiness.standardCertification = selectStandardCertification.value.toString();
-  formBusiness.plantBrgyAddress = addressSelectBus.plantAddress;
-  formBusiness.businessBrgyAddress = addressSelectBus.businessAddress;
-  brgyId.value = addressSelectBus.businessAddress.split(", ")
-  formBusiness.businessBrgy = brgyId.value[0]
-  formBusiness.businessCity = brgyId.value[1]
-  formBusiness.businessProvince = brgyId.value[2]
-  brgyId.value = addressSelectBus.plantAddress.split(", ")
-  formBusiness.plantBrgy = brgyId.value[0]
-  formBusiness.plantCity = brgyId.value[1]
-  formBusiness.plantProvince = brgyId.value[2]
-  formBusiness.organization = selectOrganization.value.toString();
-  formBusiness.clientId = props.clientId;
-  if(formBusiness.businessProvince===undefined){
-    addressSelectBus.businessAddress = ""
-    successNotification.value.showToast();
-    message.value = "Error in Saving!!!!!"
-    messageDetail.value = "Error Occured, Please Select a proper Barangay/City or Municipality/Province"
-    return
-  }
-  if(formBusiness.id==="0"){
-    BusinessDataService.create(formBusiness).then((response: ResponseData)=>{
-      businessID.value = response.data.id
-      if(formBusiness.clientId!=="0"){
-        patchClientInfo(formBusiness.clientId,{'businessId':businessID.value})
-      }
-      successNotification.value.showToast();
-      message.value = "SUCESSFULL!!!!!"
-      messageDetail.value = "You successfully business profile with a Business ID "+businessID.value;
-      formBusiness.id = businessID.value.toString();
-      dataTable();
-    }).catch((e:Error)=>{
+  if(selectedFromAddressDropdown.value === true){
+    formBusiness.businessOwnership = selectBusinessOwner.value.toString();
+    formBusiness.lineOfBusiness = selectLineOfBusiness.value.toString();
+    formBusiness.standardCertification = selectStandardCertification.value.toString();
+    formBusiness.plantBrgyAddress = addressSelectBus.plantAddress;
+    formBusiness.businessBrgyAddress = addressSelectBus.businessAddress;
+    brgyId.value = addressSelectBus.businessAddress.split(", ")
+    formBusiness.businessCity = brgyId.value[0]
+    formBusiness.businessBrgy = brgyId.value[1]
+    formBusiness.businessProvince = brgyId.value[2]
+    brgyId.value = addressSelectBus.plantAddress.split(", ")
+    formBusiness.plantCity = brgyId.value[0]
+    formBusiness.plantBrgy = brgyId.value[1]
+    formBusiness.plantProvince = brgyId.value[2]
+    formBusiness.organization = selectOrganization.value.toString();
+    formBusiness.clientId = props.clientId;
+    if(formBusiness.businessProvince===undefined){
+      addressSelectBus.businessAddress = ""
       successNotification.value.showToast();
       message.value = "Error in Saving!!!!!"
-      messageDetail.value = e.message + " Details: Business Name Exists"
-    })
-  }else{
-    BusinessDataService.update(formBusiness.id, formBusiness).then((response: ResponseData)=>{
-      businessID.value = response.data.id
-      if(formBusiness.clientId!=="0"){
-        patchClientInfo(formBusiness.clientId,{'businessId':businessID.value})
-      }
-      successNotification.value.showToast();
-      messageDetail.value = "You successfully updated business profile with a Business ID "+businessID.value
-      formBusiness.id = businessID.value.toString()
-      dataTable();
-    }).catch((e:Error)=>{
-      successNotification.value.showToast();
-      message.value = "Error in Saving!!!!!"
-      messageDetail.value = e.message
-    })
-  }
-  formOrganization.title = formBusiness.organization.toUpperCase();
-  OrganizationDataService.findByTitle(formBusiness.organization).then((response: ResponseData)=>{
-    if(response.data.length===0){
-      OrganizationDataService.create(formOrganization).then((response: ResponseData)=>{
-          
-      }).catch((e: Error)=>{
-          console.log(e.message)
+      messageDetail.value = "Error Occured, Please Select a proper Barangay/City or Municipality/Province"
+      return
+    }
+    if(formBusiness.id==="0"){
+      BusinessDataService.create(formBusiness).then((response: ResponseData)=>{
+        businessID.value = response.data.id
+        if(formBusiness.clientId!=="0"){
+          patchClientInfo(formBusiness.clientId,{'businessId':businessID.value})
+        }
+        successNotification.value.showToast();
+        message.value = "SUCESSFULL!!!!!"
+        messageDetail.value = "You successfully business profile with a Business ID "+businessID.value;
+        formBusiness.id = businessID.value.toString();
+        dataTable();
+      }).catch((e:Error)=>{
+        successNotification.value.showToast();
+        message.value = "Error in Saving!!!!!"
+        messageDetail.value = e.message + " Details: Business Name Exists"
+      })
+    }else{
+      BusinessDataService.update(formBusiness.id, formBusiness).then((response: ResponseData)=>{
+        businessID.value = response.data.id
+        if(formBusiness.clientId!=="0"){
+          patchClientInfo(formBusiness.clientId,{'businessId':businessID.value})
+        }
+        successNotification.value.showToast();
+        messageDetail.value = "You successfully updated business profile with a Business ID "+businessID.value
+        formBusiness.id = businessID.value.toString()
+        dataTable();
+      }).catch((e:Error)=>{
+        successNotification.value.showToast();
+        message.value = "Error in Saving!!!!!"
+        messageDetail.value = e.message
       })
     }
-  })
+    formOrganization.title = formBusiness.organization.toUpperCase();
+    OrganizationDataService.findByTitle(formBusiness.organization).then((response: ResponseData)=>{
+      if(response.data.length===0){
+        OrganizationDataService.create(formOrganization).then((response: ResponseData)=>{
+            
+        }).catch((e: Error)=>{
+            console.log(e.message)
+        })
+      }
+    })
+  }
+  else{
+    alert('Please select the address in the dropdown for proper tagging. Thanks')
+  }
+  
 }
 const onAddBSocial = async () => {
   formSocialMedia.business = formBusiness.id
@@ -381,11 +391,14 @@ onMounted(async () => {
   CodeBook.getType(11).then((resp: ResponseData)=>{
     priorityIndustry.value = resp.data
   })
+  CodeBook.getPSICSection().then((resp: ResponseData)=>{
+    psicSection.value = resp.data
+  })
   dataTable();
 
   formBusiness.noOfFemaleEmployee = "0"
   formBusiness.noOfMaleEmployee = "0"
-  formBusiness.priorityIndustry = "BAMBOO"
+  formBusiness.priorityIndustry = "OTHERS"
 });
 const capitalized = (item: any) =>{
   const capitalizedFirst = item[0].toUpperCase();
@@ -594,8 +607,8 @@ const sendButtonRef = ref(null);
                                           }"
                                           class="w-full"
                                         >
-                                        <option v-for="item in priorityIndustry" :value="item['textdata']" :key="item['id']">{{item['textdata']}}</option>
                                         <option v-if="parseInt(formBusiness.id) === 0" :value="formBusiness.priorityIndustry">{{formBusiness.priorityIndustry}}</option>
+                                        <option v-for="item in priorityIndustry" :value="item['textdata']" :key="item['id']">{{item['textdata']}}</option>
                                     </TomSelect>
                                 </div>
                                   <div class="col-span-12 md:col-span-4">
@@ -615,18 +628,16 @@ const sendButtonRef = ref(null);
                                     </TomSelect>
                                   </div>
                                   <div class="col-span-12 md:col-span-4">
-                                    <FormLabel htmlFor="modal-form-3">Main Line of Business</FormLabel>
+                                    <FormLabel htmlFor="modal-form-3">PSIC Section</FormLabel>
                                     <TomSelect
-                                      v-model="selectLineOfBusiness"
-                                      :options="{
-                                        placeholder: 'Select item below. If others please specify...',
-                                      }"
-                                      class="w-full"
-                                    >
-                                      <option value="Farming">Farming</option>
-                                      <option value="Manufacturing/Processing">Manufacturing/Processing</option>
-                                      <option value="Trader/Consolidator">Trader/Consolidator</option>
-                                      <option :value="formBusiness.lineOfBusiness">{{formBusiness.lineOfBusiness}}</option>
+                                        v-model="formBusiness.psicSection"
+                                          :options="{
+                                            placeholder: 'Select item below. If not exist please specify...',
+                                          }"
+                                          class="w-full"
+                                        >
+                                        <option v-if="parseInt(formBusiness.id) === 0" value="Other Service Activities">Other Service Activities</option>
+                                        <option v-for="item in psicSection" :value="item['title']" :key="item['id']">{{item['title']}}</option>
                                     </TomSelect>
                                   </div>
                                   <div class="col-span-12 md:col-span-4">
@@ -705,10 +716,10 @@ const sendButtonRef = ref(null);
                                     <!-- BEGIN: Search -->
                                     <div class="col-span-12 md:col-span-4">
                                       <div class="col-span-12 md:col-span-12">
-                                          <FormLabel  htmlFor="modal-form-1"> Barangay / Municipality or City / Region  </FormLabel>
+                                          <FormLabel  htmlFor="modal-form-1">Municipality or City / Barangay / Region  </FormLabel>
                                           <FormInput form-input-size="sm"
                                               type="text"
-                                              placeholder="Search Barangay..."
+                                              placeholder="Search Address..."
                                               @focus="showSearchBrgyBusiness"
                                               @blur="hideSearchBrgyBusiness"
                                               v-model="addressSelectBus.businessAddress"
@@ -729,7 +740,7 @@ const sendButtonRef = ref(null);
                                       >
                                       <div class="absolute right-100 z-50 mt-[3px]">
                                           <div class="w-auto p-5 box">
-                                          <div class="mb-2 font-medium">List of Barangay</div>
+                                          <div class="mb-2 font-medium">List of Address</div>
                                               <button href="" class="w-full mb-5 flex items-center hover:bg-slate-400" type="button" v-for="item in brgySelect" :key="item.id" :value="item.id" @click="checkBusinessBrgy(item)">
                                               <div
                                                   class="flex items-center justify-center w-8 h-8 rounded-full bg-success/20 dark:bg-success/10 text-success"
@@ -771,10 +782,10 @@ const sendButtonRef = ref(null);
                                     </div>
                                     <div class="col-span-12 md:col-span-4">
                                       <div class="col-span-12 md:col-span-12">
-                                          <FormLabel  htmlFor="modal-form-1"> Barangay / Municipality or City / Region  </FormLabel>
+                                          <FormLabel  htmlFor="modal-form-1"> Municipality or City / Barangay / Region  </FormLabel>
                                           <FormInput form-input-size="sm"
                                               type="text"
-                                              placeholder="Search Barangay..."
+                                              placeholder="Search Address..."
                                               @focus="showSearchBrgyPlant"
                                               @blur="hideSearchBrgyPlant"
                                               v-model="addressSelectBus.plantAddress" :disabled="disAbled"
@@ -795,7 +806,7 @@ const sendButtonRef = ref(null);
                                           >
                                           <div class="absolute right-100 z-50 mt-[3px]">
                                               <div class="w-auto p-5 box">
-                                              <div class="mb-2 font-medium">List of Barangay</div>
+                                              <div class="mb-2 font-medium">List of Address</div>
                                                 <button href="" class="w-full mb-5 flex items-center hover:bg-slate-400" type="button" v-for="item in brgySelect" :key="item.id" :value="item.id" @click="checkPlantBrgy(item)">
                                                   <div
                                                       class="flex items-center justify-center w-8 h-8 rounded-full bg-success/20 dark:bg-success/10 text-success"
@@ -1170,7 +1181,7 @@ const sendButtonRef = ref(null);
                                           <option value="Branding/Brand Identity Development ">Branding/Brand Identity Development </option>
                                           <option value="Intellectual Property (IP) Rights Awareness & Registration ">Intellectual Property (IP) Rights Awareness & Registration </option>
                                           <option value="Visual Merchandising">Visual Merchandising</option>
-                                          <option value="Retail Store Mansadagement">Retail Store Mansadagement</option>
+                                          <option value="Retail Store Management">Retail Store Management</option>
                                           <option value="Digitalization Seminars">Digitalization Seminars</option>
                                           <option value="Digital Marketing/Use of Social Media and other Marketing Platforms">Digital Marketing/Use of Social Media and other Marketing Platforms</option>
                                           <option value="Subcontracting Partners for Innovation (SPIN) Program"></option>
@@ -1194,18 +1205,29 @@ const sendButtonRef = ref(null);
                           </Tab.Panel>
                           <!-- BEGIN: Product Information -->
                           <Tab.Panel>
-                            <div class="grid grid-cols-12 gap-12">
-                              <div class="col-span-12 intro-y box lg:col-span-12">
-                                <div class="p-2">
-                                    <Product :business="formBusiness.id"/>
-                                </div>
-                              </div>
-                              <div class="col-span-12 intro-y box lg:col-span-12 -mt-4">
-                                <div class="p-2">
-                                    <MarketProfile :business="formBusiness.id"/>
-                                </div>
-                              </div>
-                            </div>
+                            <Tab.Group>
+                              <Tab.List variant="link-tabs"
+                                        class="flex-col justify-center text-center sm:flex-row lg:justify-start">
+                                  <Tab :fullWidth="false">
+                                      <Tab.Button class="flex items-center py-4 cursor-pointer">
+                                          Product List
+                                      </Tab.Button>
+                                  </Tab>
+                                  <Tab :fullWidth="false">
+                                      <Tab.Button class="flex items-center py-4 cursor-pointer">
+                                          Market Profile List
+                                      </Tab.Button>
+                                  </Tab>
+                              </Tab.List>
+                              <Tab.Panels class="mt-5">
+                                <Tab.Panel class="leading-relaxed">
+                                  <Product :business="formBusiness.id"/>
+                                </Tab.Panel>
+                                <Tab.Panel class="leading-relaxed">
+                                  <MarketProfile :business="formBusiness.id"/>
+                                </Tab.Panel>
+                              </Tab.Panels>
+                            </Tab.Group>
                           </Tab.Panel>
                           <!-- END: Product Information -->
                       </Tab.Panels>

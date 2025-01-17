@@ -21,7 +21,7 @@ import Toastify from "toastify-js";
 import { createIcons, icons } from "lucide";
 import { useRouter } from "vue-router"; 
 import LoadingIcon from "../../base-components/LoadingIcon";
-
+import { ClassicEditor } from "../../base-components/Ckeditor";
 const {formProduct, columnData} = useProduct();
 const {initTabulator, reInitOnResizeWindow, 
 filter, onFilter, 
@@ -31,6 +31,7 @@ onPrint, onResetFilter, tabulator, loadingIcon} = tabulatorFunc();
 
 interface Product {
     business?: any;
+    businessName?: any;
 }
 const props = defineProps<Product>();
 const tableClient = ref<HTMLDivElement>();
@@ -39,12 +40,14 @@ const message = ref("");
 const messageDetail = ref("");
 const sendButtonRef = ref(null);
 const selectProduct = ref(["1"]);
+const selectProductType = ref(["1"]);
 const selectCertification = ref(["1"]);
 const selectUom = ref(["1"]);
 const buttonTitle = ref("");
 const onSubmit = async () =>{
     formProduct.productName = selectProduct.value.toString();
     formProduct.certification = selectCertification.value.toString();
+    formProduct.productType = selectProductType.value.toString();
     formProduct.uom = selectUom.value.toString();
     if(formProduct.id === "0"){
       ProductDataService.create(formProduct).then((response: ResponseData)=>{
@@ -95,11 +98,19 @@ const dataTable = () =>{
   tabulator.value?.on("rowClick",(e, cell)=>{
     formProduct.id = cell.getData().id
     selectProduct.value = ([cell.getData().productName])
+    selectProductType.value = ([cell.getData().productType])
     formProduct.certification = cell.getData().certification
     selectCertification.value = ([cell.getData().certification])
     selectUom.value = ([cell.getData().uom])
     formProduct.productionCapacity = cell.getData().productionCapacity
     formProduct.size = cell.getData().size
+    formProduct.width = cell.getData().width
+    formProduct.height = cell.getData().height
+    formProduct.length = cell.getData().length
+    formProduct.description = cell.getData().description
+    formProduct.materials = cell.getData().materials
+    formProduct.pictureURL = cell.getData().pictureURL
+    formProduct.sku = cell.getData().sku
     formProduct.brandName = cell.getData().brandName
     addModal.value = true
     buttonTitle.value = "Update"
@@ -108,6 +119,7 @@ const dataTable = () =>{
 onMounted(() => {
     dataTable();
     formProduct.business = props.business;
+    formProduct.businessName = props.businessName;
 });
 </script>
 
@@ -140,7 +152,7 @@ onMounted(() => {
                           setAddModal(false);
                         }
                       " :initialFocus="sendButtonRef">
-          <Dialog.Panel>
+          <Dialog.Panel class="z-40 top-0 left-0 w-full h-full outline-none overflow-x-hidden overflow-y-auto">
               <Dialog.Title>
                   <h2 class="mr-auto text-base font-medium">
                      Adding Product
@@ -155,7 +167,26 @@ onMounted(() => {
               </Dialog.Title>
               <form class="validate-form" @submit.prevent="onSubmit">
                 <Dialog.Description class="text-xs w-full h-full">
-                  <div class="grid grid-cols-12 col-span-12 gap-4 gap-y-3 p-2">
+                  
+                  <div class="grid grid-cols-12 col-span-12 gap-4 gap-y-3 p-2 h-auto">
+                          <div class="col-span-12 md:col-span-6">
+                                  <FormLabel htmlFor="modal-form-3">Product Type</FormLabel>
+                                  <TomSelect
+                                    v-model="selectProductType"
+                                    :options="{
+                                      placeholder: 'Select item below. If others please specify.',
+                                      persist: false,
+                                      createOnBlur: true,
+                                      create: true,
+                                      maxItems:1
+                                    }"
+                                    class="w-full"
+                                  >
+                                    <option value="Food">Food</option>
+                                    <option value="Non-Food">Non-Food</option>
+                                    <option :value="formProduct.productType">{{formProduct.productType}}</option>
+                                  </TomSelect>
+                          </div>
                           <div class="col-span-12 md:col-span-6">
                             <FormLabel htmlFor="modal-form-3">Product Name</FormLabel>
                             <TomSelect
@@ -189,6 +220,11 @@ onMounted(() => {
                             </TomSelect>
                           </div>
                           <div class="col-span-12 md:col-span-6">
+                            <FormLabel htmlFor="modal-form-3">Brand Name</FormLabel>
+                            <FormInput v-model="formProduct.brandName" 
+                              type="text" placeholder="" required/>
+                          </div>
+                          <div class="col-span-12 md:col-span-3">
                             <FormLabel htmlFor="modal-form-3">UOM</FormLabel>
                             <TomSelect
                               v-model="selectUom"
@@ -201,30 +237,41 @@ onMounted(() => {
                               }"
                               class="w-full" multiple required
                             >
+                              <option value="Kilo/s">Kilo/s</option>
+                              <option value="Grams">Grams</option>
                               <option value="Milliliter">Milliliter</option>
                               <option value="Liter">Liter</option>
                               <option value="Gallon">Gallon</option>
                               <option value="Piece/s">Piece/s</option>
-                              <option value="Kilo/s">Kilo/s</option>
-                              <option value="Lot/s">Lot</option>
                               <option value="Box/es">Box</option>
                               <option value="Pack/s">Pack/s</option>
+                              <option value="Lot/s">Lot</option>
                               <option :value="formProduct.uom">{{formProduct.uom}}</option>
                             </TomSelect>
                           </div>
-                          <div class="col-span-12 sm:col-span-6">
+                          <div class="col-span-12 md:col-span-3 ">
                             <FormLabel htmlFor="modal-form-3">Size</FormLabel>
                             <FormInput v-model="formProduct.size" 
                               type="number" placeholder="" required/>
                           </div>
-                          <div class="col-span-12 sm:col-span-6">
+                          <div class="col-span-12 md:col-span-2">
+                            <FormLabel htmlFor="modal-form-3">Width</FormLabel>
+                            <FormInput v-model="formProduct.width" 
+                              type="number" placeholder="" required/>
+                          </div>
+                          <div class="col-span-12 md:col-span-2">
+                            <FormLabel htmlFor="modal-form-3">Height</FormLabel>
+                            <FormInput v-model="formProduct.height" 
+                              type="number" placeholder="" required/>
+                          </div>
+                          <div class="col-span-12 md:col-span-2 ">
+                            <FormLabel htmlFor="modal-form-3">Length</FormLabel>
+                            <FormInput v-model="formProduct.length" 
+                              type="number" placeholder="" required/>
+                          </div>
+                          <div class="col-span-12 md:col-span-6">
                             <FormLabel htmlFor="modal-form-3">Production Capacity per Month</FormLabel>
                             <FormInput v-model="formProduct.productionCapacity" 
-                              type="text" placeholder="" required/>
-                          </div>
-                          <div class="col-span-12 sm:col-span-6">
-                            <FormLabel htmlFor="modal-form-3">Brand Name</FormLabel>
-                            <FormInput v-model="formProduct.brandName" 
                               type="text" placeholder="" required/>
                           </div>
                           <div class="col-span-12 md:col-span-6">
@@ -240,6 +287,20 @@ onMounted(() => {
                               <option value="HALAL">HALAL</option>
                               <option :value="formProduct.certification">{{formProduct.certification}}</option>
                             </TomSelect>
+                          </div>
+                          <div class="col-span-12 md:col-span-6">
+                            <FormLabel htmlFor="modal-form-3">SKU</FormLabel>
+                            <FormInput v-model="formProduct.sku" 
+                              type="text" placeholder="" required/>
+                          </div>
+                          <div class="col-span-12 md:col-span-12">
+                            <FormLabel htmlFor="modal-form-3">Material/s Used</FormLabel>
+                            <FormInput v-model="formProduct.materials" 
+                              type="text" placeholder="" required/>
+                          </div>
+                          <div class="col-span-12 md:col-span-12">
+                            <FormLabel htmlFor="modal-form-3">Descriptiom</FormLabel>
+                            <ClassicEditor v-model="formProduct.description" />
                           </div>
                   </div>
                 </Dialog.Description>
@@ -286,6 +347,8 @@ onMounted(() => {
                 <option value="id">No.</option>
                 <option value="productName">Product</option>
                 <option value="brandName">Brand Name</option>
+                <option value="sku">SKU</option>
+                <option value="productType">Product type</option>
                 <option value="certification">Certification</option>
                 <option value="size">Size</option>
             </FormSelect>

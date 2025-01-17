@@ -27,6 +27,10 @@ class CodeBook {
     delete(id: any): Promise<any> {
       return http.delete(`/codebook/${id}/`);
     }
+
+    getPSICSection(): Promise<any> {
+      return http.get("/psicsection/");
+    }
   
   }
   

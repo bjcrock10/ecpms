@@ -30,6 +30,7 @@ export function useMarketProfile(){
     const formMaterialSource = reactive({
         'id':'0',
         'business':'',
+        'productid':'',
         'location':'',
         'volume':'',
         'rawMaterial':'',

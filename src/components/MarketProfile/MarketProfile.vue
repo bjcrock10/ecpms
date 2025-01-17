@@ -313,23 +313,23 @@ onMounted(() => {
                 <Dialog.Description class="text-xs w-full h-full">
                     <div class="grid grid-cols-12 col-span-12 gap-4 gap-y-3 p-2">
                             <div class="col-span-12 md:col-span-6">
-                            <FormLabel htmlFor="modal-form-3">Product Name</FormLabel>
-                            <FormSelect  v-model="formMarketProfile.productName" required>
-                                <option v-for="item in dataProduct" :value="item['productName']" :key="item['id']">{{item['productName']}}</option>
-                            </FormSelect>
-                            <!-- <TomSelect
-                                v-model="selectProduct"
-                                    :options="{
-                                    placeholder: 'Select item below.',
-                                    persist: false,
-                                    createOnBlur: true,
-                                    create: true,
-                                    maxItems:1
-                                }"
-                                class="w-full">
-                                <option v-for="item in dataProduct" :value="item['productName']" :key="item['id']">{{item['productName']}}</option>
-                                <option :value="formMarketProfile.productName">{{formMarketProfile.productName}}</option>
-                            </TomSelect> -->
+                                <FormLabel htmlFor="modal-form-3">Product Name</FormLabel>
+                                <FormSelect  v-model="formMarketProfile.productName" required>
+                                    <option v-for="item in dataProduct" :value="item['productName']" :key="item['id']">{{item['productName']}}</option>
+                                </FormSelect>
+                                <!-- <TomSelect
+                                    v-model="selectProduct"
+                                        :options="{
+                                        placeholder: 'Select item below.',
+                                        persist: false,
+                                        createOnBlur: true,
+                                        create: true,
+                                        maxItems:1
+                                    }"
+                                    class="w-full">
+                                    <option v-for="item in dataProduct" :value="item['productName']" :key="item['id']">{{item['productName']}}</option>
+                                    <option :value="formMarketProfile.productName">{{formMarketProfile.productName}}</option>
+                                </TomSelect> -->
                             </div>
                             <div class="col-span-12 sm:col-span-6">
                             <FormLabel  htmlFor="modal-form-1"> Type of Market </FormLabel>
@@ -344,30 +344,30 @@ onMounted(() => {
                                 type="text" placeholder="" required :disabled="domesticDisabled"/>
                             </div>
                             <div class="col-span-12 md:col-span-4">
-                            <FormLabel htmlFor="modal-form-3">Country</FormLabel>
-                            <TomSelect
-                                v-model="selectCountry"
-                                :options="{
-                                placeholder: 'Select item below. If others please specify.',
-                                }"
-                                class="w-full" multiple :disabled="exportDisabled"
-                            >
-                                <option v-for="item in country"
-                                :key="item.code" :value="item.name">{{item.name}}</option>
-                                <option :value="formMarketProfile.country">{{formMarketProfile.country}}</option>
-                            </TomSelect>
+                                <FormLabel htmlFor="modal-form-3">Country</FormLabel>
+                                <TomSelect
+                                    v-model="selectCountry"
+                                    :options="{
+                                    placeholder: 'Select item below. If others please specify.',
+                                    }"
+                                    class="w-full" multiple :disabled="exportDisabled"
+                                >
+                                    <option v-for="item in country"
+                                    :key="item.code" :value="item.name">{{item.name}}</option>
+                                    <option :value="formMarketProfile.country">{{formMarketProfile.country}}</option>
+                                </TomSelect>
                             </div>
                             <div class="col-span-12 sm:col-span-6">
-                            <FormLabel htmlFor="modal-form-3">Volume</FormLabel>
-                            <FormInput v-model="formMarketProfile.volume" 
-                                type="text" placeholder="" required />
+                                <FormLabel htmlFor="modal-form-3">Volume</FormLabel>
+                                <FormInput v-model="formMarketProfile.volume" 
+                                    type="text" placeholder="" required />
+                                </div>
+                                <div class="col-span-12 sm:col-span-6">
+                                <FormLabel htmlFor="modal-form-3">Export Started</FormLabel>
+                                <FormInput v-model="formMarketProfile.exportStarted" 
+                                    type="number" placeholder="" required :disabled="exportDisabled"/>
                             </div>
-                            <div class="col-span-12 sm:col-span-6">
-                            <FormLabel htmlFor="modal-form-3">Export Started</FormLabel>
-                            <FormInput v-model="formMarketProfile.exportStarted" 
-                                type="number" placeholder="" required :disabled="exportDisabled"/>
-                            </div>
-                    </div>
+                        </div>
                 </Dialog.Description>
                 <Dialog.Footer>
                     <Button type="button" variant="outline-secondary" @click="
@@ -517,6 +517,7 @@ onMounted(() => {
                       <Table sm striped>
                         <Table.Thead>
                           <Table.Tr>
+                            <Table.Th class="whitespace-nowrap w-auto sm:w-96 min-w-min">Product Name</Table.Th>
                             <Table.Th class="whitespace-nowrap w-auto sm:w-96 min-w-min"> LOCATION: (Brgy/ City / Province / Region) </Table.Th>
                             <Table.Th class="whitespace-nowrap w-auto sm:w-96 min-w-min"> Volume </Table.Th>
                             <Table.Th class="whitespace-nowrap w-auto sm:w-96 min-w-min"> Raw Mats </Table.Th>
@@ -526,6 +527,7 @@ onMounted(() => {
                         </Table.Thead>
                         <Table.Tbody>
                           <Table.Tr v-for="item in sourcesList" :key="item['id']" :value="item['id']" class="-p-10">
+                            <Table.Td>{{item['productid']}} </Table.Td>
                             <Table.Td>{{item['location']}} </Table.Td>
                             <Table.Td>{{item['volume']}}</Table.Td>
                             <Table.Td>{{item['rawMaterial']}}</Table.Td>
@@ -537,6 +539,11 @@ onMounted(() => {
                             </Table.Td>
                           </Table.Tr>
                           <Table.Tr>
+                            <Table.Td>
+                                <FormSelect  form-select-size="sm"  v-model="formMaterialSource.productid" required>
+                                    <option v-for="item in dataProduct" :value="item['productName']" :key="item['id']">{{item['productName']}}</option>
+                                </FormSelect>
+                            </Table.Td>
                               <Table.Td>
                                 <FormInput form-input-size="sm" :rounded="rounded" v-model="formMaterialSource.id" 
                                 type="text" placeholder="" class="col-span-12 md:col-span-12 hidden" required/>

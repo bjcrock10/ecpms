@@ -8,13 +8,21 @@ export function useProduct(){
     const formProduct = reactive({
         'id':'0',
         'business':'',
+        'businessName':'',
         'productType':'',
         'productName':'',
         'productionCapacity':'',
         'uom':'',
         'size':'',
+        'width':'',
+        'height':'',
+        'length':'',
+        'sku':'',
         'brandName':'',
         'certification':'',
+        'description':'',
+        'materials':'',
+        'pictureURL':'',
         'encodedBy': sessionStorage.getItem('userId'),
         'encodedByName': sessionStorage.getItem('name'),
         'office':sessionStorage.getItem('office'),
@@ -55,6 +63,7 @@ export function useProduct(){
             vertAlign: "middle",
             print: false,
             download: false,
+            frozen: true,
             formatter(cell) {
                 return `<div>
                     <div class="font-medium whitespace-nowrap">${cell.getData().productName}</div>
@@ -76,21 +85,43 @@ export function useProduct(){
             vertAlign: "middle",
             print: false,
             download: false,
+            formatter(cell) {
+                return `<div>
+                    <div class="font-medium whitespace-nowrap">${cell.getData().brandName}</div>
+                        <div class="text-slate-500 text-xs whitespace-nowrap"><label>Material Used: </label>${
+                          cell.getData().materials
+                        }</div>
+                        <div class="text-slate-500 text-xs whitespace-nowrap"><label>Description: </label>${
+                          cell.getData().description
+                        }</div>
+                    </div>`;
+                },
         },
         {
-            title: "Production Capacity",
+            title: "Category",
             minWidth: 200,
-            field: "productionCapacity",
+            field: "productType",
             hozAlign: "center",
             headerHozAlign: "center",
             vertAlign: "middle",
             print: false,
             download: false,
+            formatter(cell) {
+                return `<div>
+                    <div class="font-medium whitespace-nowrap">${cell.getData().productType}</div>
+                        <div class="text-slate-500 text-xs whitespace-nowrap"><label>SKU: </label>${
+                          cell.getData().sku
+                        }</div>
+                        <div class="text-slate-500 text-xs whitespace-nowrap"><label>Certification: </label>${
+                          cell.getData().certification
+                        }</div>
+                    </div>`;
+                },
         },
         {
-            title: "Certification",
+            title: "Production Capacity",
             minWidth: 200,
-            field: "certification",
+            field: "productionCapacity",
             hozAlign: "center",
             headerHozAlign: "center",
             vertAlign: "middle",

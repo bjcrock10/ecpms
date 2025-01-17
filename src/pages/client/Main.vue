@@ -29,7 +29,7 @@ const {formClient, errorMessage, isError, columnData, addModal, rounded,  brgyDr
         message, messageDetail, buttonTitle, buttonIcon, setAddModal, select, brgy, sendButtonRef, ncfrs, tenurial,
         accreditation, organization, disNcfrs, disTenurial, disAccreditation, disOrganization, brgySelect, citySelect,
         clientList, addressSelect, checkBa, aNcfrs, dTenurial, dOrganization, dAccreditation, brgyId, formOrganization, 
-        setAddModalSearch,addModalSearch,orgList, selectOrganization} = useClient();
+        setAddModalSearch,addModalSearch,orgList, selectOrganization,selectedFromAddressDropdown} = useClient();
 const {initTabulator, reInitOnResizeWindow, 
 filter, onFilter, 
 onExportCsv, onExportHtml, 
@@ -54,66 +54,70 @@ provide("bind[successNotification]", (el: any) => {
 }
 
 const onSubmit = () => {
-  brgyId.value = addressSelect.addressName.split(", ")
-  formClient.farmerId = currentClientId.value
-  formClient.barangay = brgyId.value[0].trim()
-  formClient.lgu = brgyId.value[1].trim()
-  formClient.province = brgyId.value[2].trim()
-  if(formClient.province===undefined){
-    addressSelect.addressName = ""
-    successNotification.value.showToast();
-    messageDetail.value = "Error Occured, Please Select a proper Barangay/City or Municipality/Province"
-    return
-  }
-  formClient.lname.toUpperCase().trim().replace(
-    /[@!^&\/\\#,+()$~%.'":*?<>{}]/g,
-    '',
-  );
-  formClient.fname.toUpperCase().trim().replace(
-    /[@!^&\/\\#,+()$~%.'":*?<>{}]/g,
-    '',
-  );
-  formClient.mname.toUpperCase().trim().replace(
-    /[@!^&\/\\#,+()$~%.'":*?<>{}]/g,
-    '',
-  );
-  formClient.fullName = formClient.lname.toUpperCase().trim() + ", " + formClient.fname.toUpperCase().trim() + " " + formClient.mname.toUpperCase().trim().replace(
-    /[@!^&\/\\#,+()$~%.'":*?<>{}]/g,
-    '',
-  );
-  formClient.address.toUpperCase().trim();
-  formClient.barangay.toUpperCase().trim();
-  formClient.ipGroup = selectOrganization.value.toString().toUpperCase()
-  formOrganization.title = selectOrganization.value.toString().toUpperCase()
-  OrganizationDataService.create(formOrganization).then((response: ResponseData)=>{
-        formClient.organization = response.data.id
-  }).catch((e: Error)=>{
-    console.log(e.message)
-  })
-  OrganizationDataService.findByTitle(formClient.ipGroup).then((response: ResponseData)=>{
-    if(response.data.length<0){
-      OrganizationDataService.create(formOrganization).then((response: ResponseData)=>{
-            formClient.organization = response.data.id
-      }).catch((e: Error)=>{
-        console.log(e.message)
-      })
-    }
-    else{
-      formClient.organization = response.data[0].id
-    }
- })
- formClient.gender = (formClient.prefix==='Mr.')?"MALE":"FEMALE"
-  ClientDataService.create(formClient).then((response: ResponseData)=>{
+  if(selectedFromAddressDropdown.value ===true){
+    brgyId.value = addressSelect.addressName.split(", ")
+    formClient.farmerId = currentClientId.value
+    formClient.lgu = brgyId.value[0].trim()
+    formClient.barangay = brgyId.value[1].trim()
+    formClient.province = brgyId.value[2].trim()
+    if(formClient.province===undefined){
+      addressSelect.addressName = ""
       successNotification.value.showToast();
-      addModal.value = false
-      messageDetail.value = "You successfully created client profile redirecting you to the profile page..."
-      router.push({path:`/client/${response.data.id}`})
-    }).catch((e : Error)=>{
-      message.value = "Error occurred!!!"
-      messageDetail.value = e.message.toString()
-      formClient.fullName = formClient.lname.toUpperCase();
-      setAddModalSearch(true);
+      messageDetail.value = "Error Occured, Please Select a proper Barangay/City or Municipality/Province"
+      return
+    }
+    formClient.lname.toUpperCase().trim().replace(
+      /[@!^&\/\\#,+()$~%.'":*?<>{}]/g,
+      '',
+    );
+    formClient.fname.toUpperCase().trim().replace(
+      /[@!^&\/\\#,+()$~%.'":*?<>{}]/g,
+      '',
+    );
+    formClient.mname.toUpperCase().trim().replace(
+      /[@!^&\/\\#,+()$~%.'":*?<>{}]/g,
+      '',
+    );
+    formClient.fullName = formClient.lname.toUpperCase().trim() + ", " + formClient.fname.toUpperCase().trim() + " " + formClient.mname.toUpperCase().trim().replace(
+      /[@!^&\/\\#,+()$~%.'":*?<>{}]/g,
+      '',
+    );
+    formClient.address.toUpperCase().trim();
+    formClient.barangay.toUpperCase().trim();
+    formClient.ipGroup = selectOrganization.value.toString().toUpperCase()
+    formOrganization.title = selectOrganization.value.toString().toUpperCase()
+    OrganizationDataService.create(formOrganization).then((response: ResponseData)=>{
+          formClient.organization = response.data.id
+    }).catch((e: Error)=>{
+      console.log(e.message)
     })
+    OrganizationDataService.findByTitle(formClient.ipGroup).then((response: ResponseData)=>{
+      if(response.data.length<0){
+        OrganizationDataService.create(formOrganization).then((response: ResponseData)=>{
+              formClient.organization = response.data.id
+        }).catch((e: Error)=>{
+          console.log(e.message)
+        })
+      }
+      else{
+        formClient.organization = response.data[0].id
+      }
+  })
+  formClient.gender = (formClient.prefix==='Mr.')?"MALE":"FEMALE"
+    ClientDataService.create(formClient).then((response: ResponseData)=>{
+        successNotification.value.showToast();
+        addModal.value = false
+        messageDetail.value = "You successfully created client profile redirecting you to the profile page..."
+        router.push({path:`/client/${response.data.id}`})
+      }).catch((e : Error)=>{
+        message.value = "Error occurred!!!"
+        messageDetail.value = e.message.toString()
+        formClient.fullName = formClient.lname.toUpperCase();
+        setAddModalSearch(true);
+      })
+  }else{
+    alert("Please select a valid address from the dropdown....")
+  }
 };
 watch(addModal,(addModal, oldAdm)=> {
   if(addModal === false){
@@ -297,10 +301,10 @@ onMounted(async () => {
                         <legend class="text-sm font-bold">Personal Information</legend>
                         <div class="col-span-12 sm:col-span-1">
                           <FormLabel htmlFor="modal-form-3"> Prefix<span class="requiredTag"> *</span></FormLabel>
-                          <FormSelect  v-model="formClient.prefix" class="col-span-12 sm:col-span-2" @change="aNcfrs" placeholder="Required Fields *" required>
-                            <option value="Mr.">Mr.</option>
-                            <option value="Ms.">Ms.</option>
-                            <option value="Mrs.">Mrs.</option>
+                          <FormSelect form-select-size="sm"  v-model="formClient.prefix" required>
+                            <option value="MR.">MR.</option>
+                            <option value="MS.">Ms.</option>
+                            <option value="MRS.">MRS.</option>
                           </FormSelect>
                         </div>
                         <div class="col-span-12 sm:col-span-4">
@@ -356,14 +360,14 @@ onMounted(async () => {
                           <FormLabel htmlFor="modal-form-3"> Suffix </FormLabel>
                           <FormInput  :rounded="rounded" v-model="formClient.suffix" type="text" placeholder="Sr/Jr/III" />
                         </div>
-                        <div class="col-span-12 sm:col-span-2">
+                        <!-- <div class="col-span-12 sm:col-span-2 hidden">
                             <FormLabel htmlFor="modal-form-3"> Sex<span class="requiredTag hidden"> *</span> </FormLabel>
                             <FormSelect  v-model="formClient.gender" placeholder="Required Fields *" required>
                               <option value="FEMALE">Female</option>
                               <option value="MALE">Male</option>
                               <option value="Other">Other</option>
                             </FormSelect>
-                        </div>
+                        </div> -->
                         <div class="col-span-12 sm:col-span-2">
                           <FormLabel htmlFor="modal-form-3"> Civil Status<span class="requiredTag"> *</span> </FormLabel>
                           <FormSelect  v-model="formClient.civilStatus" placeholder="Required Fields *" required>
@@ -394,6 +398,13 @@ onMounted(async () => {
                           <FormLabel  htmlFor="modal-form-1"> Job Position </FormLabel>
                           <FormInput  :rounded="rounded" v-model="formClient.designation" type="text" placeholder=""/>
                         </div>
+                        <div class="col-span-12 md:col-span-2">
+                          <FormLabel htmlFor="modal-form-3"> Are you an Investor<span class="requiredTag"> *</span> </FormLabel>
+                          <FormSelect v-model="formClient.investor" placeholder="Required Fields *" @change="loadPriority()" required>
+                              <option value="Yes">Yes</option>
+                              <option value="No">No</option>
+                          </FormSelect>
+                        </div>
                         <div class="col-span-12 sm:col-span-4">
                           <FormLabel  htmlFor="modal-form-1"> Are you a member of a organization? </FormLabel>
                           <TomSelect
@@ -410,13 +421,6 @@ onMounted(async () => {
                             <option v-for="item in orgList" :value="item['title']" :key="item['id']">{{item['title']}}</option>
                             <option value="No">Not a member of any organization</option>
                           </TomSelect>
-                        </div>
-                        <div class="col-span-12 md:col-span-4">
-                          <FormLabel htmlFor="modal-form-3"> Are you an Investor<span class="requiredTag"> *</span> </FormLabel>
-                          <FormSelect form-select-size="sm"  v-model="formClient.investor" placeholder="Required Fields *" @change="loadPriority()" required>
-                              <option value="Yes">Yes</option>
-                              <option value="No">No</option>
-                          </FormSelect>
                         </div>
                         <div class="col-span-12 md:col-span-4" v-if="formClient.investor==='Yes'">
                             <FormLabel  htmlFor="modal-form-1"> Priority Industry </FormLabel>

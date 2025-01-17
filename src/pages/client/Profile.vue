@@ -45,7 +45,7 @@ const {formClient, errorMessage, isError, columnData, addModal, rounded,  brgyDr
         message, messageDetail, buttonTitle, buttonIcon, setAddModal, select, brgy, sendButtonRef, ncfrs, tenurial,
         accreditation, organization, disNcfrs, disTenurial, disAccreditation, disOrganization, brgySelect, citySelect,
         clientList, addressSelect, checkBa, aNcfrs, dTenurial, dOrganization, dAccreditation, getClientInfo, 
-        updateClientInfo, clientSubmit, patchClientInfo, formOrganization, orgList, selectOrganization, brgyId} = useClient();
+        updateClientInfo, clientSubmit, patchClientInfo, formOrganization, orgList, selectOrganization, brgyId, selectedFromAddressDropdown} = useClient();
 
 const clientID = ref(router.currentRoute.value.params.id);
 const tableClient = ref<HTMLDivElement>();
@@ -68,6 +68,7 @@ const searchLeo = () => {
   if(addressSelect.addressName.length>4){
         LocationDataService.getBarangayVal(addressSelect.addressName).then((response: ResponseData)=>{
         brgySelect.value = response.data
+        selectedFromAddressDropdown.value = false
         }).catch((e: Error)=>{
           console.log(citySelect.value)
         })
@@ -256,12 +257,12 @@ onMounted(async () => {
                         <fieldset class="grid grid-cols-12 col-span-12 gap-4 gap-y-3 
                                 border border-solid border-gray-300 p-2">
                                 <legend class="text-sm font-bold">Personal Information</legend>
-                                <div class="col-span-12 md:col-span-1 hidden">
+                                <div class="col-span-12 md:col-span-1">
                                     <FormLabel htmlFor="modal-form-3"> Prefix </FormLabel>
                                     <FormSelect form-select-size="sm"  v-model="formClient.prefix" required>
-                                      <option value="Mr.">Mr.</option>
-                                      <option value="Ms.">Ms.</option>
-                                      <option value="Mrs.">Mrs.</option>
+                                      <option value="MR.">MR.</option>
+                                      <option value="MS.">Ms.</option>
+                                      <option value="MRS.">MRS.</option>
                                     </FormSelect>
                                 </div>
                                 <div class="col-span-12 md:col-span-3">
@@ -289,14 +290,14 @@ onMounted(async () => {
                                     <FormLabel htmlFor="modal-form-3"> Suffix </FormLabel>
                                     <FormInput form-input-size="sm"  :rounded="rounded" v-model="formClient.suffix" type="text" placeholder="Sr/Jr/III" />
                                 </div>
-                                <div class="col-span-12 md:col-span-2 hidden">
+                                <!-- <div class="col-span-12 md:col-span-2 hidden">
                                     <FormLabel htmlFor="modal-form-3"> Sex </FormLabel>
                                     <FormSelect form-select-size="sm"  v-model="formClient.gender" required>
                                       <option value="FEMALE">Female</option>
                                       <option value="MALE">Male</option>
                                       <option value="Other">Other</option>
                                     </FormSelect>
-                                </div>
+                                </div> -->
                                 <div class="col-span-12 md:col-span-2">
                                     <FormLabel htmlFor="modal-form-3"> Civil Status </FormLabel>
                                     <FormSelect form-select-size="sm"  v-model="formClient.civilStatus" required>
@@ -327,9 +328,18 @@ onMounted(async () => {
                                   <FormLabel  htmlFor="modal-form-1"> Job Position </FormLabel>
                                   <FormInput form-input-size="sm"  :rounded="rounded" v-model="formClient.designation" type="text" placeholder=""/>
                                 </div>
+                                <div class="col-span-12 md:col-span-2">
+                                  <FormLabel htmlFor="modal-form-3"> Are you an Investor </FormLabel>
+                                  <FormSelect form-select-size="sm"  v-model="formClient.investor"
+                                      @change="loadPriority()" required>
+                                      <option value="Yes">Yes</option>
+                                      <option value="No">No</option>
+                                  </FormSelect>
+                                </div>
                                 <div class="col-span-12 md:col-span-4">
                                   <FormLabel  htmlFor="modal-form-1"> Are you a member of a organization/cooperative? </FormLabel>
                                   <TomSelect
+                                        form-input-size="sm"
                                         v-model="selectOrganization"
                                         :options="{
                                           placeholder: 'Select item below. If not exist please specify...',
@@ -348,17 +358,11 @@ onMounted(async () => {
                                       <option value="No">Not a member of any organization</option>
                                   </TomSelect>
                                 </div>
-                                <div class="col-span-12 md:col-span-4">
-                                  <FormLabel htmlFor="modal-form-3"> Are you an Investor </FormLabel>
-                                  <FormSelect form-select-size="sm"  v-model="formClient.investor"
-                                      @change="loadPriority()" required>
-                                      <option value="Yes">Yes</option>
-                                      <option value="No">No</option>
-                                  </FormSelect>
-                                </div>
+                                
                                 <div class="col-span-12 md:col-span-4" v-if="formClient.investor==='Yes'">
                                     <FormLabel  htmlFor="modal-form-1"> Priority Industry </FormLabel>
                                     <TomSelect
+                                          form-input-size="sm"
                                           v-model="formClient.typeOfInvestment"
                                           :options="{
                                             placeholder: 'Select item below. If not exist please specify...',
@@ -393,10 +397,10 @@ onMounted(async () => {
                                     <!-- BEGIN: Search -->
                                     <div class="col-span-12 md:col-span-12">
                                         <div class="col-span-12 md:col-span-3">
-                                        <FormLabel  htmlFor="modal-form-1"> Barangay / Municipality or City / Region  </FormLabel>
+                                        <FormLabel  htmlFor="modal-form-1">  Municipality or City / Barangay / Region / Country  </FormLabel>
                                         <FormInput form-input-size="sm"
                                             type="text"
-                                            placeholder="Search Barangay..."
+                                            placeholder="Search Municipality or City..."
                                             @focus="showSearchBrgy"
                                             @blur="hideSearchBrgy"
                                             v-model="addressSelect.addressName"

@@ -300,12 +300,14 @@ export function useClient(){
     const addressSelect = reactive({
       'addressName':''
     })
+    const selectedFromAddressDropdown = ref(false)
     const checkBa = (item: any) => {
       formClient.lgu = item.cityName
       formClient.barangay = item.barangayName
       formClient.province = item.provinceName
       formClient.city = item.city
       addressSelect.addressName = item.address
+      selectedFromAddressDropdown.value = true
     }
     const aNcfrs = () =>{
       if(ncfrs.value !== 'Yes'){
@@ -441,6 +443,6 @@ export function useClient(){
         message, messageDetail, buttonTitle, buttonIcon, setAddModal,setAddModalSearch, select, brgy, sendButtonRef, ncfrs, tenurial,
         accreditation, organization, disNcfrs, disTenurial, disAccreditation, disOrganization, brgySelect, citySelect,
         clientList, addressSelect, checkBa, aNcfrs, dTenurial, dOrganization, dAccreditation, getClientInfo, 
-        updateClientInfo, clientSubmit, patchClientInfo, brgyId, formOrganization, selectOrganization, orgList
+        updateClientInfo, clientSubmit, patchClientInfo, brgyId, formOrganization, selectOrganization, orgList, selectedFromAddressDropdown
     }
 }

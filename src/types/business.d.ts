@@ -139,11 +139,13 @@ export function useBusiness(){
         'businessAddress':'',
         'plantAddress':'',
       })
+    const selectedFromAddressDropdown = ref(false)
     const checkBusinessBrgy = (item: any) => {
         formBusiness.businessCity = item.cityName
         formBusiness.businessBrgy = item.barangayName
         formBusiness.businessProvince = item.provinceName
         addressSelectBus.businessAddress = item.address
+        selectedFromAddressDropdown.value = true
     }
     const checkPlantBrgy = (item: any) => {
         formBusiness.plantCity = item.cityName
@@ -399,6 +401,7 @@ export function useBusiness(){
         selectMarketPlan,
         selectMarketTraining, selectOrganization, formOrganization, orgList, selectPriorityIndustry,
         current_date,
-        patchBusiness
+        patchBusiness,
+        selectedFromAddressDropdown
     }
 }
