@@ -2,7 +2,7 @@
 import Lucide from "../../base-components/Lucide";
 import { Menu, Dialog, Tab } from "../../base-components/Headless";
 import Button from "../../base-components/Button";
-import { onMounted, ref, reactive, watch, provide, toRefs} from "vue";
+import { onMounted, ref, reactive, watch, provide, toRefs, nextTick, onUnmounted} from "vue";
 import { FormInput, FormSelect, InputGroup, FormLabel, FormTextarea, FormSwitch} from "../../base-components/Form";
 import Tippy from "../../base-components/Tippy";
 import TomSelect from "../../base-components/TomSelect";
@@ -22,6 +22,8 @@ import LoadingIcon from "../../base-components/LoadingIcon";
 import CodeBook from "../../services/CodeBook";
 import Client from "../../components/Client/Client.vue";
 import SearchBusiness from "../../components/BusinessSearch/SearchBusiness.vue"
+import axios from "axios"
+import LocationDetails from "../../components/Location/LocationDetails.vue";
 
 const router = useRouter();
 const {formClient, errorMessage, isError, columnData, addModal, rounded,  brgyDropdown,
@@ -55,11 +57,11 @@ provide("bind[successNotification]", (el: any) => {
 
 const onSubmit = () => {
   if(selectedFromAddressDropdown.value ===true){
-    brgyId.value = addressSelect.addressName.split(", ")
-    formClient.farmerId = currentClientId.value
-    formClient.lgu = brgyId.value[0].trim()
-    formClient.barangay = brgyId.value[1].trim()
-    formClient.province = brgyId.value[2].trim()
+    // brgyId.value = addressSelect.addressName.split(", ")
+    // formClient.farmerId = currentClientId.value
+    // formClient.lgu = brgyId.value[0].trim()
+    // formClient.barangay = brgyId.value[1].trim()
+    // formClient.province = brgyId.value[2].trim()
     if(formClient.province===undefined){
       addressSelect.addressName = ""
       successNotification.value.showToast();
@@ -175,13 +177,50 @@ const loadPriority = () => {
 }
 const priorityIndustry = ref([]);
 const currentClientId = ref();
-onMounted(async () => {
-  initTabulator(columnData.value, ClientDataService, tableClient);
-  reInitOnResizeWindow();
-  ClientDataService.getAll().then((resp: ResponseData)=>{
-    currentClientId.value = sessionStorage.getItem('office') + resp.data.length.toString()
-  })
+
+// Search Address
+// Define the interface for location details
+interface LocationDetails {
+  lng: number;
+  lat: number;
+  barangay: string | null;
+  city: string | null;
+  province: string | null;
+  region: string | null;
+  country: string | null;
+  place_name: string | null;
+}
+// Reactive state to store the selected location
+const selectedLocation = ref<LocationDetails | null>(null);
+const autocompleteInput = ref()
+// Handle the location-selected event
+const handleLocationSelected = (locationDetails: LocationDetails) => {
+  selectedLocation.value = locationDetails;
+  autocompleteInput.value = (locationDetails.barangay 
+            + ", " + locationDetails.city + ", " + locationDetails.province
+            + ", " + locationDetails.region + ", " + locationDetails.country).trim().toUpperCase()
+  formClient.province = (locationDetails.province || '0').toString().trim().toUpperCase()
+  formClient.latitude = (locationDetails.lat || '0').toString().trim().toUpperCase()
+  formClient.longitude = (locationDetails.lng || '0').toString().trim().toUpperCase()
+  formClient.lgu = (locationDetails.city || '0').toString().trim().toUpperCase()
+  formClient.barangay = (locationDetails.barangay || autocompleteInput.value).toString().trim().toUpperCase()
+  formClient.city = autocompleteInput.value
+  if(locationDetails.lat===0){
+    selectedFromAddressDropdown.value = false
+  }else{
+    selectedFromAddressDropdown.value = true
+  }
   
+};
+// End Search address
+onMounted(async () => {
+  nextTick(() => {
+    initTabulator(columnData.value, ClientDataService, tableClient);
+    reInitOnResizeWindow();
+    ClientDataService.getAll().then((resp: ResponseData)=>{
+      currentClientId.value = sessionStorage.getItem('office') + resp.data.length.toString()
+    })
+  })
   tabulator.value?.on("rowClick",(e, cell)=>{
     const id = cell.getData().id
     router.push({path:`/client/${id}`, params:{id}})
@@ -441,63 +480,40 @@ onMounted(async () => {
                         </div>
                         <fieldset class="grid grid-cols-12 col-span-12 gap-4 gap-y-3 border border-solid border-gray-300 p-3">
                           <legend class="text-xs">Address<span class="requiredTag"> *</span></legend>
-                          <div class="col-span-12 sm:col-span-6">
+                          <div class="col-span-12 sm:col-span-12">
                             <FormLabel  htmlFor="modal-form-1"> House No./Street Name</FormLabel>
                             <FormInput  v-model="formClient.address" type="text"
                             placeholder="House/Building No. / Room & Floor No./ Building Name" required/>
                           </div>
+                          <!-- BEGIN: Search -->
+                          <div class="col-span-12 sm:col-span-12">
+                            <div class="col-span-12 sm:col-span-12">
+                              <FormLabel  htmlFor="modal-form-1"> BARANGAY / CITY or Municipality / PROVINCE / REGION</FormLabel>
+                              <LocationDetails @location-selected="handleLocationSelected" />
+                            </div>
+                          </div>
+                          <!-- END: Search -->
+                          <div class="col-span-12 sm:col-span-3">
+                            <FormLabel  htmlFor="modal-form-3"> Province </FormLabel>
+                            <FormInput  v-model="formClient.province" type="text"
+                            placeholder="If applicable" readonly/>
+                          </div>
+                          <div class="col-span-12 sm:col-span-3">
+                            <FormLabel  htmlFor="modal-form-3"> City / Municipality </FormLabel>
+                            <FormInput  v-model="formClient.lgu" type="text"
+                            placeholder="If applicable" readonly/>
+                          </div>
                           <div class="col-span-12 sm:col-span-3">
                             <FormLabel  htmlFor="modal-form-3"> Longitude </FormLabel>
                             <FormInput  v-model="formClient.longitude" type="text"
-                            placeholder="If applicable"/>
+                            placeholder="If applicable" readonly/>
                           </div>
                           <div class="col-span-12 sm:col-span-3">
                             <FormLabel  htmlFor="modal-form-3"> Latitude </FormLabel>
                             <FormInput  v-model="formClient.latitude" type="text"
-                            placeholder="If applicable"/>
+                            placeholder="If applicable" readonly/>
                           </div>
-                          <!-- BEGIN: Search -->
-                          <div class="col-span-12 sm:col-span-12">
-                            <div class="col-span-12 sm:col-span-3">
-                              <FormLabel  htmlFor="modal-form-1"> Barangay / Municipality or City / Region<span class="requiredTag"> *</span>  </FormLabel>
-                              <FormInput
-                                type="text"
-                                placeholder="Search Barangay..."
-                                @focus="showSearchBrgy"
-                                @blur="hideSearchBrgy"
-                                v-model="addressSelect.addressName"
-                                @keyup.space="searchLeo"
-                                @paste="searchLeo"
-                                required
-                              />
-                          </div>
-                            <TransitionRoot
-                              as="template"
-                              :show="brgyDropdown"
-                              enter="transition-all ease-linear duration-150"
-                              enterFrom="mt-5 invisible opacity-0 translate-y-1"
-                              enterTo="mt-[3px] visible opacity-100 translate-y-0"
-                              entered="mt-[3px]"
-                              leave="transition-all ease-linear duration-150"
-                              leaveFrom="mt-[3px] visible opacity-100 translate-y-0"
-                              leaveTo="mt-5 invisible opacity-0 translate-y-1"
-                            >
-                              <div class="absolute right-100 z-50 mt-[3px]">
-                                <div class="w-auto p-5 box">
-                                  <div class="mb-2 font-medium">List of Barangay</div>
-                                    <button href="" type="button" class="w-full mb-5 flex items-center hover:bg-slate-400" v-for="item in brgySelect" :key="item.id" :value="item.id" @click="checkBa(item)">
-                                      <div
-                                        class="flex items-center justify-center w-8 h-8 rounded-full bg-success/20 dark:bg-success/10 text-success"
-                                      >
-                                        <Lucide icon="MapPin" class="w-4 h-4" />
-                                      </div>
-                                      <div class="ml-3">{{item.address}}</div>
-                                    </button>
-                                 </div>
-                              </div>
-                            </TransitionRoot>
-                          </div>
-                          <!-- END: Search -->
+                          
                         </fieldset>
                         <fieldset class="grid grid-cols-12 col-span-12 gap-4 gap-y-3 border border-solid border-gray-300 p-3">
                           <legend class="text-xs">Contact Details</legend>
@@ -588,5 +604,30 @@ onMounted(async () => {
   .requiredTag{
     color: red;
     opacity: 1;
+  }
+  .autocomplete-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .suggestions-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    border: 1px solid #ccc;
+    border-top: none;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  
+  .suggestions-list li {
+    padding: 8px;
+    cursor: pointer;
+  }
+  
+  .suggestions-list li:hover {
+    background-color: #f0f0f0;
   }
 </style>

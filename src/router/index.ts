@@ -13,6 +13,7 @@ import ClientProfile from "../pages/client/Profile.vue";
 import Report from "../pages/report/Main.vue";
 import TO from "../pages/travelorder/Main.vue";
 import TOProfile from "../pages/travelorder/Profile.vue";
+import Product from '../pages/product/Main.vue'
 
 const routes = [
   {
@@ -53,6 +54,11 @@ const routes = [
         path: "/toprofile/:id",
         name: "side-menu-toprofile",
         component: TOProfile,
+      },
+      {
+        path: "/product",
+        name: "side-menu-product",
+        component: Product,
       },
     ],
   },
