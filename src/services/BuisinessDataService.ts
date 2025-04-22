@@ -12,6 +12,10 @@ class BusinessDataService {
       return http.get(`/business/?id=${id}`);
     }
 
+    getId(id: any): Promise<any> {
+      return http.get(`/business/${id}`);
+    }
+
     getByClient(id: any): Promise<any> {
       return http.get(`/business/?cid=${id}`);
     }

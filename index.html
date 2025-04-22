@@ -3,12 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.10.0/mapbox-gl.css" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>ECPMS</title>
     <style>
       #wdr-pivot-view > span > a {
           display: none;
       }
+      body { margin: 0; padding: 0; }
+      #map { position: absolute; top: 0; bottom: 0; width: 100%; }
   </style>
   </head>
   <body>
@@ -18,9 +22,10 @@
 </html>
 <!-- <script src="https://api.mapbox.com/search-js/v1.0.0-beta.25/search-js-web.js"></script> -->
 <!-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDF8Z1ViYmr_nCgQv11Sqya8ybRaA7otpg&libraries=places"></script> -->
-<script
+<!-- <script
   src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDF8Z1ViYmr_nCgQv11Sqya8ybRaA7otpg&libraries=places"
   async
   defer
-></script>
+></script> -->
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.10.0/mapbox-gl.js"></script>
 

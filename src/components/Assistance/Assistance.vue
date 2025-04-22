@@ -55,6 +55,35 @@ const msmeProgram = ref([])
 const assistanceType = ref([])
 const subTypeAssistance = ref([])
 const buttonSubmitDisable = ref(false)
+
+const edtDigitalLevel = (edt:any,digital:any)=>{
+  if(edt==="Level 0 – Potential Entrepreneurs"){
+    formAssistance.venue =  "0"
+  }else if(edt==="Level 1 – Nurturing Startup"){
+    formAssistance.venue =  "1"
+  }else if(edt==="Level 1.1 (Unregistered)"){
+    formAssistance.venue =  "2"
+  }else if(edt==="Level 1.2 (Partially Registered)"){
+    formAssistance.venue =  "3"
+  }else if(edt==="Level 2 – Growing Entrepreneurs"){
+    formAssistance.venue =  "4"
+  }else if(edt==="Level 3 – Expanding Enterprises"){
+    formAssistance.venue =  "5"
+  }else if(edt==="Level 4 – Sustaining Enterprises"){
+    formAssistance.venue =  "6"
+  }
+ 
+  if(digital==="Level 0 – No use of Digital Tools"){
+    formAssistance.msmeProgramAvail =  "0"
+  }else if(digital==="Level 1 – Basic. MSMEs that use Basic Digital Tools for Business"){
+    formAssistance.msmeProgramAvail =  "1"
+  }else if(digital==="Level 2 – Intermediate. MSMEs that have an Online Presence"){
+    formAssistance.msmeProgramAvail =  "2"
+  }else if(digital==="Level 3 – Advanced. Use of Advanced Digital Tools"){
+    formAssistance.msmeProgramAvail =  "3"
+  }
+}
+
 const resetFields = () =>{
     formAssistance.title = ""
     formAssistance.jobsGen = "0"
@@ -82,7 +111,7 @@ const onSubmit = async () =>{
     buttonSubmitDisable.value = true;
     formAssistance.referTo = selectReferTo.value.toString();
     if(formAssistance.id === "0"){
-      
+      edtDigitalLevel(formAssistance.edtLevel,formAssistance.digitalLevel)
       AssistanceDataService.create(formAssistance).then((response: ResponseData)=>{
         if(encodedDate.getFullYear()!==date.getFullYear()){
           patchClientInfo(props.clientId,{'encodedDate':current_date,'encodedBy':sessionStorage.getItem('userId'),'encodedByName':sessionStorage.getItem('name')})
@@ -112,7 +141,8 @@ const onSubmit = async () =>{
       })
     }
     else{
-    AssistanceDataService.update(formAssistance.id,formAssistance).then((response: ResponseData)=>{
+      edtDigitalLevel(formAssistance.edtLevel,formAssistance.digitalLevel)
+      AssistanceDataService.update(formAssistance.id,formAssistance).then((response: ResponseData)=>{
       if(encodedDate.getFullYear()!==date.getFullYear()){
           patchClientInfo(props.clientId,{'encodedDate':current_date,'encodedBy':sessionStorage.getItem('userId'),'encodedByName':sessionStorage.getItem('name')})
           patchBusiness(props.business,{'currentEdt':formAssistance.edtLevel,'currentDigital':formAssistance.digitalLevel, 'encodedDate':current_date,'encodedBy':sessionStorage.getItem('userId'),'encodedByName':sessionStorage.getItem('name')});
@@ -205,6 +235,7 @@ const dataTable = () =>{
     formAssistance.encodedByName = cell.getData().encodedByName
     addModal.value = true
     buttonTitle.value = "Update"
+    lockDateProvided.value = true
     if(sessionStorage.getItem('userId')===formAssistance.encodedBy?.toString()){
         canDelete.value = true
     }
@@ -227,6 +258,7 @@ const deleteAssistance = (id:any) => {
   })
 }
 const canDelete = ref(true)
+const lockDateProvided = ref(false)
 const userId = ref();
 onMounted(async () => {
     dataTable();
@@ -259,6 +291,7 @@ onMounted(async () => {
         <Button class="mr-2 shadow-md" as="a" href="#" variant="primary" @click="(event: MouseEvent) => {
             event.preventDefault();
             setAddModal(true);
+            lockDateProvided=false;
           }">
           Add New Assistance
         </Button>
@@ -299,6 +332,19 @@ onMounted(async () => {
               <form class="validate-form" @submit.prevent="onSubmit">
                 <Dialog.Description class="text-xs w-full h-full">
                   <div class="grid grid-cols-12 col-span-12 gap-4 gap-y-3 p-2">
+                    <p class="col-span-12 sm:col-span-12 w-full p-2 bg-primary text-center text-slate-50 text-lg">
+                        <h2>Date Provided</h2>
+                    </p>
+                    <div class="col-span-12 sm:col-span-6">
+                        <FormLabel htmlFor="modal-form-3">Date Provided From</FormLabel>
+                        <FormInput v-model="formAssistance.dateProvidedFrom" 
+                            type="date" placeholder="" required :readonly="lockDateProvided"/>
+                    </div>
+                    <div class="col-span-12 sm:col-span-6">
+                        <FormLabel htmlFor="modal-form-3">Date Provided To</FormLabel>
+                        <FormInput v-model="formAssistance.dateProvidedTo" 
+                            type="date" placeholder="" required :readonly="lockDateProvided"/>
+                    </div>
                     <p class="col-span-12 sm:col-span-12 w-full p-2 bg-primary text-center text-slate-50 text-lg">
                         <h2>Client Assistance Monitoring</h2>
                     </p>
@@ -425,20 +471,7 @@ onMounted(async () => {
                             <option v-if="formAssistance.id!=='0'" :value="formAssistance.referTo">{{formAssistance.referTo}}</option>
                         </TomSelect>
                     </div>
-                    <p class="col-span-12 sm:col-span-12 w-full p-2 bg-primary text-center text-slate-50 text-lg">
-                        <h2>Date Provided</h2>
-                    </p>
                     
-                    <div class="col-span-12 sm:col-span-6">
-                        <FormLabel htmlFor="modal-form-3">Date Provided From</FormLabel>
-                        <FormInput v-model="formAssistance.dateProvidedFrom" 
-                            type="date" placeholder="" required/>
-                    </div>
-                    <div class="col-span-12 sm:col-span-6">
-                        <FormLabel htmlFor="modal-form-3">Date Provided To</FormLabel>
-                        <FormInput v-model="formAssistance.dateProvidedTo" 
-                            type="date" placeholder="" required/>
-                    </div>
                   </div>
                 </Dialog.Description>
                 <Dialog.Footer>

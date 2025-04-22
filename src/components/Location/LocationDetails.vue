@@ -10,7 +10,11 @@
       />
     </div>
   </template>
-  
+  <script lang="ts">
+  export default {
+    inheritAttrs: false,
+  };
+  </script>
   <script setup lang="ts">
   import { ref, onMounted, watch } from 'vue';
   
@@ -30,7 +34,7 @@
   }
   const props = defineProps<InputAutocomplete>();
   const autocompleteValue = ref('');
-  const autocompleteInput = ref<HTMLInputElement | null>(null);
+  const autocompleteInput : any = ref<HTMLInputElement | null>(null);
   const locationDetails = ref<LocationDetails | null>(null);
   
   // Emit event
@@ -67,7 +71,7 @@
       locationDetails.value = {
         lng: place.geometry.location?.lng() || 0,
         lat: place.geometry.location?.lat() || 0,
-        barangay: getAddressComponent(["sublocality_level_1", "sublocality"]) || getAddressComponent(["village"]),
+        barangay: getAddressComponent(["sublocality_level_1", "sublocality"]) || getAddressComponent(["village"]) || autocompleteValue.value,
         city: getAddressComponent(["locality"]),
         province: getAddressComponent(["administrative_area_level_2"]) || getAddressComponent(["administrative_area_level_1"]),
         region: getAddressComponent(["administrative_area_level_1"]),
@@ -89,8 +93,8 @@
         lng: 0,
         lat: 0,
         barangay: "",
-        city: "",
-        province: "",
+        city: null,
+        province: null,
         region: "",
         country: "",
         place_name: "",

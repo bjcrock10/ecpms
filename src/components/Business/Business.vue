@@ -17,7 +17,7 @@ import { TransitionRoot } from "@headlessui/vue";
 import { useClient } from "../../types/client.d";
 import { useBusiness } from "../../types/business.d";
 import { useRouter } from "vue-router";
-import { onMounted, ref, reactive, watch, provide, toRefs} from "vue";
+import { onMounted, ref, reactive, watch, provide, toRefs, nextTick} from "vue";
 import Notification from "../../base-components/Notification";
 import { NotificationElement } from "../../base-components/Notification";
 import Toastify from "toastify-js";
@@ -30,7 +30,187 @@ import CodeBook from "../../services/CodeBook";
 import Product from "../../components/Product";
 import MarketProfile from '../../components/MarketProfile';
 import { tabulatorFunc } from "../../types/tabulator.d";
+import LocationDetails from "../../components/Location/LocationDetails.vue";
+import axios from "axios"
+import mapboxgl from "mapbox-gl";
+const searchQuery = ref("");
+const suggestions = ref([]);
+const mapContainer = ref<HTMLElement | null | string>(null);
+let map:any, marker:any;
 
+mapboxgl.accessToken = "pk.eyJ1IjoiZHRpY2FyYWdhIiwiYSI6ImNtOXM5ODNwNDAwZGQycW9hY2o0NWliencifQ.cVXvJ3YMPK31uLO4B1FXjg";
+
+const fetchAddressSuggestions = async () => {
+  if (searchQuery.value.length < 3) {
+    suggestions.value = [];
+    return;
+  }
+  try {
+    const response = await axios.get(
+      `https://api.mapbox.com/geocoding/v5/mapbox.places/${searchQuery.value}.json`,
+      {
+        params: {
+          access_token: mapboxgl.accessToken,
+          country: "PH",
+          types: "address,place,locality,neighborhood,region,poi",
+          limit: 5,
+        },
+      }
+    );
+    suggestions.value = response.data.features;
+  } catch (error) {
+    console.error("Error fetching suggestions:", error);
+  }
+};
+
+const selectAddress = (suggestion:any) => {
+  const [longitude, latitude] = suggestion.center;
+  const context = suggestion.context || [];
+  updateMap(latitude, longitude);
+  const province = getValue(context, "region") || getValue(context, "place");
+  const city = getValue(context, "place") || getValue(context, "locality") || getValue(context, "neighborhood");
+  const district = getValue(context, "neighborhood") || "N/A";
+  const barangay = getValue(context, "locality") || context.value;
+  searchQuery.value = suggestion.place_name;
+  suggestions.value = [];
+ 
+  formBusiness.businessProvince = province
+  formBusiness.businessLatitude = latitude
+  formBusiness.businessLongitude = longitude
+  formBusiness.businessCity = city
+  formBusiness.businessBrgy = barangay
+  formBusiness.businessBrgyAddress = searchQuery.value
+  selectedFromAddressDropdown.value = true
+};
+const reverseGeocode = async (lat:any, lng:any) => {
+  try {
+    const response = await axios.get(
+      `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json`,
+      {
+        params: {
+          access_token: mapboxgl.accessToken,
+          types: "region,place,locality,neighborhood",
+        },
+      }
+    );
+
+    if (response.data.features.length > 0) {
+      const result = response.data.features[0];
+      searchQuery.value = result.place_name;
+      updateMap(lat, lng);
+
+      const context = result.context || [];
+
+      // Extract location details
+      const province = getValue(context, "region") || getValue(context, "place");
+      const city = getValue(context, "place") || getValue(context, "locality") || getValue(context, "neighborhood");
+      const district = getValue(context, "neighborhood") || "N/A";
+      const barangay = getValue(context, "locality"); // Fixed the incorrect `context.value`
+
+      // Assign values to form fields
+      formBusiness.businessProvince = province
+      formBusiness.businessLatitude = lat
+      formBusiness.businessLongitude = lng
+      formBusiness.businessCity = city
+      formBusiness.businessBrgy = barangay
+      formBusiness.businessBrgyAddress = searchQuery.value
+      selectedFromAddressDropdown.value = true
+    }
+  } catch (error) {
+    console.error("Error with reverse geocoding:", error);
+  }
+};
+
+const updateMap = (lat:any, lng:any) => {
+  if (!map) {
+    console.error("Map is not initialized yet.");
+    return;
+  }
+  if (marker) marker.remove();
+  marker = new mapboxgl.Marker().setLngLat([lng, lat]).addTo(map);
+  map.flyTo({ center: [lng, lat], zoom: 14 });
+};
+
+const getValue = (context:any, type:any) => {
+  const item = context.find((c:any) => c.id.startsWith(type));
+  return item ? item.text : "N/A";
+};
+
+const initializeMap = () => {
+  if (!mapContainer.value) {
+    console.error("Map container is not available!");
+    return;
+  }
+
+  map = new mapboxgl.Map({
+    container: mapContainer.value, // Ensure the container exists
+    style: "mapbox://styles/mapbox/streets-v11",
+    center: [120.9842, 14.5995], // Example: Manila
+    zoom: 12,
+  });
+
+  map.on("click", async (e:any) => {
+    const { lng, lat } = e.lngLat;
+    await reverseGeocode(lat, lng);
+  });
+};
+
+// const initializeMap = async () => {
+//   await nextTick(); // Wait for the modal to be fully rendered
+
+//   if (!mapContainer.value) {
+//     console.error("Map container is not available.");
+//     return;
+//   }
+//   map = new mapboxgl.Map({
+//     container: mapContainer.value,
+//     style: "mapbox://styles/mapbox/streets-v11",
+//     center: [120.9842, 14.5995],
+//     zoom: 12,
+//   });
+
+//   map.on("click", async (e:any) => {
+//     const { lng, lat } = e.lngLat;
+//     await reverseGeocode(lat, lng);
+//   });
+// };
+//----------------------------------------------------End of MAPBOX--------------------------------------------------------------------
+// Search Address
+// Define the interface for location details
+// const selectedAddress = ref()
+// interface LocationDetails {
+//   lng: number;
+//   lat: number;
+//   barangay: string | null;
+//   city: string | null;
+//   province: string | null;
+//   region: string | null;
+//   country: string | null;
+//   place_name: string | null;
+// }
+// // Reactive state to store the selected location
+// const selectedLocation = ref<LocationDetails | null>(null);
+// const autocompleteInput = ref()
+// // Handle the location-selected event
+// const handleLocationSelected = (locationDetails: LocationDetails) => {
+//   selectedLocation.value = locationDetails;
+//   autocompleteInput.value = (locationDetails.barangay 
+//             + ", " + locationDetails.city + ", " + locationDetails.province
+//             + ", " + locationDetails.region + ", " + locationDetails.country).trim().toUpperCase()
+//   formBusiness.businessProvince = (locationDetails.province || '0').toString().trim().toUpperCase()
+//   formBusiness.businessLatitude = (locationDetails.lat || '0').toString().trim().toUpperCase()
+//   formBusiness.businessLongitude = (locationDetails.lng || '0').toString().trim().toUpperCase()
+//   formBusiness.businessCity = (locationDetails.city || '0').toString().trim().toUpperCase()
+//   formBusiness.businessBrgy = (locationDetails.barangay || autocompleteInput.value).toString().trim().toUpperCase()
+//   formBusiness.businessBrgyAddress = autocompleteInput.value
+//   if(locationDetails.lat===0 || locationDetails.city === null || locationDetails.province === null){
+//     selectedFromAddressDropdown.value = false
+//   }else{
+//     selectedFromAddressDropdown.value = true
+//   }
+  
+// };
+// End Search address
 const router = useRouter();
 const {message, messageDetail,patchClientInfo, brgySelect, clientList, hideSearchLname, showSearchLname, lnameDropdown} = useClient();
 const {formBusiness, formBusinessOwner, formEcommerce, formSocialMedia,formMarketPlan, formMarketTraining, hideSearchBrgyBusiness, hideSearchBrgyPlant, 
@@ -38,7 +218,7 @@ const {formBusiness, formBusinessOwner, formEcommerce, formSocialMedia,formMarke
       checkBusinessBrgy, checkPlantBrgy, businessID, businessSubmit, getBusinessInfo, 
       selectBusinessOwner, selectLineOfBusiness, selectStandardCertification, selectSocialMed, selectEcommerce, 
       selectBOwner, selectMarketPlan, selectMarketTraining, showSearchBusiness, hideSearchBusiness, businessList, businessDropdown, formOrganization, 
-      orgList, selectOrganization, selectPriorityIndustry, columnData, selectedFromAddressDropdown} = useBusiness();
+      orgList, selectOrganization, selectPriorityIndustry, columnData, selectedFromAddressDropdown, resetForm} = useBusiness();
 const tableClient = ref<HTMLDivElement>();
 const {initTabulator, initTabulatorByClient, reInitOnResizeWindow, tabulator, loadingIcon} = tabulatorFunc();
 const successNotification = ref();
@@ -71,29 +251,29 @@ const dataTable = () =>{
     addModal.value = true;
   })
 };
-watch(sameAddress, (sameAddress, prevAddProjectModal) => {
-  if(sameAddress===true){
-    formBusiness.plantAddress = formBusiness.businessAddress
-    formBusiness.plantBrgy = formBusiness.businessBrgy
-    formBusiness.plantCity = formBusiness.businessCity
-    formBusiness.plantProvince = formBusiness.businessProvince
-    formBusiness.plantLatitude = formBusiness.businessLatitude
-    formBusiness.plantLongitude = formBusiness.businessLongitude
-    addressSelectBus.plantAddress = addressSelectBus.businessAddress
-    disAbled.value = true
-  }
-  else{
-    formBusiness.plantAddress = ""
-    formBusiness.plantBrgy = ""
-    formBusiness.plantCity = ""
-    formBusiness.plantLatitude = ""
-    formBusiness.plantLongitude = ""
-    addressSelectBus.plantAddress = ""
-    formBusiness.plantProvince = ""
-    disAbled.value = false
-  }
+// watch(sameAddress, (sameAddress, prevAddProjectModal) => {
+//   if(sameAddress===true){
+//     formBusiness.plantAddress = formBusiness.businessAddress
+//     formBusiness.plantBrgy = formBusiness.businessBrgy
+//     formBusiness.plantCity = formBusiness.businessCity
+//     formBusiness.plantProvince = formBusiness.businessProvince
+//     formBusiness.plantLatitude = formBusiness.businessLatitude
+//     formBusiness.plantLongitude = formBusiness.businessLongitude
+//     addressSelectBus.plantAddress = addressSelectBus.businessAddress
+//     disAbled.value = true
+//   }
+//   else{
+//     formBusiness.plantAddress = ""
+//     formBusiness.plantBrgy = ""
+//     formBusiness.plantCity = ""
+//     formBusiness.plantLatitude = ""
+//     formBusiness.plantLongitude = ""
+//     addressSelectBus.plantAddress = ""
+//     formBusiness.plantProvince = ""
+//     disAbled.value = false
+//   }
   
-})
+// })
 // watch(
 //   () => (addressSelectBus.businessAddress), async(address, prevToe) => {
 //     if(address.length>4){
@@ -116,26 +296,26 @@ watch(sameAddress, (sameAddress, prevAddProjectModal) => {
 //       }
 //     }
 // )
-const searchLeo = () => {
-  if(addressSelectBus.businessAddress.length>4){
-        LocationDataService.getBarangayVal(addressSelectBus.businessAddress).then((response: ResponseData)=>{
-        brgySelect.value = response.data
-        selectedFromAddressDropdown.value = false
-        }).catch((e: Error)=>{
-          console.log(brgySelect.value)
-        })
-      }
-}
-const searchLeoPlant = () => {
-  if(addressSelectBus.plantAddress.length>4){
-        LocationDataService.getBarangayVal(addressSelectBus.plantAddress).then((response: ResponseData)=>{
-        brgySelect.value = response.data
-        selectedFromAddressDropdown.value = false
-        }).catch((e: Error)=>{
-          console.log(brgySelect.value)
-        })
-      }
-}
+// const searchLeo = () => {
+//   if(addressSelectBus.businessAddress.length>4){
+//         LocationDataService.getBarangayVal(addressSelectBus.businessAddress).then((response: ResponseData)=>{
+//         brgySelect.value = response.data
+//         selectedFromAddressDropdown.value = false
+//         }).catch((e: Error)=>{
+//           console.log(brgySelect.value)
+//         })
+//       }
+// }
+// const searchLeoPlant = () => {
+//   if(addressSelectBus.plantAddress.length>4){
+//         LocationDataService.getBarangayVal(addressSelectBus.plantAddress).then((response: ResponseData)=>{
+//         brgySelect.value = response.data
+//         selectedFromAddressDropdown.value = false
+//         }).catch((e: Error)=>{
+//           console.log(brgySelect.value)
+//         })
+//       }
+// }
 const searchBN = () => {
   if(formBusiness.businessName.length>4){
         BusinessDataService.findByName(formBusiness.businessName).then((response: ResponseData)=>{
@@ -167,6 +347,13 @@ watch(
       }
     }
 )
+
+// Watch for modal open and initialize map
+watch(addModal, (newVal) => {
+  if (newVal) {
+    initializeMap();
+  }
+});
 const socialMedList = ref([])
 const ecommerceList = ref([])
 const businessOwnerList = ref([])
@@ -243,20 +430,27 @@ const removeMarketTraining = async (id: any) =>{
 }
 const brgyId = ref()
 const onAddBusiness = async () => {
+  if(formBusiness.businessCity==="0"||formBusiness.businessCity===""
+     ||formBusiness.businessProvince==="0"||formBusiness.businessProvince===""
+     ||formBusiness.businessLatitude==="0"||formBusiness.businessLongitude==="0"){
+    selectedFromAddressDropdown.value = false
+  }else{
+    selectedFromAddressDropdown.value = true
+  }
   if(selectedFromAddressDropdown.value === true){
     formBusiness.businessOwnership = selectBusinessOwner.value.toString();
     formBusiness.lineOfBusiness = selectLineOfBusiness.value.toString();
     formBusiness.standardCertification = selectStandardCertification.value.toString();
-    formBusiness.plantBrgyAddress = addressSelectBus.plantAddress;
-    formBusiness.businessBrgyAddress = addressSelectBus.businessAddress;
-    brgyId.value = addressSelectBus.businessAddress.split(", ")
-    formBusiness.businessCity = brgyId.value[0]
-    formBusiness.businessBrgy = brgyId.value[1]
-    formBusiness.businessProvince = brgyId.value[2]
-    brgyId.value = addressSelectBus.plantAddress.split(", ")
-    formBusiness.plantCity = brgyId.value[0]
-    formBusiness.plantBrgy = brgyId.value[1]
-    formBusiness.plantProvince = brgyId.value[2]
+    // formBusiness.plantBrgyAddress = addressSelectBus.plantAddress;
+    // formBusiness.businessBrgyAddress = addressSelectBus.businessAddress;
+    // brgyId.value = addressSelectBus.businessAddress.split(", ")
+    // formBusiness.businessCity = brgyId.value[0]
+    // formBusiness.businessBrgy = brgyId.value[1]
+    // formBusiness.businessProvince = brgyId.value[2]
+    // brgyId.value = addressSelectBus.plantAddress.split(", ")
+    // formBusiness.plantCity = brgyId.value[0]
+    // formBusiness.plantBrgy = brgyId.value[1]
+    // formBusiness.plantProvince = brgyId.value[2]
     formBusiness.organization = selectOrganization.value.toString();
     formBusiness.clientId = props.clientId;
     if(formBusiness.businessProvince===undefined){
@@ -267,6 +461,9 @@ const onAddBusiness = async () => {
       return
     }
     if(formBusiness.id==="0"){
+      if(formBusiness.psicSection===''){
+        formBusiness.psicSection = "Accommodation and Food Service Activities"
+      }
       BusinessDataService.create(formBusiness).then((response: ResponseData)=>{
         businessID.value = response.data.id
         if(formBusiness.clientId!=="0"){
@@ -283,20 +480,28 @@ const onAddBusiness = async () => {
         messageDetail.value = e.message + " Details: Business Name Exists"
       })
     }else{
-      BusinessDataService.update(formBusiness.id, formBusiness).then((response: ResponseData)=>{
-        businessID.value = response.data.id
-        if(formBusiness.clientId!=="0"){
-          patchClientInfo(formBusiness.clientId,{'businessId':businessID.value})
+      if(formBusiness.businessLatitude!==''){
+        if(formBusiness.psicSection.trim()===''){
+          formBusiness.psicSection = "Accommodation and Food Service Activities"
         }
-        successNotification.value.showToast();
-        messageDetail.value = "You successfully updated business profile with a Business ID "+businessID.value
-        formBusiness.id = businessID.value.toString()
-        dataTable();
-      }).catch((e:Error)=>{
-        successNotification.value.showToast();
-        message.value = "Error in Saving!!!!!"
-        messageDetail.value = e.message
-      })
+        BusinessDataService.update(formBusiness.id, formBusiness).then((response: ResponseData)=>{
+          businessID.value = response.data.id
+          if(formBusiness.clientId!=="0"){
+            patchClientInfo(formBusiness.clientId,{'businessId':businessID.value})
+          }
+          successNotification.value.showToast();
+          messageDetail.value = "You successfully updated business profile with a Business ID "+businessID.value
+          formBusiness.id = businessID.value.toString()
+          dataTable();
+        }).catch((e:Error)=>{
+          successNotification.value.showToast();
+          message.value = "Error in Saving!!!!!"
+          messageDetail.value = e.message
+        })
+      }else{
+        alert('Please select the address in the dropdown for proper tagging. Thanks')
+      }
+      
     }
     formOrganization.title = formBusiness.organization.toUpperCase();
     OrganizationDataService.findByTitle(formBusiness.organization).then((response: ResponseData)=>{
@@ -376,6 +581,7 @@ const onAddMarketTraining = async () => {
       messageDetail.value = e.message
   })
 }
+const searchBusiness = ref(false)
 onMounted(async () => {
   if(sessionStorage.getItem('userId') === null){
       router.push({ path:'/login'})
@@ -387,7 +593,27 @@ onMounted(async () => {
   //   messageDetail.value = "You don't have access to this page. Redirecting you the landing page."
   //   router.push({path: "/dashboard"});
   // }
-  loadBusiness();
+  if(!props.business===undefined){
+    addModal.value = true
+    formBusiness.id = props.business || "0"
+    loadBusiness();
+    nextTick(() => {
+      initializeMap();
+      map = new mapboxgl.Map({
+        container: (mapContainer.value===null)?'':mapContainer.value,
+        style: "mapbox://styles/mapbox/streets-v11",
+        center: [120.9842, 14.5995],
+        zoom: 12,
+      });
+
+      map.on("click", async (e:any) => {
+        const { lng, lat } = e.lngLat;
+        await reverseGeocode(lat, lng);
+      });
+    })
+  }else{
+    addModal.value = false
+  }
   CodeBook.getType(11).then((resp: ResponseData)=>{
     priorityIndustry.value = resp.data
   })
@@ -395,7 +621,6 @@ onMounted(async () => {
     psicSection.value = resp.data
   })
   dataTable();
-
   formBusiness.noOfFemaleEmployee = "0"
   formBusiness.noOfMaleEmployee = "0"
   formBusiness.priorityIndustry = "OTHERS"
@@ -453,7 +678,8 @@ const selectOwner = (item:any)=>{
   loadBusinessOwner(item.id);
 }
 const setAddModal = (value: boolean) => {
-      addModal.value = value;
+    initializeMap();
+    addModal.value = value;
 };
 const sendButtonRef = ref(null);
 </script>
@@ -481,6 +707,7 @@ const sendButtonRef = ref(null);
                 <Button class="mr-2 shadow-md" as="a" href="#" variant="primary" @click="(event: MouseEvent) => {
                     event.preventDefault();
                     setAddModal(true);
+                    resetForm();
                   }">
                   Add New Business Name
                 </Button>
@@ -514,7 +741,7 @@ const sendButtonRef = ref(null);
                             setAddModal(false);
                           }
                         " class="w-auto mr-1">
-                        <Lucide icon="XSquare" class="w-4 h-4 mr-2" />
+                        <Lucide icon="XSquare" class=" w-10 h-10 mr-2" />
                 </button>
             </Dialog.Title>
             <Dialog.Description class="text-xs">
@@ -559,7 +786,7 @@ const sendButtonRef = ref(null);
                                 <div class="grid grid-cols-12 col-span-12 gap-4 gap-y-3">
                                   <div class="col-span-12 md:col-span-8">
                                       <FormLabel htmlFor="modal-form-2">Registered Business Name</FormLabel>
-                                      <FormInput form-input-size="sm"  :rounded="rounded" 
+                                      <FormInput :rounded="rounded" 
                                       v-model="formBusiness.businessName" type="text" placeholder=""
                                       @focus="showSearchBusiness"
                                       @blur="hideSearchBusiness"
@@ -595,7 +822,7 @@ const sendButtonRef = ref(null);
                                   </div>
                                   <div class="col-span-12 md:col-span-4">
                                     <FormLabel htmlFor="modal-form-3">Year Established</FormLabel>
-                                    <FormInput form-input-size="sm"  :rounded="rounded" v-model="formBusiness.yearEstablished" 
+                                    <FormInput :rounded="rounded" v-model="formBusiness.yearEstablished" 
                                         type="number" placeholder="" />
                                   </div>
                                   <div class="col-span-12 md:col-span-4">
@@ -637,10 +864,11 @@ const sendButtonRef = ref(null);
                                           class="w-full"
                                         >
                                         <option v-if="parseInt(formBusiness.id) === 0" value="Other Service Activities">Other Service Activities</option>
+                                        <option value="Accommodation and Food Service Activities">Accommodation and Food Service Activities</option>
                                         <option v-for="item in psicSection" :value="item['title']" :key="item['id']">{{item['title']}}</option>
                                     </TomSelect>
                                   </div>
-                                  <div class="col-span-12 md:col-span-4">
+                                  <div class="col-span-12 md:col-span-3">
                                     <FormLabel htmlFor="modal-form-3">Standard Certification/Accreditation</FormLabel>
                                     <TomSelect
                                       v-model="selectStandardCertification"
@@ -655,16 +883,16 @@ const sendButtonRef = ref(null);
                                       <option :value="formBusiness.standardCertification">{{formBusiness.standardCertification}}</option>
                                     </TomSelect>
                                   </div>
-                                  <div class="col-span-12 md:col-span-4">
+                                  <div class="col-span-12 md:col-span-3">
                                       <FormLabel htmlFor="modal-form-3 sm:text-xs text-xs"> Company Size/Capitalization</FormLabel>
-                                      <FormSelect  v-model="formBusiness.capitalization" required>
+                                      <FormSelect  v-model="formBusiness.capitalization" class="w-full p-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500" required>
                                         <option value="Micro">Micro (3M below)</option>
                                         <option value="Small">Small (3,000,001 – 15M)</option>
                                         <option value="Medium">Medium (15,000,001 – 100M)</option>
                                         <option value="Large">Large (100,000,001 above)</option>
                                       </FormSelect>
                                   </div>
-                                  <div class="col-span-12 md:col-span-4">
+                                  <div class="col-span-12 md:col-span-3">
                                     <FormLabel  htmlFor="modal-form-1"> Are you a member/affiliated of a organization? </FormLabel>
                                     <TomSelect
                                           v-model="selectOrganization"
@@ -680,15 +908,22 @@ const sendButtonRef = ref(null);
                                         <option :value="formBusiness.organization">{{formBusiness.organization}}</option>
                                         <option value="No">Not a member of any organization</option>
                                     </TomSelect>
-                                </div>
+                                  </div>
+                                  <div class="col-span-12 md:col-span-3">
+                                      <FormLabel htmlFor="modal-form-3 sm:text-xs text-xs">OTOP?</FormLabel>
+                                      <FormSelect  v-model="formBusiness.psicGroup" class="w-full p-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500" required>
+                                        <option value="No">No</option>
+                                        <option value="Yes">Yes</option>
+                                      </FormSelect>
+                                  </div>
                                   <!-- <div class="col-span-12 md:col-span-3">
                                     <FormLabel htmlFor="modal-form-3"> No. of Outlet </FormLabel>
-                                    <FormInput form-input-size="sm"  v-model="formBusiness.noOutlets" type="number"
+                                    <FormInput v-model="formBusiness.noOutlets" type="number"
                                         placeholder="" required/>
                                   </div> -->
                                   <div class="col-span-12 md:col-span-4">
                                     <FormLabel htmlFor="modal-form-3"> No. of Employees </FormLabel>
-                                    <FormSelect form-select-size="sm"  v-model="formBusiness.noEmployee" required>
+                                    <FormSelect v-model="formBusiness.noEmployee" required>
                                         <option value="1-9">1-9</option>
                                         <option value="10-99">10-99</option>
                                         <option value="100-199">100-199</option>
@@ -697,75 +932,83 @@ const sendButtonRef = ref(null);
                                   </div>
                                   <div class="col-span-12 md:col-span-4">
                                     <FormLabel  htmlFor="modal-form-3"> No. of Male </FormLabel>
-                                    <FormInput form-input-size="sm"  v-model="formBusiness.noOfMaleEmployee" type="text"
+                                    <FormInput v-model="formBusiness.noOfMaleEmployee" type="text"
                                     placeholder="If applicable"/>
                                   </div>
                                   <div class="col-span-12 md:col-span-4">
                                     <FormLabel  htmlFor="modal-form-3"> No. of Female </FormLabel>
-                                    <FormInput form-input-size="sm"  v-model="formBusiness.noOfFemaleEmployee" type="text"
+                                    <FormInput v-model="formBusiness.noOfFemaleEmployee" type="text"
                                     placeholder="If applicable"/>
                                   </div>
                                   
                                   <fieldset class="grid grid-cols-12 col-span-12 gap-4 gap-y-3 border border-solid border-gray-300 p-3">
                                     <legend class="text-xs">Business Address</legend>
-                                    <div class="col-span-12 md:col-span-4">
+                                    <div class="col-span-12 md:col-span-12">
                                         <FormLabel  htmlFor="modal-form-1"> House No./Street Name</FormLabel>
-                                        <FormInput form-input-size="sm"  v-model="formBusiness.businessAddress" type="text"
+                                        <FormInput v-model="formBusiness.businessAddress" type="text"
                                         placeholder="House/Building No. / Room & Floor No./ Building Name" required/>
                                     </div>
-                                    <!-- BEGIN: Search -->
-                                    <div class="col-span-12 md:col-span-4">
-                                      <div class="col-span-12 md:col-span-12">
-                                          <FormLabel  htmlFor="modal-form-1">Municipality or City / Barangay / Region  </FormLabel>
-                                          <FormInput form-input-size="sm"
-                                              type="text"
-                                              placeholder="Search Address..."
-                                              @focus="showSearchBrgyBusiness"
-                                              @blur="hideSearchBrgyBusiness"
-                                              v-model="addressSelectBus.businessAddress"
-                                              @keyup.space="searchLeo"
-                                              @paste="searchLeo"
-                                          />
+                                  <!-- BEGIN: Search -->
+                                    <div class="col-span-12 sm:col-span-12">
+                                      <div class="col-span-12 sm:col-span-12">
+                                        <FormLabel  htmlFor="modal-form-1"> SEARCH BARANGAY / CITY or Municipality / PROVINCE / REGION</FormLabel>
+                                        <!-- <LocationDetails :address="formBusiness.businessBrgyAddress" @location-selected="handleLocationSelected" /> -->
+                                        <input
+                                          v-model="searchQuery"
+                                          @input="fetchAddressSuggestions"
+                                          placeholder="Search for an address"
+                                          class="input"
+                                        />
+                                        <ul v-if="suggestions.length" class="suggestions">
+                                          <li v-for="(suggestion, index) in suggestions" :key="index" @click="selectAddress(suggestion)">
+                                            {{ suggestion['place_name'] }}
+                                          </li>
+                                        </ul>
+                                        <div ref="mapContainer" class="map-container"></div>
                                       </div>
-                                      <TransitionRoot
-                                      as="template"
-                                      :show="brgyDropdownBusiness"
-                                      enter="transition-all ease-linear duration-150"
-                                      enterFrom="mt-5 invisible opacity-0 translate-y-1"
-                                      enterTo="mt-[3px] visible opacity-100 translate-y-0"
-                                      entered="mt-[3px]"
-                                      leave="transition-all ease-linear duration-150"
-                                      leaveFrom="mt-[3px] visible opacity-100 translate-y-0"
-                                      leaveTo="mt-5 invisible opacity-0 translate-y-1"
-                                      >
-                                      <div class="absolute right-100 z-50 mt-[3px]">
-                                          <div class="w-auto p-5 box">
-                                          <div class="mb-2 font-medium">List of Address</div>
-                                              <button href="" class="w-full mb-5 flex items-center hover:bg-slate-400" type="button" v-for="item in brgySelect" :key="item.id" :value="item.id" @click="checkBusinessBrgy(item)">
-                                              <div
-                                                  class="flex items-center justify-center w-8 h-8 rounded-full bg-success/20 dark:bg-success/10 text-success"
-                                              >
-                                                  <Lucide icon="MapPin" class="w-4 h-4" />
-                                              </div>
-                                              <div class="ml-3">{{item.address}}</div>
-                                              </button>
-                                          </div>
-                                      </div>
-                                      </TransitionRoot>
-                                  </div>
-                                  <!-- END: Search -->
-                                    <div class="col-span-12 md:col-span-2">
-                                        <FormLabel  htmlFor="modal-form-3"> Longitude </FormLabel>
-                                        <FormInput form-input-size="sm"  v-model="formBusiness.businessLongitude" type="text"
-                                        placeholder="If applicable"/>
                                     </div>
-                                    <div class="col-span-12 md:col-span-2">
-                                        <FormLabel  htmlFor="modal-form-3"> Latitude </FormLabel>
-                                        <FormInput form-input-size="sm"  v-model="formBusiness.businessLatitude" type="text"
-                                        placeholder="If applicable"/>
+                                    <!-- END: Search -->
+                                    <div class="col-span-12 md:col-span-12">
+                                        <FormLabel  htmlFor="modal-form-1"> Current BARANGAY / CITY or Municipality / PROVINCE / REGION</FormLabel>
+                                        <FormInput v-model="formBusiness.businessBrgyAddress" type="text"
+                                        placeholder="House/Building No. / Room & Floor No./ Building Name"  readonly/>
+                                    </div>
+                                    <div class="col-span-12 sm:col-span-3">
+                                      <FormLabel  htmlFor="modal-form-3"> District </FormLabel>
+                                      <FormSelect v-model="formBusiness.businessZipcode" required>
+                                          <option value="LONE">LONE</option>
+                                          <option value="1ST">1ST</option>
+                                          <option value="2ND">2ND</option>
+                                          <option value="3RD">3RD</option>
+                                          <option value="4TH">4TH</option>
+                                          <option value="5TH">5TH</option>
+                                          <option value="6TH">6TH</option>
+                                          <option value="7TH">7TH</option>
+                                          <option value="8TH">8TH</option>
+                                      </FormSelect>
+                                    </div>
+                                    <div class="col-span-12 sm:col-span-3">
+                                      <FormLabel  htmlFor="modal-form-3"> Province </FormLabel>
+                                      <FormInput  v-model="formBusiness.businessProvince" type="text"
+                                      placeholder="If applicable" required readonly/>
+                                    </div>
+                                    <div class="col-span-12 sm:col-span-3">
+                                      <FormLabel  htmlFor="modal-form-3"> City / Municipality </FormLabel>
+                                      <FormInput  v-model="formBusiness.businessCity" type="text"
+                                      placeholder="If applicable" required readonly/>
+                                    </div>
+                                    <div class="col-span-12 sm:col-span-3">
+                                      <FormLabel  htmlFor="modal-form-3"> Longitude </FormLabel>
+                                      <FormInput  v-model="formBusiness.businessLongitude" type="text"
+                                      placeholder="If applicable" required readonly/>
+                                    </div>
+                                    <div class="col-span-12 sm:col-span-3">
+                                      <FormLabel  htmlFor="modal-form-3"> Latitude </FormLabel>
+                                      <FormInput  v-model="formBusiness.businessLatitude" type="text"
+                                      placeholder="If applicable" required readonly/>
                                     </div>
                                   </fieldset>
-                                  <div class="col-span-12 md:col-span-6">
+                                  <!-- <div class="col-span-12 md:col-span-6">
                                     <FormSwitch>
                                         <FormSwitch.Label htmlFor="checkbox-switch-7">
                                           Is the Office and Factory/Plant Address the same? &nbsp;
@@ -777,7 +1020,7 @@ const sendButtonRef = ref(null);
                                     <legend class="text-xs">Plant Address</legend>
                                     <div class="col-span-12 md:col-span-4">
                                         <FormLabel  htmlFor="modal-form-1"> House No./Street Name</FormLabel>
-                                        <FormInput form-input-size="sm"  v-model="formBusiness.plantAddress" type="text"
+                                        <FormInput v-model="formBusiness.plantAddress" type="text"
                                         placeholder="House/Building No. / Room & Floor No./ Building Name" :disabled="disAbled"/>
                                     </div>
                                     <div class="col-span-12 md:col-span-4">
@@ -821,41 +1064,41 @@ const sendButtonRef = ref(null);
                                   </div>
                                     <div class="col-span-12 md:col-span-2">
                                         <FormLabel  htmlFor="modal-form-3"> Longitude </FormLabel>
-                                        <FormInput form-input-size="sm"  v-model="formBusiness.plantLongitude" type="text"
+                                        <FormInput v-model="formBusiness.plantLongitude" type="text"
                                         placeholder="If applicable" :disabled="disAbled"/>
                                     </div>
                                     <div class="col-span-12 md:col-span-2">
                                         <FormLabel  htmlFor="modal-form-3"> Latitude </FormLabel>
-                                        <FormInput form-input-size="sm"  v-model="formBusiness.plantLatitude" type="text"
+                                        <FormInput v-model="formBusiness.plantLatitude" type="text"
                                         placeholder="If applicable" :disabled="disAbled"/>
-                                    </div>
+                                    </div> -->
                                     
-                                  </fieldset>
+                                  <!-- </fieldset> -->
                                   <fieldset class="grid grid-cols-12 col-span-12 gap-4 gap-y-3 border border-solid border-gray-300 p-3">
                                     <legend class="text-xs">Contact Details</legend>
                                     <div class="col-span-12 md:col-span-4">
                                         <FormLabel  htmlFor="modal-form-3"> Landline Number </FormLabel>
-                                        <FormInput form-input-size="sm"  v-model="formBusiness.landlineNo" type="text"
+                                        <FormInput v-model="formBusiness.landlineNo" type="text"
                                         placeholder="If applicable"/>
                                     </div>
                                     <div class="col-span-12 md:col-span-4">
                                         <FormLabel  htmlFor="modal-form-3"> Mobile Number </FormLabel>
-                                        <FormInput form-input-size="sm"  v-model="formBusiness.mobileNo" type="text"
+                                        <FormInput v-model="formBusiness.mobileNo" type="text"
                                         placeholder="If applicable"/>
                                     </div>
                                     <div class="col-span-12 md:col-span-4">
                                         <FormLabel  htmlFor="modal-form-3"> Fax Number </FormLabel>
-                                        <FormInput form-input-size="sm"  v-model="formBusiness.faxNo" type="text"
+                                        <FormInput v-model="formBusiness.faxNo" type="text"
                                         placeholder="If applicable"/>
                                     </div>
                                     <div class="col-span-12 md:col-span-6">
                                       <FormLabel  htmlFor="modal-form-3"> Website </FormLabel>
-                                      <FormInput form-input-size="sm"  v-model="formBusiness.website" type="text"
+                                      <FormInput v-model="formBusiness.website" type="text"
                                       placeholder="If applicable"/>
                                     </div>
                                     <div class="col-span-12 md:col-span-6">
                                         <FormLabel  htmlFor="modal-form-3"> Email Address </FormLabel>
-                                        <FormInput form-input-size="sm"  v-model="formBusiness.email" type="email"
+                                        <FormInput v-model="formBusiness.email" type="email"
                                         placeholder="If applicable"/>
                                     </div>
                                   </fieldset>
@@ -1237,3 +1480,174 @@ const sendButtonRef = ref(null);
       </Dialog>
       <!-- END: Modal Content -->
 </template>
+
+<!-- <style scoped>
+  input{
+    text-transform: uppercase;
+  }
+  ::placeholder {
+    color: red;
+    opacity: 1;
+  }
+  ::-ms-input-placeholder {
+    color: red;
+  }
+  .requiredTag{
+    color: red;
+    opacity: 1;
+  }
+  .autocomplete-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .suggestions-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    border: 1px solid #ccc;
+    border-top: none;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  
+  .suggestions-list li {
+    padding: 8px;
+    cursor: pointer;
+  }
+  
+  .suggestions-list li:hover {
+    background-color: #f0f0f0;
+  }
+  .input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 5px;
+  }
+  .suggestions {
+    list-style-type: none;
+    padding: 0;
+    border: 1px solid #ccc;
+    background: white;
+    position: absolute;
+    width: 100%;
+    max-height: 150px;
+    overflow-y: auto;
+    z-index: 100;
+  }
+  .suggestions li {
+    padding: 8px;
+    cursor: pointer;
+  }
+  .suggestions li:hover {
+    background-color: #f0f0f0;
+  }
+  .map-container {
+    height: 400px;
+    width: 100%;
+    margin-top: 10px;
+  }
+  .modal {
+  display: flex;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 80%;
+  height: 500px;
+}
+
+.map-container {
+  height: 400px;
+  width: 100%;
+}
+</style> -->
+
+<style scoped>
+.suggestions-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  border: 1px solid #ccc;
+  border-top: none;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.suggestions-list li {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.suggestions-list li:hover {
+  background-color: #f0f0f0;
+}
+.input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 5px;
+}
+.suggestions {
+  list-style-type: none;
+  padding: 0;
+  border: 1px solid #ccc;
+  background: white;
+  position: absolute;
+  width: 100%;
+  max-height: 150px;
+  overflow-y: auto;
+  z-index: 100;
+}
+.suggestions li {
+  padding: 8px;
+  cursor: pointer;
+}
+.suggestions li:hover {
+  background-color: #f0f0f0;
+}
+.map-container {
+  height: 400px;
+  width: 100%;
+  margin-top: 10px;
+}
+.modal {
+display: flex;
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgba(0, 0, 0, 0.5);
+align-items: center;
+justify-content: center;
+}
+
+.modal-content {
+background: white;
+padding: 20px;
+border-radius: 8px;
+width: 80%;
+height: 500px;
+}
+
+.map-container {
+height: 400px;
+width: 100%;
+}
+</style>

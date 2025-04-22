@@ -34,7 +34,7 @@
     background: white;
     padding: 1cm 2cm 2cm;
     border-radius: var(--ck-border-radius);
-    border: 1px solid theme("colors.slate.200");
+    border: 1px solid theme("colors.slate.800");
     box-shadow: theme("boxShadow.sm");
   }
   .ck-heading-dropdown .ck-list .ck-button__label {

@@ -30,7 +30,7 @@ import { useAutocomplete, LocationDetails } from "../../types/location.d";
 export default defineComponent({
   name: "ParentComponent",
   setup() {
-    const autocompleteInput = ref<HTMLInputElement | null>(null);
+    const autocompleteInput : any = ref<HTMLInputElement | null>(null);
     const { locationDetails, initializeAutocomplete } = useAutocomplete(autocompleteInput.value);
 
     onMounted(() => {

@@ -6,7 +6,7 @@ import ResponseData from "./response";
 export function useBusiness(){
     const date = new Date();
     const current_date = date.getFullYear()+"-"+(date.getMonth()+1)+"-"+ date.getDate();
-    const formBusiness = reactive({
+    const initialFormData = {
         'id' : '0',
         'clientId' : '0',
         'businessName': '',
@@ -16,8 +16,8 @@ export function useBusiness(){
         'lineOfBusiness': '',
         'standardCertification':'',
         'capitalization':'',
-        'noOfMaleEmployee':'',
-        'noOfFemaleEmployee':'',
+        'noOfMaleEmployee':'0',
+        'noOfFemaleEmployee':'0',
         'noEmployee':'',
         'businessAddress': '',
         'businessBrgy':'',
@@ -38,7 +38,7 @@ export function useBusiness(){
         'plantLatitude':'',
         'landlineNo':'',
         'faxNo':'',
-        'email':'0',
+        'email':'0@gmail.com',
         'mobileNo': '',
         'website':'',
         'socialMedia':'',
@@ -50,7 +50,7 @@ export function useBusiness(){
         'priorityIndustry':'',
         'psicSection': '',
         'psicDivision': '',
-        'psicGroup': '',
+        'psicGroup': 'No',
         'rawMatsSources': '',
         'estimatedVolume': '',
         'volumeUom':'0',
@@ -60,7 +60,11 @@ export function useBusiness(){
         'office':sessionStorage.getItem('office'),
         'encodedDate':current_date,
         'recStat':'0',
-    });
+    }
+    const formBusiness = reactive({...initialFormData});
+    const resetForm = () => {
+        Object.assign(formBusiness, initialFormData);
+    }
     const formSocialMedia = reactive({
         'id' : '0',
         'business' : '0',
@@ -242,6 +246,7 @@ export function useBusiness(){
             formBusiness.website = response.data[0].website
             formBusiness.organization = response.data[0].organization
             formBusiness.priorityIndustry = response.data[0].priorityIndustry
+            formBusiness.psicSection = response.data[0].psicSection
             addressSelectBus.businessAddress = response.data[0].businessBrgyAddress
             addressSelectBus.plantAddress = response.data[0].plantBrgyAddress
             businessID.value = response.data[0].id
@@ -346,9 +351,9 @@ export function useBusiness(){
         download: false,
         },
         {
-        title: "Line Of Business",
+        title: "PSIC Section",
         minWidth: 200,
-        field: "lineOfBusiness",
+        field: "psicSection",
         hozAlign: "center",
         headerHozAlign: "center",
         vertAlign: "middle",
@@ -402,6 +407,7 @@ export function useBusiness(){
         selectMarketTraining, selectOrganization, formOrganization, orgList, selectPriorityIndustry,
         current_date,
         patchBusiness,
-        selectedFromAddressDropdown
+        selectedFromAddressDropdown,
+        resetForm
     }
 }

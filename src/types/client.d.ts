@@ -3,7 +3,15 @@ import { stringToHTML } from "../utils/helper";
 import ClientDataService from '../services/ClientDataService';
 import OrganizationDataService from "../services/Organization";
 import ResponseData from "./response";
+import mapboxgl from "mapbox-gl";
+import axios from "axios"
+
 export function useClient(){
+
+  const searchQuery = ref("");
+  const suggestions = ref([]);
+  const mapContainer = ref();
+  let map:any, marker:any;
     interface Response {
       name?: string;
       jobs?: string;
@@ -33,23 +41,23 @@ export function useClient(){
         print: false,
         download: false
       },
-      {
-        title: "Client Id",
-        minWidth: 100,
-        maxWidth: 150,
-        field: "farmerId",
-        hozAlign: "center",
-        headerHozAlign: "center",
-        vertAlign: "middle",
-        print: false,
-        download: false,
-        formatter(cell) {
-            return `<div>
-                <div class="font-medium whitespace-nowrap">${cell.getData().farmerId}</div>
+      // {
+      //   title: "Client Id",
+      //   minWidth: 100,
+      //   maxWidth: 150,
+      //   field: "farmerId",
+      //   hozAlign: "center",
+      //   headerHozAlign: "center",
+      //   vertAlign: "middle",
+      //   print: false,
+      //   download: false,
+      //   formatter(cell) {
+      //       return `<div>
+      //           <div class="font-medium whitespace-nowrap">${cell.getData().farmerId}</div>
                 
-            </div>`;
-        },
-      },
+      //       </div>`;
+      //   },
+      // },
       {
       title: "Name",
       minWidth: 200,
@@ -379,6 +387,8 @@ export function useClient(){
           console.log(e.message)
       })
     }
+    const longitude = ref();
+    const latitude = ref();
     const getClientInfo = async (id) =>{
       ClientDataService.get(id).then((response: ResponseData)=>{
         formClient.id = response.data[0].id
@@ -389,6 +399,9 @@ export function useClient(){
         formClient.suffix = response.data[0].suffix.toUpperCase()
         formClient.province = response.data[0].province.toUpperCase()
         formClient.lgu = response.data[0].lgu.toUpperCase()
+        formClient.city = response.data[0].city.toUpperCase()
+        formClient.longitude = response.data[0].longitude.toUpperCase()
+        formClient.latitude = response.data[0].latitude.toUpperCase()
         formClient.barangay = response.data[0].barangay.toUpperCase()
         addressSelect.addressName = response.data[0].barangay.toUpperCase() + ", " +response.data[0].lgu.toUpperCase()+ ",  " + response.data[0].province.toUpperCase()
         formClient.address = response.data[0].address.toUpperCase()
@@ -420,6 +433,20 @@ export function useClient(){
         formClient.designation = response.data[0].designation.toUpperCase()
         formClient.recStat = response.data[0].recStat
         formClient.encodedDate = response.data[0].encodedDate
+        
+        longitude.value = response.data[0].longitude
+        latitude.value = response.data[0].latitude
+
+        map = new mapboxgl.Map({
+          container: mapContainer.value,
+          style: "mapbox://styles/mapbox/streets-v11",
+          center: [parseFloat(longitude.value), parseFloat(latitude.value)],
+          zoom: 12,
+        });
+        map.on("click", async (e:any) => {
+          const { lng, lat } = e.lngLat;
+          await reverseGeocode(lat, lng);
+        });
       }).catch((e: Error)=>{
           console.log(e.message)
       })
@@ -430,6 +457,7 @@ export function useClient(){
     });
     const selectOrganization = ref(["0"]);
     const orgList = ref([]);
+
     return {
         columnData,
         formClient,
@@ -443,6 +471,7 @@ export function useClient(){
         message, messageDetail, buttonTitle, buttonIcon, setAddModal,setAddModalSearch, select, brgy, sendButtonRef, ncfrs, tenurial,
         accreditation, organization, disNcfrs, disTenurial, disAccreditation, disOrganization, brgySelect, citySelect,
         clientList, addressSelect, checkBa, aNcfrs, dTenurial, dOrganization, dAccreditation, getClientInfo, 
-        updateClientInfo, clientSubmit, patchClientInfo, brgyId, formOrganization, selectOrganization, orgList, selectedFromAddressDropdown
+        updateClientInfo, clientSubmit, patchClientInfo, brgyId, formOrganization, selectOrganization, orgList, selectedFromAddressDropdown,
+        latitude,longitude
     }
 }

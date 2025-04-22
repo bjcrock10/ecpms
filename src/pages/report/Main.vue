@@ -89,7 +89,9 @@
         <Tab.Panels class="mt-5 intro-y">
             <Tab.Panel>
               <div class="col-span-12 intro-y lg:col-span-12">
-                <iframe title="ECPMS_2024_SQL_Localhost" class="w-full" height="1060" src="https://app.powerbi.com/view?r=eyJrIjoiNjNiOWRmYTktZjFkMi00YmEzLTk0NzgtM2MxZDYxM2VlYWJlIiwidCI6IjNlYzExNDExLTJhNzEtNGExMi1hYzgwLWZiZjkzNTUzZjkxOCIsImMiOjEwfQ%3D%3D" frameborder="0" allowFullScreen="true"></iframe>
+                <!-- <iframe title="ECPMS_2024_SQL_Localhost" class="w-full" height="1060" src="https://app.powerbi.com/view?r=eyJrIjoiNjNiOWRmYTktZjFkMi00YmEzLTk0NzgtM2MxZDYxM2VlYWJlIiwidCI6IjNlYzExNDExLTJhNzEtNGExMi1hYzgwLWZiZjkzNTUzZjkxOCIsImMiOjEwfQ%3D%3D" frameborder="0" allowFullScreen="true"></iframe> -->
+                <iframe title="RPT_ECPMS_2025_Direct to Server" class="w-full" height="1060" src="https://app.powerbi.com/view?r=eyJrIjoiOTJiNjg5ODYtNDRmOC00OWM1LWExYWYtZDE4MjI4MzRiOTQ5IiwidCI6IjNlYzExNDExLTJhNzEtNGExMi1hYzgwLWZiZjkzNTUzZjkxOCIsImMiOjEwfQ%3D%3D" frameborder="0" allowFullScreen="true"></iframe>
+                
               </div>
             </Tab.Panel>
             <Tab.Panel>

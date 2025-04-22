@@ -104,7 +104,7 @@ const onSubmit = async () => {
               class="mt-10 text-4xl font-medium leading-tight text-white -intro-x"
             >
               E-Client Profiling & Monitoring <br />
-              System - Region 7 version 1.0
+              System (ECPMS version 2)
             </div>
           </div>
         </div>

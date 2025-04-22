@@ -6,18 +6,17 @@ import {
   LitepickerEmit,
 } from "./Litepicker.vue";
 
-interface Picker extends Litepicker {
-  on?: (
-    event: string,
-    cb: (
-      startDate: {
-        dateInstance: Date;
-      },
-      endDate: {
-        dateInstance: Date;
-      }
-    ) => void
-  ) => {};
+// Extend Litepicker to include the `on` method
+declare module "litepicker" {
+  interface Litepicker {
+    on?: (
+      event: string,
+      cb: (
+        startDate: { dateInstance: Date },
+        endDate: { dateInstance: Date }
+      ) => void
+    ) => void;
+  }
 }
 
 const getDateFormat = (format: string | undefined) => {
@@ -46,17 +45,15 @@ const init = (
     ...props.options,
     element: el,
     format: format,
-    setup: (picker: Picker) => {
-      if (picker.on) {
-        picker.on("selected", (startDate, endDate) => {
-          let date = dayjs(startDate.dateInstance).format(format);
-          date +=
-            endDate !== undefined && endDate !== null
-              ? " - " + dayjs(endDate.dateInstance).format(format)
-              : "";
-          emit("update:modelValue", date);
-        });
-      }
+    setup: (picker: Litepicker) => {
+      picker.on?.("selected", (startDate, endDate) => {
+        let date = dayjs(startDate.dateInstance).format(format);
+        date +=
+          endDate
+            ? " - " + dayjs(endDate.dateInstance).format(format)
+            : "";
+        emit("update:modelValue", date);
+      });
     },
   });
 };

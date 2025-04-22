@@ -30,7 +30,7 @@
   }
   const props = defineProps<InputAutocomplete>();
   const autocompleteValue = ref('');
-  const autocompleteInput = ref<HTMLInputElement | null>(null);
+  const autocompleteInput : any = ref<HTMLInputElement | null>(null);
   const locationDetails = ref<LocationDetails | null>(null);
   
   // Emit event

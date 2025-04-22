@@ -10,7 +10,7 @@
     background-position: center right 0.6rem;
     background-repeat: no-repeat;
     .ts-control {
-      border: 0;
+      border: 1;
       display: flex;
       outline: none;
       min-height: 36px;

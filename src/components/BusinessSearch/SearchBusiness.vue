@@ -1,35 +1,52 @@
 <script setup lang="ts">
-import _ from "lodash";
+import _, { get } from "lodash";
 import Button from "../../base-components/Button";
 import { FormSwitch, FormInput, FormSelect, InputGroup, FormLabel, FormTextarea} from "../../base-components/Form";
+import { Menu, Tab, Dialog } from "../../base-components/Headless";
 import Lucide from "../../base-components/Lucide";
 import { useBusiness } from "../../types/business.d";
 import { useRouter } from "vue-router";
 import { onMounted, ref, reactive, watch, provide, toRefs} from "vue";
 import BusinessDataService from "../../services/BuisinessDataService";
 import { tabulatorFunc } from "../../types/tabulator.d";
+import BusinessInfoOnly from "../Business/BusinessInfoOnly.vue";
+import ResponseData from "../../types/response";
 
 const router = useRouter();
 const {columnData, formBusiness} = useBusiness();
 const tableClient = ref<HTMLDivElement>();
 const {initTabulatorSearchClientName, reInitOnResizeWindow, tabulator, loadingIcon} = tabulatorFunc();
 
-interface Business {
+interface BusinessSearch {
     businessName?: any;
 }
-const props = defineProps<Business>();
-
+const props = defineProps<BusinessSearch>();
+const businessId = ref()
+const clientId = ref ()
 const dataTable = (businessName: any) =>{
   initTabulatorSearchClientName(columnData.value, BusinessDataService, tableClient, businessName);
   reInitOnResizeWindow();
   tabulator.value?.on("rowClick",(e, cell)=>{
-    const id = cell.getData().clientId
-    router.push({path:`/client/${id}`, params:{id}})
+    // const id = cell.getData().clientId
+    // router.push({path:`/client/${id}`, params:{id}})
+    businessId.value = cell.getData().id
+    addModal.value = true
+    getClientId(businessId.value)
   })
 };
+const addModal = ref(false)
 const onSubmit = () => {
     dataTable(formBusiness.businessName);
 }
+const setAddModal = (value: boolean) => {
+      addModal.value = value;
+};
+const getClientId = (businessId:any) => {
+    BusinessDataService.getId(businessId).then((resp:ResponseData)=>{
+        clientId.value = resp.data.clientId
+    })
+}
+const sendButtonRef = ref(null);
 onMounted(() => {
     dataTable(props.businessName);
 })
@@ -61,4 +78,34 @@ onMounted(() => {
           </div>
         </div>
     </div>
+    <Dialog size="2xl" :open="addModal" @close="
+                      () => {
+                        setAddModal(false);
+                      }
+                    " :initialFocus="sendButtonRef"
+                    :draggable="true">
+        <Dialog.Panel class="z-40 top-0 left-0 w-full h-full outline-none overflow-x-hidden overflow-y-auto">
+            <Dialog.Title>
+                <h2 class="mr-auto text-base font-medium">
+                    Business Profile 
+                </h2>
+                <Button type="submit" variant="primary" elevated class="w-auto bg-primary" @click="()=>{
+                    router.push({path:`/client/${clientId}`})
+                }">
+                    <Lucide icon="Search" class="w-4 h-4 mr-2" />View Client Info
+                </Button>
+                <button type="button" variant="outline-secondary" @click="
+                          () => {
+                            setAddModal(false);
+                          }
+                        " class="w-auto mr-1">
+                        <Lucide icon="XSquare" class=" w-10 h-10 mr-2" />
+                </button>
+            </Dialog.Title>
+            <Dialog.Description class="text-xs">
+                <BusinessInfoOnly :business="businessId"/>
+            </Dialog.Description>
+        </Dialog.Panel>
+    </Dialog>
+    
 </template>

@@ -9,7 +9,7 @@ import TomSelect from "../../base-components/TomSelect";
 import ClientDataService from '../../services/ClientDataService';
 import LocationDataService from "../../services/LocationDataService";
 import OrganizationDataService from "../../services/Organization";
-import ResponseData from "../../types/response";
+import ResponseData from "../../types/response.d";
 import { TransitionRoot } from "@headlessui/vue";
 import { useClient } from "../../types/client.d";
 import { tabulatorFunc } from "../../types/tabulator.d";
@@ -24,129 +24,59 @@ import Client from "../../components/Client/Client.vue";
 import SearchBusiness from "../../components/BusinessSearch/SearchBusiness.vue"
 import axios from "axios"
 import LocationDetails from "../../components/Location/LocationDetails.vue";
-import mapboxgl from "mapbox-gl";
-const searchQuery = ref("");
-const suggestions = ref([]);
-const mapContainer = ref();
-let map:any, marker:any;
 
-mapboxgl.accessToken = "pk.eyJ1IjoiYmpjcm9jazEwIiwiYSI6ImNtNXhrNTdibDBhYnQyam9ueWJmaDJ3ajYifQ.9LV1zKsB1AWBtrDaQdxCEA";
 
-const fetchAddressSuggestions = async () => {
-  if (searchQuery.value.length < 3) {
-    suggestions.value = [];
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+
+let map;
+
+const initMap = () => {
+  if (!formClient.latitude || !formClient.longitude) {
+    alert("Please provide both latitude and longitude.");
     return;
   }
-  try {
-    const response = await axios.get(
-      `https://api.mapbox.com/geocoding/v5/mapbox.places/${searchQuery.value}.json`,
-      {
-        params: {
-          access_token: mapboxgl.accessToken,
-          country: "PH",
-          types: "address,place,locality,neighborhood,region,poi",
-          limit: 5,
-        },
-      }
-    );
-    suggestions.value = response.data.features;
-  } catch (error) {
-    console.error("Error fetching suggestions:", error);
-  }
+
+  // Initialize Leaflet Map
+  map = L.map("map").setView([parseFloat(formClient.latitude), parseFloat(formClient.longitude)], 15);
+
+  // Use OpenStreetMap (OSM) tiles
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "© OpenStreetMap contributors",
+    maxZoom: 18,
+  }).addTo(map);
+
+  // Add Marker
+  L.marker([parseFloat(formClient.latitude), parseFloat(formClient.longitude)]).addTo(map)
+    .bindPopup("Your Location")
+    .openPopup();
+
+  // Call Reverse Geocoding Function
+  getBarangayName();
 };
 
-const selectAddress = (suggestion:any) => {
-  const [longitude, latitude] = suggestion.center;
-  const context = suggestion.context || [];
-  updateMap(latitude, longitude);
-  const province = getValue(context, "region") || getValue(context, "place");
-  const city = getValue(context, "place") || getValue(context, "locality") || getValue(context, "neighborhood");
-  const district = getValue(context, "neighborhood") || "N/A";
-  const barangay = getValue(context, "locality") || context.value;
-  searchQuery.value = suggestion.place_name;
-  suggestions.value = [];
-  formClient.province = province
-  formClient.lgu = city
-  formClient.barangay = barangay
-  formClient.longitude = longitude
-  formClient.latitude = latitude
-  selectedFromAddressDropdown.value = true
-  formClient.city = searchQuery.value
-};
+const getBarangayName = async () => {
+  const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${formClient.latitude}&lon=${formClient.longitude}&zoom=16&addressdetails=1`;
 
-const reverseGeocode = async (lat:any, lng:any) => {
   try {
-    const response = await axios.get(
-      `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json`,
-      {
-        params: {
-          access_token: mapboxgl.accessToken,
-          types: "",
-        },
-      }
-    );
-    if (response.data.features.length > 0) {
-      const result = response.data.features[0];
-      searchQuery.value = response.data.features[0].place_name;
-      updateMap(lat, lng);
-      const context = result.context || [];
-      const province = getValue(context, "region") || getValue(context, "place");
-      const city = getValue(context, "place") || getValue(context, "locality") || getValue(context, "neighborhood");
-      const district = getValue(context, "neighborhood") || "N/A";
-      const barangay = getValue(context, "locality") || context.value;
-      formClient.province = province
-      formClient.lgu = city
-      formClient.barangay = barangay
-      formClient.longitude = lng
-      formClient.latitude = lat
-      selectedFromAddressDropdown.value = true
-      formClient.city = searchQuery.value
-      //province.value = getProvince(context)
-      //alert(province)
-      //console.log(context)
+    const response = await axios.get(url, {
+      headers: { "User-Agent": "YourAppName" }, // Nominatim requires a User-Agent
+    });
+
+    if (response.data.address) {
+      // Try to get the barangay (suburb or village)
+      formClient.barangay =
+        response.data.address.suburb || response.data.address.village || "Barangay not found";
+    } else {
+      formClient.barangay = "No location data found";
     }
   } catch (error) {
-    console.error("Error with reverse geocoding:", error);
+    console.error("Error fetching data from Nominatim API:", error);
+    formClient.barangay = "Failed to fetch barangay data";
   }
 };
 
-const updateMap = (lat:any, lng:any) => {
-  if (!map) {
-    console.error("Map is not initialized yet.");
-    return;
-  }
-  if (marker) marker.remove();
-  marker = new mapboxgl.Marker().setLngLat([lng, lat]).addTo(map);
-  map.flyTo({ center: [lng, lat], zoom: 14 });
-};
 
-const getValue = (context:any, type:any) => {
-  const item = context.find((c:any) => c.id.startsWith(type));
-  return item ? item.text : "N/A";
-};
-
-
-const initializeMap = async () => {
-  await nextTick(); // Wait for the modal to be fully rendered
-
-  if (!mapContainer.value) {
-    console.error("Map container is not available.");
-    return;
-  }
-
-  map = new mapboxgl.Map({
-    container: mapContainer.value,
-    style: "mapbox://styles/mapbox/streets-v11",
-    center: [120.9842, 14.5995],
-    zoom: 12,
-  });
-
-  map.on("click", async (e:any) => {
-    const { lng, lat } = e.lngLat;
-    await reverseGeocode(lat, lng);
-  });
-};
-//------------------------------------------------------------------------------------------------------------------------
 
 const router = useRouter();
 const {formClient, errorMessage, isError, columnData, addModal, rounded,  brgyDropdown,
@@ -163,6 +93,39 @@ onPrint, onResetFilter, tabulator, loadingIcon} = tabulatorFunc();
 const tableClient = ref<HTMLDivElement>();
 const successNotification = ref();
 
+// const getBarangyName  = async () => {
+//       if (!formClient.latitude || !formClient.longitude) {
+//         alert("Please provide both latitude and longitude.");
+//         return;
+//       }
+
+//       const apiKey = "AIzaSyDF8Z1ViYmr_nCgQv11Sqya8ybRaA7otpg"; // Replace with your API key
+//       const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${formClient.latitude},${formClient.longitude}&key=${apiKey}`;
+
+//       try {
+//         const response = await axios.get(url);
+
+//         if (response.data.status === "OK") {
+//           const results = response.data.results;
+
+//           // Find the address component containing the barangay
+//           const barangayComponent = results
+//             .flatMap((result:any) => result.address_components)
+//             .find((component:any) =>
+//               component.types.includes("administrative_area_level_3")
+//             );
+
+//           formClient.barangay = barangayComponent
+//             ? barangayComponent.long_name
+//             : "Barangay not found";
+//         } else {
+//           formClient.barangay = `Error: ${response.data.status}`;
+//         }
+//       } catch (error) {
+//         console.error("Error fetching data from Google Maps API:", error);
+//         formClient.barangay = "Failed to fetch barangay data";
+//       }
+// }
 provide("bind[successNotification]", (el: any) => {
   // Binding
   successNotification.value = el;
@@ -302,21 +265,10 @@ const handleLocationSelected = (locationDetails: LocationDetails) => {
   }
 };
 // End Search address
-
-// Watch for modal open and initialize map
-watch(addModal, (newVal) => {
-  if (newVal) {
-    initializeMap();
-  }
-});
 onMounted(async () => {
   nextTick(() => {
     initTabulator(columnData.value, ClientDataService, tableClient);
     reInitOnResizeWindow();
-    if (!mapContainer.value) {
-      console.error("Map container is not available.");
-      return;
-    }
     ClientDataService.getAll().then((resp: ResponseData)=>{
       currentClientId.value = sessionStorage.getItem('office') + resp.data.length.toString()
     })
@@ -324,23 +276,12 @@ onMounted(async () => {
       const id = cell.getData().id
       router.push({path:`/client/${id}`, params:{id}})
     })
-    map = new mapboxgl.Map({
-      container: mapContainer.value,
-      style: "mapbox://styles/mapbox/streets-v11",
-      center: [120.9842, 14.5995],
-      zoom: 12,
-    });
-
-    map.on("click", async (e:any) => {
-      const { lng, lat } = e.lngLat;
-      await reverseGeocode(lat, lng);
-    });
   })
   if(sessionStorage.getItem('userId') === null){
       router.push({ path:'/login'})
       sessionStorage.clear()
     }
-   
+  initMap();
 });
 </script>
 <template>
@@ -582,19 +523,7 @@ onMounted(async () => {
                           <div class="col-span-12 sm:col-span-12">
                             <div class="col-span-12 sm:col-span-12">
                               <FormLabel  htmlFor="modal-form-1"> BARANGAY / CITY or Municipality / PROVINCE / REGION</FormLabel>
-                              <!-- <LocationDetails @location-selected="handleLocationSelected" /> -->
-                              <input
-                                  v-model="searchQuery"
-                                  @input="fetchAddressSuggestions"
-                                  placeholder="Search for an address"
-                                  class="input"
-                                />
-                                <ul v-if="suggestions.length" class="suggestions">
-                                  <li v-for="(suggestion, index) in suggestions" :key="index" @click="selectAddress(suggestion)">
-                                    {{ suggestion['place_name'] }}
-                                  </li>
-                                </ul>
-                                <div ref="mapContainer" class="map-container"></div>
+                              <LocationDetails @location-selected="handleLocationSelected" />
                             </div>
                           </div>
                           <!-- END: Search -->
@@ -740,59 +669,4 @@ onMounted(async () => {
   .suggestions-list li:hover {
     background-color: #f0f0f0;
   }
-  .input {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    margin-bottom: 5px;
-  }
-  .suggestions {
-    list-style-type: none;
-    padding: 0;
-    border: 1px solid #ccc;
-    background: white;
-    position: absolute;
-    width: 100%;
-    max-height: 150px;
-    overflow-y: auto;
-    z-index: 100;
-  }
-  .suggestions li {
-    padding: 8px;
-    cursor: pointer;
-  }
-  .suggestions li:hover {
-    background-color: #f0f0f0;
-  }
-  .map-container {
-    height: 400px;
-    width: 100%;
-    margin-top: 10px;
-  }
-  .modal {
-  display: flex;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  align-items: center;
-  justify-content: center;
-}
-
-.modal-content {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  width: 80%;
-  height: 500px;
-}
-
-.map-container {
-  height: 400px;
-  width: 100%;
-}
-
 </style>
