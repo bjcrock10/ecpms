@@ -17,7 +17,8 @@ const apiClient: AxiosInstance = axios.create({
     },
     //baseURL: 'http://localhost:8000/', // Update with your base URL
     //baseURL:'https://ecpmsv3api.dti7.site/',
-    baseURL:'http://13.217.53.199:8000/',
+    // baseURL: 'http://52.90.160.169:8000/',
+    baseURL: 'https://cpmsapi.ecpms-caraga.org/',
     timeout: 100000,
     withCredentials: true, // Include cookies in requests
 });

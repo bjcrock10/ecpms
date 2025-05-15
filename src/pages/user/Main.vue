@@ -46,7 +46,7 @@ const onSubmit = async () => {
       successNotification.value.showToast();
       addModal.value = false
       messageDetail.value = "You successfully created an account for "+response.data.email
-      // initTabulator(columnData.value, UserDataService);
+      initTabulator(columnData.value, UserDataService, tableRef);
     }).catch((e : Error)=>{
       console.log(e);
     })
@@ -57,7 +57,7 @@ const onSubmit = async () => {
       successNotification.value.showToast();
       addModal.value = false
       messageDetail.value = "You successfully updated the information for "+response.data.email
-      // initTabulator(columnData.value, UserDataService);
+      initTabulator(columnData.value, UserDataService, tableRef);
     }).catch((e: Error)=>{
       console.log(e);
     })
@@ -78,6 +78,7 @@ const deleteUser = (id: any) => {
     successNotification.value.showToast();
       addModal.value = false
       messageDetail.value = "You successfully deleted an account for "+resp.data.email
+      initTabulator(columnData.value, UserDataService, tableRef);
   })
 }
 
@@ -179,13 +180,14 @@ onMounted(async () => {
                   </div>
                   <div class="col-span-12 sm:col-span-4">
                     <FormLabel  htmlFor="modal-form-1"> Office </FormLabel>
-                    <FormSelect form-select-size="sm" v-model="formUsers.office" required>
+                    <FormInput form-input-size="sm" :rounded="rounded" v-model="formUsers.office" type="text" placeholder="" required/>
+                    <!-- <FormSelect form-select-size="sm" v-model="formUsers.office" required>
                       <option value="BPO">BPO</option>
                       <option value="CPO">CPO</option>
                       <option value="NOPO">NOPO</option>
                       <option value="SPO">SPO</option>
                       <option value="RO">RO</option>
-                    </FormSelect>
+                    </FormSelect> -->
                   </div>
                   <div class="col-span-12 sm:col-span-4">
                     <FormLabel  htmlFor="modal-form-1"> Division </FormLabel>
