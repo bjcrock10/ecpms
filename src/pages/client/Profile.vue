@@ -318,7 +318,7 @@ watch(addModal, (newVal) => {
 });
 const long = ref()
 const lat = ref()
-const selectClassification = ref();
+const selectClassification = ref([formClient.classification]);
 const classificationList = ref([]);
 const loadClassification = async (idType:any)=>{
   CodeBook.getType(idType).then((resp:ResponseData)=>{
