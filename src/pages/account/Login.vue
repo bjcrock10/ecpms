@@ -103,8 +103,8 @@ const onSubmit = async () => {
             <div
               class="mt-10 text-4xl font-medium leading-tight text-white -intro-x"
             >
-              E-Client Profiling & Monitoring <br />
-              System (ECPMS version 2)
+              electronic-Client Assistance<br />
+              Registry (e-CARE)
             </div>
           </div>
         </div>
@@ -126,7 +126,7 @@ const onSubmit = async () => {
                   class="w-10 -mt-16 -intro-y"
                   :src="illustrationUrl"
                 />
-              ECPM <br />
+              e-CARE <br />
               System
             </div>
           <form class="validate-form" @submit.prevent="onSubmit">

@@ -309,7 +309,17 @@ watch(addModal, (newVal) => {
     initializeMap();
   }
 });
+const classificationList = ref([]);
+const loadClassification = async (idType:any)=>{
+  CodeBook.getType(idType).then((resp:ResponseData)=>{
+    classificationList.value = resp.data
+  })
+}
 onMounted(async () => {
+  if(sessionStorage.getItem('userId') === null){
+      router.push({ path:'/login'})
+      sessionStorage.clear()
+  }
   nextTick(() => {
     initTabulator(columnData.value, ClientDataService, tableClient);
     reInitOnResizeWindow();
@@ -335,11 +345,9 @@ onMounted(async () => {
       const { lng, lat } = e.lngLat;
       await reverseGeocode(lat, lng);
     });
+    loadClassification(2);
   })
-  if(sessionStorage.getItem('userId') === null){
-      router.push({ path:'/login'})
-      sessionStorage.clear()
-    }
+  
    
 });
 </script>
@@ -506,8 +514,8 @@ onMounted(async () => {
                         <div class="col-span-12 sm:col-span-2">
                           <FormLabel  htmlFor="modal-form-1"> Age<span class="requiredTag"> *</span> </FormLabel>
                           <FormSelect  v-model="formClient.age"  placeholder="Required Fields *" required>
-                            <option value="18 - 35 years old">18 - 35 years old</option>
-                            <option value="above 35 – below 60 years old">above 35 – below 60 years old</option>
+                            <option value="18 - 35 years old">18 - 30 years old</option>
+                            <option value="above 35 – below 60 years old">above 30 – below 60 years old</option>
                             <option value="60 years old and  above">60 years old and  above</option>
                           </FormSelect>
                         </div>
@@ -517,7 +525,7 @@ onMounted(async () => {
                         </div>
                         <div class="col-span-12 md:col-span-2">
                           <FormLabel htmlFor="modal-form-3"> Classification / Occupation<span class="requiredTag"> *</span> </FormLabel>
-                          <FormSelect v-model="formClient.classification" placeholder="Required Fields *" required>
+                          <!-- <FormSelect v-model="formClient.classification" placeholder="Required Fields *" required>
                               <option value="Housewife">Housewife</option>
                               <option value="Self-Employed">Self-Employed</option>
                               <option value="Government Employee">Government Employee</option>
@@ -528,7 +536,21 @@ onMounted(async () => {
                               <option value="Drug Surrenderee">Drug Surrenderee</option>
                               <option value="Ex-Convict">Ex-Convict</option>
                               <option value="Other">Other</option>
-                          </FormSelect>
+                          </FormSelect> -->
+                          <TomSelect
+                                  v-model="formClient.classification"
+                                  :options="{
+                                    placeholder: 'Select item below. If not exist please specify...',
+                                    persist: false,
+                                    createOnBlur: true,
+                                    create: true,
+                                  }"
+                                  class="w-full"
+                                >
+                                <option value="">N/A</option>
+                                <option v-for="item in classificationList" :value="item['textdata']" :key="item['id']">{{item['textdata']}}</option>
+                                <option :value="formClient.classification">{{formClient.classification}}</option>
+                            </TomSelect>
                         </div>
                         <div class="col-span-12 sm:col-span-4">
                           <FormLabel  htmlFor="modal-form-1"> Are you a member of a organization? </FormLabel>
