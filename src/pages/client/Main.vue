@@ -319,6 +319,8 @@ onMounted(async () => {
   if(sessionStorage.getItem('userId') === null){
       router.push({ path:'/login'})
       sessionStorage.clear()
+  }else{
+    loadClassification(2);
   }
   nextTick(() => {
     initTabulator(columnData.value, ClientDataService, tableClient);
@@ -345,9 +347,8 @@ onMounted(async () => {
       const { lng, lat } = e.lngLat;
       await reverseGeocode(lat, lng);
     });
-    loadClassification(2);
+    
   })
-  
    
 });
 </script>
@@ -540,12 +541,9 @@ onMounted(async () => {
                           <TomSelect
                                   v-model="formClient.classification"
                                   :options="{
-                                    placeholder: 'Select item below. If not exist please specify...',
-                                    persist: false,
-                                    createOnBlur: true,
-                                    create: true,
+                                    placeholder: 'Select item below. If not exist please specify...'
                                   }"
-                                  class="w-full"
+                                  class="w-full" multiple
                                 >
                                 <option value="">N/A</option>
                                 <option v-for="item in classificationList" :value="item['textdata']" :key="item['id']">{{item['textdata']}}</option>

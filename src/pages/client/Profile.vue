@@ -278,6 +278,7 @@ const onSubmit = () =>{
     );
     formOrganization.title = selectOrganization.value.toString()
     formClient.gender = (formClient.prefix==='MR.')?"MALE":"FEMALE"
+    formClient.classification = selectClassification.value.toString()
     updateClientInfo(clientID.value,formClient).then();
     message.value = "SUCCESSFULLY SAVE!!!"
     successNotification.value.showToast();
@@ -317,6 +318,13 @@ watch(addModal, (newVal) => {
 });
 const long = ref()
 const lat = ref()
+const selectClassification = ref();
+const classificationList = ref([]);
+const loadClassification = async (idType:any)=>{
+  CodeBook.getType(idType).then((resp:ResponseData)=>{
+    classificationList.value = resp.data
+  })
+}
 onMounted(async () => {
   //alert(longitude.value)
   nextTick(async() => {
@@ -343,6 +351,7 @@ onMounted(async () => {
             formClient.investor = response.data[0].investor
             formClient.typeOfInvestment = response.data[0].typeOfInvestment.toUpperCase()
             formClient.classification = response.data[0].classification
+            selectClassification.value = [response.data[0].classification]
             formClient.telNo = response.data[0].telNo.toUpperCase()
             formClient.personNotify = response.data[0].personNotify.toUpperCase()
             formClient.socialClassification = response.data[0].socialClassification
@@ -403,6 +412,9 @@ onMounted(async () => {
       router.push({ path:'/login'})
       sessionStorage.clear()
     }
+  else{
+    loadClassification(2);
+  }
   
 });
 
@@ -593,7 +605,7 @@ onMounted(async () => {
                                 </div>
                                 <div class="col-span-12 md:col-span-2">
                                   <FormLabel htmlFor="modal-form-3"> Classification / Occupation<span class="requiredTag"> *</span> </FormLabel>
-                                  <FormSelect  v-model="formClient.classification" placeholder="Required Fields *" required>
+                                  <!-- <FormSelect  v-model="formClient.classification" placeholder="Required Fields *" required>
                                     <option value="Housewife">Housewife</option>
                                     <option value="Self-Employed">Self-Employed</option>
                                     <option value="Government Employee">Government Employee</option>
@@ -604,7 +616,17 @@ onMounted(async () => {
                                     <option value="Drug Surrenderee">Drug Surrenderee</option>
                                     <option value="Ex-Convict">Ex-Convict</option>
                                     <option value="Other">Other</option>>
-                                  </FormSelect>
+                                  </FormSelect> -->
+                                  <TomSelect
+                                        v-model="selectClassification"
+                                        :options="{
+                                          placeholder: 'Select item below. If not exist please specify...'
+                                        }"
+                                        class="w-full" multiple
+                                      >
+                                      <option :value="formClient.classification">{{formClient.classification}}</option>
+                                      <option v-for="item in classificationList" :value="item['textdata']" :key="item['id']">{{item['textdata']}}</option>
+                                  </TomSelect>
                                 </div>
                                 <div class="col-span-12 md:col-span-4">
                                   <FormLabel  htmlFor="modal-form-1"> Are you a member of a organization/cooperative? </FormLabel>
