@@ -35,7 +35,7 @@ import axios from "axios"
 import mapboxgl from "mapbox-gl";
 const searchQuery = ref("");
 const suggestions = ref([]);
-const mapContainer = ref<HTMLElement | null | string>(null);
+const mapContainer = ref<any>(null);
 let map:any, marker:any;
 
 mapboxgl.accessToken = "pk.eyJ1IjoiZHRpY2FyYWdhIiwiYSI6ImNtOXM5ODNwNDAwZGQycW9hY2o0NWliencifQ.cVXvJ3YMPK31uLO4B1FXjg";
@@ -66,6 +66,7 @@ const fetchAddressSuggestions = async () => {
 const selectAddress = (suggestion:any) => {
   const [longitude, latitude] = suggestion.center;
   const context = suggestion.context || [];
+  initializeMap()
   updateMap(latitude, longitude);
   const province = getValue(context, "region") || getValue(context, "place");
   const city = getValue(context, "place") || getValue(context, "locality") || getValue(context, "neighborhood");
@@ -248,6 +249,7 @@ const dataTable = () =>{
   tabulator.value?.on("rowClick",(e, cell)=>{
     formBusiness.id = cell.getData().id;
     loadBusiness();
+    selectAddress(['place_name',formBusiness.businessAddress])
     addModal.value = true;
   })
 };
@@ -349,11 +351,11 @@ watch(
 )
 
 // Watch for modal open and initialize map
-watch(addModal, (newVal) => {
-  if (newVal) {
-    initializeMap();
-  }
-});
+// watch(addModal, (newVal) => {
+//   if (newVal) {
+//     initializeMap();
+//   }
+// });
 const socialMedList = ref([])
 const ecommerceList = ref([])
 const businessOwnerList = ref([])
@@ -367,6 +369,7 @@ const loadBusiness = () => {
   // loadBusinessOwner(formBusiness.id)
   // loadMarketPlan(formBusiness.id)
   // loadMarketTraining(formBusiness.id)
+
 }
 const loadSocial = async (id:any) =>{
   BusinessDataService.getSocialByBusiness(id).then((response: ResponseData)=>{
@@ -597,20 +600,6 @@ onMounted(async () => {
     addModal.value = true
     formBusiness.id = props.business || "0"
     loadBusiness();
-    nextTick(() => {
-      initializeMap();
-      map = new mapboxgl.Map({
-        container: (mapContainer.value===null)?'':mapContainer.value,
-        style: "mapbox://styles/mapbox/streets-v11",
-        center: [120.9842, 14.5995],
-        zoom: 12,
-      });
-
-      map.on("click", async (e:any) => {
-        const { lng, lat } = e.lngLat;
-        await reverseGeocode(lat, lng);
-      });
-    })
   }else{
     addModal.value = false
   }
@@ -624,7 +613,17 @@ onMounted(async () => {
   formBusiness.noOfFemaleEmployee = "0"
   formBusiness.noOfMaleEmployee = "0"
   formBusiness.priorityIndustry = "OTHERS"
-});
+  // const latitude = ref()
+  // const longitude = ref()
+  // nextTick(() => {
+  //   alert(formBusiness.businessLatitude)
+  //     if (!mapContainer.value) {
+  //       console.error("Map container not found!");
+  //       return;
+  //     }
+  // })
+})
+
 const capitalized = (item: any) =>{
   const capitalizedFirst = item[0].toUpperCase();
   const rest = item.slice(1);
@@ -678,7 +677,7 @@ const selectOwner = (item:any)=>{
   loadBusinessOwner(item.id);
 }
 const setAddModal = (value: boolean) => {
-    initializeMap();
+    //initializeMap();
     addModal.value = value;
 };
 const sendButtonRef = ref(null);
@@ -708,6 +707,8 @@ const sendButtonRef = ref(null);
                     event.preventDefault();
                     setAddModal(true);
                     resetForm();
+                    initializeMap();
+                    updateMap(120.9842, 14.5995)
                   }">
                   Add New Business Name
                 </Button>
